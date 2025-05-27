@@ -1,0 +1,3 @@
+# Slash
+
+Python dashboard framework.
