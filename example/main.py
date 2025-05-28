@@ -1,10 +1,17 @@
 from slash.app import App
-from slash.elem.elem import Elem
+import slash.elem as e
 
 
 def main():
+    home = e.Div(
+        [
+            e.Span("Hello"),
+            e.Span("world!"),
+        ]
+    )
+
     app = App()
-    app.add_page("/", Elem("Hello worlD!"))
+    app.add_page("/", home)
     app.run()
 
 
