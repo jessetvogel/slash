@@ -16,6 +16,7 @@ class Client {
         };
         this.socket.onmessage = function (event) {
             try {
+                console.info(`%c${event.data}`, 'color: gray;');
                 const message = JSON.parse(event.data);
                 client.handle(message);
             }
@@ -33,10 +34,14 @@ class Client {
     handle(message) {
         const event = message.event;
         if (event == "create") {
-            const id = message.id;
-            const tag = message.tag;
-            const elem = create(tag, { id: id });
             const parent = $(message.parent);
+            const tag = message.tag;
+            if (tag == "text") {
+                parent.append(message.text);
+                return;
+            }
+            const id = message.id;
+            const elem = create(tag, { id: id });
             parent.append(elem);
             this.update(elem, message);
             return;
@@ -89,6 +94,7 @@ class Client {
                 event: "click",
                 id: elem.id
             });
+            event.stopPropagation();
         }
     }
     send(message) {

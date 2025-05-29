@@ -2,19 +2,33 @@ import logging
 
 
 class Formatter(logging.Formatter):
-    grey = "\x1b[38;20m"
-    yellow = "\x1b[33;20m"
-    red = "\x1b[31;20m"
-    bold_red = "\x1b[31;1m"
-    reset = "\x1b[0m"
-    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    GRAY = "\x1b[90m"
+    RED = "\x1b[31m"
+    GREEN = "\x1b[32m"
+    YELLOW = "\x1b[33m"
+    BLUE = "\x1b[34m"
+    WHITE = "\x1b[37m"
+    BOLD = "\x1b[1m"
+    RESET = "\x1b[0m"
+    format_str = (
+        "["
+        + BLUE
+        + "%(name)s"
+        + RESET
+        + "]["
+        + GRAY
+        + "%(levelname)s"
+        + RESET
+        + "] "
+        + "%(message)s"
+    )
 
     FORMATS = {
-        logging.DEBUG: grey + format + reset,
-        logging.INFO: grey + format + reset,
-        logging.WARNING: yellow + format + reset,
-        logging.ERROR: red + format + reset,
-        logging.CRITICAL: bold_red + format + reset,
+        logging.DEBUG: format_str,
+        logging.INFO: format_str,
+        logging.WARNING: format_str,
+        logging.ERROR: format_str,
+        logging.CRITICAL: format_str,
     }
 
     def format(self, record):
@@ -24,7 +38,7 @@ class Formatter(logging.Formatter):
 
 
 def create_logger() -> logging.Logger:
-    logger = logging.getLogger("slash-server")
+    logger = logging.getLogger("slash")
     logger.setLevel(logging.DEBUG)
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)

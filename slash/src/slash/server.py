@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Callable
 import urllib.parse
 
+from slash.message import Message
 import slash.logging
 
 from aiohttp import WSMsgType, web
@@ -27,7 +28,7 @@ class Server:
         self._logger = slash.logging.create_logger()
         self._ws_clients: set[web.WebSocketResponse] = set()
         self._ws_connect_callback: Callable[[], list[str]] | None = None
-        self._ws_message_callback: Callable[[], list[str]] | None = None
+        self._ws_message_callback: Callable[[str], list[str]] | None = None
 
     def on_ws_connect(self, callback: Callable[[], list[str]]) -> None:
         self._ws_connect_callback = callback
@@ -74,14 +75,18 @@ class Server:
         self._logger.debug("WebSocket connect")
         self._ws_clients.add(ws)
 
-        # Call `ws_connect_callback`
-        await self._call_ws_callback(ws, self._ws_connect_callback)
+        # Call `_ws_connect_callback`
+        if self._ws_connect_callback is not None:
+            for data in self._ws_connect_callback():
+                await ws.send_str(data)
 
         # Call `ws_connect_message` for every message
         async for msg in ws:
             self._logger.debug(f"WebSocket message: {msg.data}")
             if msg.type == WSMsgType.TEXT:
-                await self._call_ws_callback(ws, self._ws_message_callback, msg.data)
+                if self._ws_message_callback is not None:
+                    for data in self._ws_message_callback(msg.data):
+                        await ws.send_str(data)
             elif msg.type == WSMsgType.ERROR:
                 self._logger.warning(f"WebSocket error: {ws.exception()}")
 
@@ -89,13 +94,6 @@ class Server:
         self._ws_clients.remove(ws)
 
         return ws
-
-    async def _call_ws_callback(
-        self, ws: web.WebSocketResponse, callback: Callable, *args: str
-    ) -> None:
-        if callback is not None:
-            for message in callback(*args):
-                await ws.send_str(message)
 
     def ws_broadcast(self, data: str) -> None:
         asyncio.run(self.ws_broadcast_async(data))
