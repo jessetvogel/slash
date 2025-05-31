@@ -50,17 +50,5 @@ class Message:
         return Message(event="execute", name=name, args=args)
 
     @staticmethod
-    def info(info: str) -> Message:
-        return Message(event="info", info=info)
-
-    @staticmethod
-    def debug(debug: str) -> Message:
-        return Message(event="debug", debug=debug)
-
-    @staticmethod
-    def warning(warning: str) -> Message:
-        return Message(event="warning", warning=warning)
-
-    @staticmethod
-    def error(error: str) -> Message:
-        return Message(event="error", error=error)
+    def log(type: str, message: str) -> Message:
+        return Message(event="log", type=type, message=message)

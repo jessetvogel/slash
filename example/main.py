@@ -29,16 +29,16 @@ def home() -> e.Elem:
         reversed_text.text = f"Reversed text: {''.join(reversed(event.value))}"
 
     def trigger_info(event: e.ClickEvent):
-        event.target.page.broadcast(Message.info("Example info message"))
+        event.target.page.broadcast(Message.log("info", "Example info message"))
 
     def trigger_debug(event: e.ClickEvent):
-        event.target.page.broadcast(Message.debug("Example debug message"))
+        event.target.page.broadcast(Message.log("debug", "Example debug message"))
 
     def trigger_warning(event: e.ClickEvent):
-        event.target.page.broadcast(Message.warning("Example warning message"))
+        event.target.page.broadcast(Message.log("warning", "Example warning message"))
 
     def trigger_error(event: e.ClickEvent):
-        event.target.page.broadcast(Message.error("Example error message"))
+        event.target.page.broadcast(Message.log("error", "Example error message"))
 
     def onchange_textarea(event: e.ChangeEvent):
         state["textarea"] = event.value

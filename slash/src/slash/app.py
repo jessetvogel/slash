@@ -41,7 +41,9 @@ class App:
             id = message.data["id"]
             elem = page.find(id)
             if not isinstance(elem, SupportsOnClick):
-                page.broadcast(Message.error(f"Element '{id}' does not support click"))
+                page.broadcast(
+                    Message.log("error", f"Element '{id}' does not support click")
+                )
             else:
                 elem.click(ClickEvent(elem))
 
@@ -50,7 +52,9 @@ class App:
             id = message.data["id"]
             elem = page.find(id)
             if not isinstance(elem, SupportsOnInput):
-                page.broadcast(Message.error(f"Element '{id}' does not support input"))
+                page.broadcast(
+                    Message.log("error", f"Element '{id}' does not support input")
+                )
             else:
                 elem.input(InputEvent(elem, message.data["value"]))
 
@@ -59,7 +63,9 @@ class App:
             id = message.data["id"]
             elem = page.find(id)
             if not isinstance(elem, SupportsOnChange):
-                page.broadcast(Message.error(f"Element '{id}' does not support change"))
+                page.broadcast(
+                    Message.log("error", f"Element '{id}' does not support change")
+                )
             else:
                 elem.change(ChangeEvent(elem, message.data["value"]))
 

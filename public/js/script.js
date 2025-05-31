@@ -77,28 +77,11 @@ class Client {
             this.functions[name](...args);
             return;
         }
-        if (event == "info") {
-            const info = message.info;
-            console.log(`INFO: %c${info}`, 'color:rgb(71, 255, 227);');
-            slash_message("info", info);
-            return;
-        }
-        if (event == "debug") {
-            const debug = message.debug;
-            console.log(`DEBUG: %c${debug}`, 'color:rgb(104, 167, 77);');
-            slash_message("debug", debug);
-            return;
-        }
-        if (event == "warning") {
-            const warning = message.warning;
-            console.log(`WARNING: %c${warning}`, 'color:rgb(255, 169, 71);');
-            slash_message("warning", warning);
-            return;
-        }
-        if (event == "error") {
-            const error = message.error;
-            console.log(`ERROR: %c${error}`, 'color: #FF474C;');
-            slash_message("error", error);
+        if (event == "log") {
+            const type = message.type;
+            const text = message.message;
+            console.log(`[${type}] %c${text}`, 'color:rgb(216, 198, 162);');
+            slash_message(type, text);
             return;
         }
         throw new Error(`Unknown event '${event}'`);
