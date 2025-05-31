@@ -56,24 +56,50 @@ def home() -> e.Elem:
             e.Div([label, counter, button, reset]),
             e.Div(
                 [
-                    e.Input(oninput=oninput_callback),
+                    e.Input(placeholder="Type something...", oninput=oninput_callback),
                     reversed_text,
                 ]
             ),
             e.Div(
                 [
-                    e.Button("ℹ️ Trigger info", onclick=trigger_info),
-                    e.Button("🧪 Trigger debug", onclick=trigger_debug),
-                    e.Button("⚠️ Trigger warning", onclick=trigger_warning),
-                    e.Button("🚨 Trigger error", onclick=trigger_error),
+                    e.Button("Trigger info", onclick=trigger_info),
+                    e.Button("Trigger debug", onclick=trigger_debug),
+                    e.Button("Trigger warning", onclick=trigger_warning),
+                    e.Button("Trigger error", onclick=trigger_error),
                 ]
             ),
             e.Div(
                 [
                     textarea := e.Textarea(
-                        "alert('Hello world!');", onchange=onchange_textarea
+                        placeholder="Write some JS here..", onchange=onchange_textarea
                     ),
                     e.Button("Execute as function", onclick=onclick_execute_function),
+                ]
+            ),
+            e.Div(
+                [
+                    e.Input("button"),
+                    e.Input("checkbox"),
+                    e.Input("color"),
+                    e.Input("date"),
+                    e.Input("datetime-local"),
+                    e.Input("email"),
+                    e.Input("file"),
+                    e.Input("hidden"),
+                    e.Input("image"),
+                    e.Input("month"),
+                    e.Input("number"),
+                    e.Input("password"),
+                    e.Input("radio"),
+                    e.Input("range"),
+                    e.Input("reset"),
+                    e.Input("search"),
+                    e.Input("submit"),
+                    e.Input("tel"),
+                    e.Input("text"),
+                    e.Input("time"),
+                    e.Input("url"),
+                    e.Input("week"),
                 ]
             ),
         ]

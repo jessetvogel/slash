@@ -6,14 +6,17 @@ body {
     --primary-color: #1a7d8e;
     --secondary-color: #e2a32d;
 
-    --main-bg-color: var(--white);
+    --main-bg-color: #f1efec;
     --main-text-color: var(--black);
 
-    --button-bg-color: var(--primary-color);
-    --button-text-color: var(--white);
+    --button-bg-color: var(--white);
+    --button-bg-color-hover: #eee;
+    --button-text-color: var(--black);
+    --button-border: 1px solid #bbb;
 
     --input-bg-color: var(--white);
     --input-text-color: var(--black);
+    --input-border: 1px solid #bbb;
 
     --error-text-color: #ba5912;
     --info-text-color: #1a7d8e;
@@ -37,29 +40,74 @@ body {
     color: var(--main-text-color);
 }
 
-button {
+button,
+input[type~="button"],
+input[type~="reset"],
+input[type~="submit"] {
     background-color: var(--button-bg-color);
     color: var(--button-text-color);
-    border: 0px;
+    border: var(--button-border);
     border-radius: 4px;
     font-size: 1rem;
-    padding: 4px 8px;
+    padding: 8px 16px;
     margin: 4px;
+    line-height: 22px;
     min-width: 64px;
+    box-shadow: var(--shadow);
     cursor: pointer;
+
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: var(--button-bg-color-hover);
+    }
 }
 
-input[type~="text"] {
+input[type~="color"] {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: var(--button-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    padding: 6px;
+    margin: 4px;
+    width: 40px;
+    height: 40px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: var(--button-bg-color-hover);
+    }
+}
+
+input[type~="text"],
+input[type~="password"],
+input[type~="date"],
+input[type~="datetime-local"],
+input[type~="email"],
+input[type~="month"],
+input[type~="number"],
+input[type~="search"],
+input[type~="tel"],
+input[type~="time"],
+input[type~="url"],
+input[type~="week"],
+textarea {
     background-color: var(--input-bg-color);
     color: var(--input-text-color);
-    border-radius: 2px;
-    padding: 4px;
+    border: var(--input-border);
+    border-radius: 4px;
+    padding: 8px;
+    margin: 4px;
+    line-height: 22px;
     outline: none;
-    border: none;
     font-size: 1rem;
-    outline: 1px solid rgb(116, 116, 116);
+    box-shadow: var(--shadow);
+}
 
-    &:focus {
-        outline: 1px solid rgb(45, 152, 229);
-    }
+input[type="range"] {
+    accent-color: var(--primary-color);
 }

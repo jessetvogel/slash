@@ -323,6 +323,7 @@ class Input(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         type: str = "text",
         *,
         style: dict[str, str] | None = None,
+        placeholder: str = "",
         onclick: ClickEventHandlder | None = None,
         oninput: InputEventHandler | None = None,
         onchange: ChangeEventHandler | None = None,
@@ -332,13 +333,18 @@ class Input(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         SupportsOnInput.__init__(self, oninput)
         SupportsOnChange.__init__(self, onchange)
         self._type = type
+        self._placeholder = placeholder
 
     @property
     def type(self) -> str:
         return self._type
 
+    @property
+    def placeholder(self) -> str:
+        return self._placeholder
+
     def attrs(self) -> dict[str, Any]:
-        return {"type": self.type}
+        return {"type": self.type, "placeholder": self.placeholder}
 
 
 class Textarea(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
@@ -347,6 +353,7 @@ class Textarea(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         text: str = "",
         *,
         style: dict[str, str] | None = None,
+        placeholder: str = "",
         onclick: ClickEventHandlder | None = None,
         oninput: InputEventHandler | None = None,
         onchange: ChangeEventHandler | None = None,
@@ -355,3 +362,11 @@ class Textarea(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         SupportsOnClick.__init__(self, onclick)
         SupportsOnInput.__init__(self, oninput)
         SupportsOnChange.__init__(self, onchange)
+        self._placeholder = placeholder
+
+    @property
+    def placeholder(self) -> str:
+        return self._placeholder
+
+    def attrs(self) -> dict[str, Any]:
+        return {"placeholder": self.placeholder}
