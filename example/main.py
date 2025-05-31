@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 from slash.app import App
 import slash.core as e
+from slash.layout import Column
 from slash.message import Message
 
 
@@ -16,11 +17,16 @@ def home() -> e.Elem:
         state["counter"] += 1
         counter.text = str(state["counter"])
 
+    def decrement_counter(_: e.ClickEvent):
+        state["counter"] -= 1
+        counter.text = str(state["counter"])
+
     def reset_counter(_: e.ClickEvent):
         state["counter"] = 0
         counter.text = "0"
 
-    button = e.Button("+1", onclick=increment_counter)
+    button_increment = e.Button("+1", onclick=increment_counter)
+    button_decrement = e.Button("-1", onclick=decrement_counter)
     reset = e.Button("Reset", onclick=reset_counter)
 
     reversed_text = e.Span("Reversed text: ")
@@ -50,10 +56,10 @@ def home() -> e.Elem:
     return e.Div(
         [
             e.Div(
-                [square(n) for n in range(1, 11)],
+                [square(n) for n in range(1, 5)],
                 style={"display": "flex", "gap": "16px", "flex-wrap": "wrap"},
             ),
-            e.Div([label, counter, button, reset]),
+            e.Div([label, counter, button_decrement, button_increment, reset]),
             e.Div(
                 [
                     e.Input(placeholder="Type something...", oninput=oninput_callback),
@@ -76,8 +82,9 @@ def home() -> e.Elem:
                     e.Button("Execute as function", onclick=onclick_execute_function),
                 ]
             ),
-            e.Div(
+            Column(
                 [
+                    e.H2("<input> elements"),
                     e.Input("button"),
                     e.Input("checkbox"),
                     e.Input("color"),
@@ -86,7 +93,6 @@ def home() -> e.Elem:
                     e.Input("email"),
                     e.Input("file"),
                     e.Input("hidden"),
-                    e.Input("image"),
                     e.Input("month"),
                     e.Input("number"),
                     e.Input("password"),
@@ -100,6 +106,30 @@ def home() -> e.Elem:
                     e.Input("time"),
                     e.Input("url"),
                     e.Input("week"),
+                ],
+                style={"width": "512px"},
+            ),
+            e.Div(
+                [
+                    e.H2("header elements"),
+                    e.H1("<h1> element"),
+                    e.H2("<h2> element"),
+                    e.H3("<h3> element"),
+                    e.H4("<h4> element"),
+                    e.H5("<h5> element"),
+                    e.H6("<h6> element"),
+                ]
+            ),
+            e.Div(
+                [
+                    e.H2("Lorem ipsum"),
+                    e.P(
+                        " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a vehicula enim, sed malesuada purus. Aliquam erat volutpat. Pellentesque vel sagittis erat. Suspendisse pellentesque dictum justo quis semper. Suspendisse lobortis nisl suscipit enim dapibus interdum. Proin vel vestibulum justo. Maecenas in tellus ac leo blandit mattis. Fusce quis feugiat ipsum. Proin pellentesque ut nunc sed accumsan."
+                    ),
+                    e.H2("Duis ac tempus eros"),
+                    e.P(
+                        "Duis ac tempus eros, nec feugiat felis. Proin efficitur augue faucibus sapien condimentum interdum. Etiam a nibh ac ante scelerisque sodales. Sed eu orci aliquet, sodales dolor in, vestibulum diam. Ut sed est libero. Morbi erat elit, iaculis et scelerisque ultrices, eleifend non dui. Mauris id magna eget dolor posuere porttitor id at leo. Quisque porttitor sem quis sem dignissim ultrices. Fusce at tellus nec urna posuere suscipit interdum at nulla. Ut nec metus tristique, dictum dui non, scelerisque lacus. Nam consequat dolor non sodales molestie. Suspendisse laoreet dolor arcu, non pellentesque lacus vehicula quis."
+                    ),
                 ]
             ),
         ]

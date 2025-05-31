@@ -27,6 +27,12 @@ body {
     --main-font: 'DM Sans';
 }
 
+html,
+body {
+    /* margin: 0px; */
+    /* padding: 0px; */
+}
+
 body,
 button,
 input {

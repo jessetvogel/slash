@@ -34,13 +34,13 @@ class Server:
         self._ws_message_callback = callback
 
     def serve(self) -> None:
-        self._logger.info(f"Serving on {self._host}:{self._port} ..")
+        self._logger.info(f"Serving on http://{self._host}:{self._port} ..")
 
         self.app = web.Application()
         self.app.router.add_get("/ws", self._ws_handler)
         self.app.router.add_route("*", "/{tail:.*}", self._http_handler)
 
-        web.run_app(self.app, host=self._host, port=self._port)
+        web.run_app(self.app, host=self._host, port=self._port, print=None)
 
     async def _http_handler(self, request: web.Request) -> web.Response:
         path = request.path

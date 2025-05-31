@@ -197,11 +197,11 @@ class Elem:
     @style.setter
     def style(self, style: dict[str, str]) -> None:
         self._style.update(style)
-        self.page.broadcast(Message.update(self.id, style=style))
+        self.update_attrs({"style": style})
 
     def set_text(self, text: str) -> None:
         self._children = [text]
-        self.page.broadcast(Message.update(self.id, text=text))
+        self.update_attrs({"text": text})
 
     def get_text(self) -> str:
         return "".join(
@@ -250,6 +250,9 @@ class Elem:
                 )
         return messages
 
+    def update_attrs(self, attrs: dict[str, Any]) -> None:
+        self.page.broadcast(Message.update(self.id, **attrs))
+
 
 Children = list[Elem | str] | Elem | str | None
 
@@ -293,6 +296,18 @@ class Div(HTML, SupportsOnClick):
         SupportsOnClick.__init__(self, onclick)
 
 
+class P(HTML, SupportsOnClick):
+    def __init__(
+        self,
+        children: Children = None,
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+    ) -> None:
+        super().__init__("p", children=children, style=style)
+        SupportsOnClick.__init__(self, onclick)
+
+
 class Span(HTML, SupportsOnClick):
     def __init__(
         self,
@@ -303,6 +318,104 @@ class Span(HTML, SupportsOnClick):
     ) -> None:
         super().__init__("span", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
+
+
+class H1(HTML, SupportsOnClick):
+    def __init__(
+        self,
+        children: Children = None,
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+    ) -> None:
+        super().__init__("h1", children=children, style=style)
+        SupportsOnClick.__init__(self, onclick)
+
+
+class H2(HTML, SupportsOnClick):
+    def __init__(
+        self,
+        children: Children = None,
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+    ) -> None:
+        super().__init__("h2", children=children, style=style)
+        SupportsOnClick.__init__(self, onclick)
+
+
+class H3(HTML, SupportsOnClick):
+    def __init__(
+        self,
+        children: Children = None,
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+    ) -> None:
+        super().__init__("h3", children=children, style=style)
+        SupportsOnClick.__init__(self, onclick)
+
+
+class H4(HTML, SupportsOnClick):
+    def __init__(
+        self,
+        children: Children = None,
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+    ) -> None:
+        super().__init__("h4", children=children, style=style)
+        SupportsOnClick.__init__(self, onclick)
+
+
+class H5(HTML, SupportsOnClick):
+    def __init__(
+        self,
+        children: Children = None,
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+    ) -> None:
+        super().__init__("h5", children=children, style=style)
+        SupportsOnClick.__init__(self, onclick)
+
+
+class H6(HTML, SupportsOnClick):
+    def __init__(
+        self,
+        children: Children = None,
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+    ) -> None:
+        super().__init__("h6", children=children, style=style)
+        SupportsOnClick.__init__(self, onclick)
+
+
+class A(HTML, SupportsOnClick):
+    def __init__(
+        self,
+        children: Children = None,
+        *,
+        href: str = "#",
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+    ) -> None:
+        super().__init__("a", children=children, style=style)
+        SupportsOnClick.__init__(self, onclick)
+        self._href = href
+
+    @property
+    def href(self) -> str:
+        return self._href
+
+    @href.setter
+    def href(self, value: str) -> None:
+        self._href = value
+        self.update_attrs({"href": self.href})
+
+    def attrs(self) -> dict[str, Any]:
+        return {"href": self.href}
 
 
 class Button(HTML, SupportsOnClick):
