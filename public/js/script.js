@@ -83,16 +83,22 @@ class Client {
             slash_message("info", info);
             return;
         }
+        if (event == "debug") {
+            const debug = message.debug;
+            console.log(`DEBUG: %c${debug}`, 'color:rgb(104, 167, 77);');
+            slash_message("debug", debug);
+            return;
+        }
+        if (event == "warning") {
+            const warning = message.warning;
+            console.log(`WARNING: %c${warning}`, 'color:rgb(255, 169, 71);');
+            slash_message("warning", warning);
+            return;
+        }
         if (event == "error") {
             const error = message.error;
             console.log(`ERROR: %c${error}`, 'color: #FF474C;');
             slash_message("error", error);
-            return;
-        }
-        if (event == "debug") {
-            const debug = message.debug;
-            console.log(`DEBUG: %c${debug}`, 'color:rgb(255, 169, 71);');
-            slash_message("debug", debug);
             return;
         }
         throw new Error(`Unknown event '${event}'`);
@@ -185,7 +191,10 @@ function init() {
     client.connect();
 }
 function slash_message(type, message) {
-    const div = create("div", { class: type }, message);
+    const div = create("div", { class: "message " + type }, [
+        create("span", { class: "icon" }),
+        create("span", {}, message)
+    ]);
     setTimeout(() => div.classList.add("remove"), 5000);
     setTimeout(() => div.remove(), 5200);
     $("slash-messages").prepend(div);

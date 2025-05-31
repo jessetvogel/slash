@@ -28,14 +28,17 @@ def home() -> e.Elem:
     def oninput_callback(event: e.InputEvent):
         reversed_text.text = f"Reversed text: {''.join(reversed(event.value))}"
 
-    def trigger_error(event: e.ClickEvent):
-        event.target.page.broadcast(Message.error("An error occured!"))
-
     def trigger_info(event: e.ClickEvent):
-        event.target.page.broadcast(Message.info("Info message!"))
+        event.target.page.broadcast(Message.info("Example info message"))
 
     def trigger_debug(event: e.ClickEvent):
-        event.target.page.broadcast(Message.debug("Debug message!"))
+        event.target.page.broadcast(Message.debug("Example debug message"))
+
+    def trigger_warning(event: e.ClickEvent):
+        event.target.page.broadcast(Message.warning("Example warning message"))
+
+    def trigger_error(event: e.ClickEvent):
+        event.target.page.broadcast(Message.error("Example error message"))
 
     def onchange_textarea(event: e.ChangeEvent):
         state["textarea"] = event.value
@@ -61,6 +64,7 @@ def home() -> e.Elem:
                 [
                     e.Button("ℹ️ Trigger info", onclick=trigger_info),
                     e.Button("🧪 Trigger debug", onclick=trigger_debug),
+                    e.Button("⚠️ Trigger warning", onclick=trigger_warning),
                     e.Button("🚨 Trigger error", onclick=trigger_error),
                 ]
             ),

@@ -13,22 +13,71 @@ body {
     gap: 8px;
     padding: 8px;
 
-    >div {
-        width: 256px;
-        background-color: var(--white);
-        padding: 12px;
-        box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.12);
-        border-radius: 8px;
+    --icon-size: 24px;
 
+    .message {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 256px;
+        padding: 12px;
+        border-radius: 8px;
+        background-color: var(--white);
+        box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.12);
         animation: slide-in-right 0.2s forwards, fade-in 0.2s forwards;
 
         &.remove {
             animation: fade-out 0.2s forwards;
         }
 
-        &.error {
+        .icon {
+            position: relative;
+            display: block;
+            mask-size: var(--icon-size);
+            mask-position: center;
+            width: var(--icon-size);
+            height: var(--icon-size);
+            margin-right: 8px;
+
             &::before {
-                content: '🚨 ';
+                content: '';
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                width: var(--icon-size);
+                height: var(--icon-size);
+            }
+        }
+
+        &.info .icon {
+            mask-image: url('../img/info.png');
+
+            &::before {
+                background-color: var(--info-text-color);
+            }
+        }
+
+        &.debug .icon {
+            mask-image: url('../img/debug.png');
+
+            &::before {
+                background-color: var(--debug-text-color);
+            }
+        }
+
+        &.warning .icon {
+            mask-image: url('../img/warning.png');
+
+            &::before {
+                background-color: var(--warning-text-color);
+            }
+        }
+
+        &.error .icon {
+            mask-image: url('../img/error.png');
+
+            &::before {
+                background-color: var(--error-text-color);
             }
         }
     }

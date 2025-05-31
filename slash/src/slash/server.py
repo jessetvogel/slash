@@ -91,7 +91,7 @@ class Server:
             elif msg.type == WSMsgType.ERROR:
                 self._logger.warning(f"WebSocket error: {ws.exception()}")
 
-        self._logger.debug("WS client disconnected")
+        self._logger.debug("WebSocket disconnected")
         self._ws_clients.remove(ws)
 
         return ws

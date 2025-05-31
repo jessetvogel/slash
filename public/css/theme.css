@@ -15,6 +15,11 @@ body {
     --input-bg-color: var(--white);
     --input-text-color: var(--black);
 
+    --error-text-color: #ba5912;
+    --info-text-color: #1a7d8e;
+    --warning-text-color: #e2a32d;
+    --debug-text-color: #7faa6c;
+
     /* Fonts */
     --main-font: 'DM Sans';
 }

@@ -58,5 +58,9 @@ class Message:
         return Message(event="debug", debug=debug)
 
     @staticmethod
+    def warning(warning: str) -> Message:
+        return Message(event="warning", warning=warning)
+
+    @staticmethod
     def error(error: str) -> Message:
         return Message(event="error", error=error)
