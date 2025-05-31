@@ -1,11 +1,8 @@
 import asyncio
-import json
-import logging
 from pathlib import Path
 from typing import Callable
 import urllib.parse
 
-from slash.message import Message
 import slash.logging
 
 from aiohttp import WSMsgType, web
@@ -48,6 +45,10 @@ class Server:
     async def _http_handler(self, request: web.Request) -> web.Response:
         path = request.path
         method = request.method
+
+        # Must be GET
+        if method != "GET":
+            return self._response_405_method_not_allowed()
 
         # Parse URL
         result = urllib.parse.urlparse(path)
@@ -109,6 +110,9 @@ class Server:
 
     def _response_404_not_found(self) -> web.Response:
         return web.Response(status=404, text="404 Not Found")
+
+    def _response_405_method_not_allowed(self) -> web.Response:
+        return web.Response(status=405, text="404 Method Not Allowed")
 
     def _response_file(self, path: Path) -> web.Response:
         # Check file existence

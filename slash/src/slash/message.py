@@ -20,6 +20,12 @@ class Message:
 
     @staticmethod
     def create(tag: str, id: str, parent: str, **attrs) -> Message:
+        if not attrs.get("onclick", True):
+            attrs.pop("onclick")
+        if not attrs.get("onupdate", True):
+            attrs.pop("onupdate")
+        if not attrs.get("style", True):
+            attrs.pop("style")
         return Message(event="create", tag=tag, id=id, parent=parent, **attrs)
 
     @staticmethod
@@ -36,28 +42,21 @@ class Message:
         return Message(event="script", script=script)
 
     @staticmethod
-    def func(name: str, args: list[str], body: str) -> Message:
-        return Message(event="func", name=name, args=args, body=body)
+    def function(name: str, args: list[str], body: str) -> Message:
+        return Message(event="function", name=name, args=args, body=body)
 
     @staticmethod
-    def exec(func: str, args: list[str | int | float]) -> Message:
-        return Message(event="exec", func=func, args=args)
+    def execute(name: str, args: list[str | int | float]) -> Message:
+        return Message(event="execute", name=name, args=args)
 
+    @staticmethod
+    def info(info: str) -> Message:
+        return Message(event="info", info=info)
 
-# class Create(Message):
-#     def __init__(self, tag: str, id: str, parent: str, **attrs) -> None:
-#         self.tag = tag
-#         self.id = id
-#         self.parent = parent
-#         self.attrs = attrs
+    @staticmethod
+    def debug(debug: str) -> Message:
+        return Message(event="debug", debug=debug)
 
-#     def to_json(self) -> str:
-#         return json.dumps(
-#             {
-#                 "event": self.event,
-#                 "tag": self.tag,
-#                 "id": self.id,
-#                 "parent": self.parent,
-#                 **self.attrs,
-#             }
-#         )
+    @staticmethod
+    def error(error: str) -> Message:
+        return Message(event="error", error=error)

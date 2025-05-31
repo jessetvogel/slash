@@ -1,0 +1,60 @@
+body {
+    /* Colors */
+    --white: #ffffff;
+    --black: #101010;
+
+    --primary-color: #1a7d8e;
+    --secondary-color: #e2a32d;
+
+    --main-bg-color: var(--white);
+    --main-text-color: var(--black);
+
+    --button-bg-color: var(--primary-color);
+    --button-text-color: var(--white);
+
+    --input-bg-color: var(--white);
+    --input-text-color: var(--black);
+
+    /* Fonts */
+    --main-font: 'DM Sans';
+}
+
+body,
+button,
+input {
+    font-family: var(--main-font);
+}
+
+/* Default style */
+
+body {
+    background-color: var(--main-bg-color);
+    color: var(--main-text-color);
+}
+
+button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: 0px;
+    border-radius: 4px;
+    font-size: 1rem;
+    padding: 4px 8px;
+    margin: 4px;
+    min-width: 64px;
+    cursor: pointer;
+}
+
+input[type~="text"] {
+    background-color: var(--input-bg-color);
+    color: var(--input-text-color);
+    border-radius: 2px;
+    padding: 4px;
+    outline: none;
+    border: none;
+    font-size: 1rem;
+    outline: 1px solid rgb(116, 116, 116);
+
+    &:focus {
+        outline: 1px solid rgb(45, 152, 229);
+    }
+}

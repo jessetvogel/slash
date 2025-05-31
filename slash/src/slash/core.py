@@ -6,7 +6,6 @@ import random
 import string
 from typing import Any
 
-import slash.event
 from slash.message import Message
 
 
@@ -16,7 +15,7 @@ def random_id() -> str:
 
 
 class Page:
-    def __init__(self, root: Callable[[], Elem]):
+    def __init__(self, root: Callable[[], Elem]) -> None:
         self._root = root()
         self._ids: dict[str, Elem] = {}
         self._message_queue: list[Message] = []
@@ -48,6 +47,103 @@ class Page:
         return self._root
 
 
+# Events
+
+
+class ClickEvent:
+    def __init__(self, target: Elem) -> None:
+        self._target = target
+
+    @property
+    def target(self) -> Elem:
+        return self._target
+
+
+ClickEventHandlder = Callable[[ClickEvent], None]
+
+
+class SupportsOnClick:
+    def __init__(self, onclick: ClickEventHandlder | None = None) -> None:
+        self._onclick = onclick
+
+    def click(self, event: ClickEvent) -> None:
+        """Trigger click event."""
+        if self._onclick:
+            self._onclick(event)
+
+    def onclick(self, handler: ClickEventHandlder | None) -> None:
+        self._onclick = handler
+
+    def attrs(self) -> dict[str, Any]:
+        return {"onclick": True} if self._onclick else {}
+
+
+class InputEvent:
+    def __init__(self, target: Elem, value: str) -> None:
+        self._target = target
+        self._value = value
+
+    @property
+    def target(self) -> Elem:
+        return self._target
+
+    @property
+    def value(self) -> str:
+        return self._value
+
+
+InputEventHandler = Callable[[InputEvent], None]
+
+
+class SupportsOnInput:
+    def __init__(self, oninput: InputEventHandler | None = None) -> None:
+        self._oninput = oninput
+
+    def input(self, event: InputEvent) -> None:
+        """Trigger input event."""
+        if self._oninput:
+            self._oninput(event)
+
+    def oninput(self, handler: InputEventHandler | None) -> None:
+        self._oninput = handler
+
+    def attrs(self) -> dict[str, Any]:
+        return {"oninput": True} if self._oninput else {}
+
+
+class ChangeEvent:
+    def __init__(self, target: Elem, value: str) -> None:
+        self._target = target
+        self._value = value
+
+    @property
+    def target(self) -> Elem:
+        return self._target
+
+    @property
+    def value(self) -> str:
+        return self._value
+
+
+ChangeEventHandler = Callable[[ChangeEvent], None]
+
+
+class SupportsOnChange:
+    def __init__(self, onchange: ChangeEventHandler | None = None) -> None:
+        self._onchange = onchange
+
+    def change(self, event: ChangeEvent) -> None:
+        """Trigger change event."""
+        if self._onchange:
+            self._onchange(event)
+
+    def onchange(self, handler: ChangeEventHandler | None) -> None:
+        self._onchange = handler
+
+    def attrs(self) -> dict[str, Any]:
+        return {"onchange": True} if self._onchange else {}
+
+
 # Elements
 
 
@@ -57,8 +153,6 @@ class Elem:
         children: list[Elem | str] | Elem | str | None = None,
         *,
         style: dict[str, str] | None = None,
-        onclick: Callable[[MouseEvent], None] | None = None,
-        **attrs: Any,
     ) -> None:
         self._page: Page | None = None
         self._parent: Elem | None = None
@@ -68,10 +162,7 @@ class Elem:
         if not isinstance(children, list):
             children = [children]
         self._children = children
-
         self._style = style or {}
-        self._onclick = onclick
-        self._attrs = attrs
 
         # Set parent of children
         for child in self._children:
@@ -110,6 +201,7 @@ class Elem:
 
     def set_text(self, text: str) -> None:
         self._children = [text]
+        self.page.broadcast(Message.update(self.id, text=text))
 
     def get_text(self) -> str:
         return "".join(
@@ -124,16 +216,31 @@ class Elem:
     def text(self, value: str) -> None:
         self.set_text(value)
 
-    def click(self, event: MouseEvent) -> None:
-        if self._onclick:
-            self._onclick(event)
-
+    @property
     @abstractmethod
-    def create(self) -> list[Message]:
+    def tag(self) -> str:
         pass
 
+    def attrs(self) -> dict[str, Any]:
+        attrs: dict[str, Any] = {
+            "tag": self.tag,
+            "id": self.id,
+            "parent": self.parent.id if self.parent is not None else "body",
+        }
+        if self.style:
+            attrs["style"] = self.style
+        return attrs
+
+    def create(self) -> Message:
+        attrs: dict[str, Any] = {}
+        for base in type(self).mro():
+            if hasattr(base, "attrs") and callable(base.attrs):
+                attrs |= base.attrs(self)
+        return Message(event="create", **attrs)
+
+    # TODO: Might move this function out of `Elem` class
     def build(self) -> list[Message]:
-        messages = self.create()
+        messages = [self.create()]
         for child in self._children:
             if isinstance(child, Elem):
                 messages.extend(child.build())
@@ -161,19 +268,6 @@ class HTML(Elem):
     def tag(self) -> str:
         return self._tag
 
-    def create(self) -> list[Message]:
-        parent = self.parent.id if self.parent is not None else "body"
-        return [
-            Message.create(
-                tag=self.tag,
-                id=self.id,
-                parent=parent,
-                style=self.style,
-                onclick=True,
-                **self._attrs,
-            )
-        ]
-
     def __repr__(self) -> str:
         s = ""
         s += f"<{self.tag}>\n"
@@ -187,23 +281,77 @@ class HTML(Elem):
         return s
 
 
-class Div(HTML):
-    def __init__(self, children: Children = None, **attrs) -> None:
-        super().__init__("div", children=children, **attrs)
+class Div(HTML, SupportsOnClick):
+    def __init__(
+        self,
+        children: Children = None,
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+    ) -> None:
+        super().__init__("div", children=children, style=style)
+        SupportsOnClick.__init__(self, onclick)
 
 
-class Span(HTML):
-    def __init__(self, children: Children = None, **attrs) -> None:
-        super().__init__("span", children=children, **attrs)
+class Span(HTML, SupportsOnClick):
+    def __init__(
+        self,
+        children: Children = None,
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+    ) -> None:
+        super().__init__("span", children=children, style=style)
+        SupportsOnClick.__init__(self, onclick)
 
 
-# Events
+class Button(HTML, SupportsOnClick):
+    def __init__(
+        self,
+        children: Children = None,
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+    ) -> None:
+        super().__init__("button", children=children, style=style)
+        SupportsOnClick.__init__(self, onclick)
 
 
-class MouseEvent:
-    def __init__(self, target: Elem):
-        self._target = target
+class Input(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
+    def __init__(
+        self,
+        type: str = "text",
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+        oninput: InputEventHandler | None = None,
+        onchange: ChangeEventHandler | None = None,
+    ) -> None:
+        super().__init__("input", style=style)
+        SupportsOnClick.__init__(self, onclick)
+        SupportsOnInput.__init__(self, oninput)
+        SupportsOnChange.__init__(self, onchange)
+        self._type = type
 
     @property
-    def target(self) -> Elem:
-        return self._target
+    def type(self) -> str:
+        return self._type
+
+    def attrs(self) -> dict[str, Any]:
+        return {"type": self.type}
+
+
+class Textarea(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
+    def __init__(
+        self,
+        text: str = "",
+        *,
+        style: dict[str, str] | None = None,
+        onclick: ClickEventHandlder | None = None,
+        oninput: InputEventHandler | None = None,
+        onchange: ChangeEventHandler | None = None,
+    ) -> None:
+        super().__init__("textarea", [text], style=style)
+        SupportsOnClick.__init__(self, onclick)
+        SupportsOnInput.__init__(self, oninput)
+        SupportsOnChange.__init__(self, onchange)

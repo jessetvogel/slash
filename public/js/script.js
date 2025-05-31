@@ -3,7 +3,10 @@ window.addEventListener('DOMContentLoaded', init);
 class Client {
     constructor() {
         this.socket = null;
+        this.functions = {};
         this.onclick = this.onclick.bind(this);
+        this.oninput = this.oninput.bind(this);
+        this.onchange = this.onchange.bind(this);
     }
     connect() {
         const hostname = window.location.hostname;
@@ -61,6 +64,37 @@ class Client {
             eval === null || eval === void 0 ? void 0 : eval(`"use strict";(${script})`);
             return;
         }
+        if (event == "function") {
+            const name = message.name;
+            const args = message.args;
+            const body = message.body;
+            this.functions[name] = new Function(...args, body);
+            return;
+        }
+        if (event == "execute") {
+            const name = message.name;
+            const args = message.args;
+            this.functions[name](...args);
+            return;
+        }
+        if (event == "info") {
+            const info = message.info;
+            console.log(`INFO: %c${info}`, 'color:rgb(71, 255, 227);');
+            slash_message("info", info);
+            return;
+        }
+        if (event == "error") {
+            const error = message.error;
+            console.log(`ERROR: %c${error}`, 'color: #FF474C;');
+            slash_message("error", error);
+            return;
+        }
+        if (event == "debug") {
+            const debug = message.debug;
+            console.log(`DEBUG: %c${debug}`, 'color:rgb(255, 169, 71);');
+            slash_message("debug", debug);
+            return;
+        }
         throw new Error(`Unknown event '${event}'`);
     }
     update(elem, message) {
@@ -84,7 +118,29 @@ class Client {
                 }
                 continue;
             }
-            throw new Error(`Unknown attribute ${attr}`);
+            if (attr == "oninput") {
+                if (message.oninput === true) {
+                    elem.addEventListener('input', this.oninput);
+                }
+                else {
+                    elem.removeEventListener("input", this.oninput);
+                }
+                continue;
+            }
+            if (attr == "onchange") {
+                if (message.onchange === true) {
+                    elem.addEventListener('change', this.onchange);
+                }
+                else {
+                    elem.removeEventListener("change", this.onchange);
+                }
+                continue;
+            }
+            if (attr == "text") {
+                elem.innerText = message.text;
+                continue;
+            }
+            elem.setAttribute(attr, message[attr]);
         }
     }
     onclick(event) {
@@ -97,6 +153,26 @@ class Client {
             event.stopPropagation();
         }
     }
+    oninput(event) {
+        const elem = event.currentTarget;
+        if (elem !== null && "id" in elem && "value" in elem) {
+            this.send({
+                event: "input",
+                id: elem.id,
+                value: elem.value
+            });
+        }
+    }
+    onchange(event) {
+        const elem = event.currentTarget;
+        if (elem !== null && "id" in elem && "value" in elem) {
+            this.send({
+                event: "change",
+                id: elem.id,
+                value: elem.value
+            });
+        }
+    }
     send(message) {
         var _a;
         (_a = this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify(message));
@@ -107,4 +183,10 @@ let client;
 function init() {
     client = new Client();
     client.connect();
+}
+function slash_message(type, message) {
+    const div = create("div", { class: type }, message);
+    setTimeout(() => div.classList.add("remove"), 5000);
+    setTimeout(() => div.remove(), 5200);
+    $("slash-messages").prepend(div);
 }
