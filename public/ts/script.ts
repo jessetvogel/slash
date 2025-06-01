@@ -44,7 +44,7 @@ class Client {
             }
             catch (error) {
                 console.error(`Failed to parse message from server!\nmessage: ${event.data}\nerror: ${error}`);
-                slash_message('error', `Failed to parse message from server!\nmessage: ${event.data}\nerror: ${error}`);
+                Slash.message('error', `Failed to parse message from server!\nmessage: ${event.data}\nerror: ${error}`);
             }
         };
 
@@ -113,7 +113,9 @@ class Client {
         if (event == "execute") {
             const name = message.name;
             const args = message.args;
-            this.functions[name](...args);
+            const value = this.functions[name](...args);
+            if (message.store)
+                Slash.store(message.store, value);
             return;
         }
 
@@ -122,7 +124,7 @@ class Client {
             const type = message.type;
             const text = message.message;
             console.log(`[${type}] %c${text}`, 'color:rgb(216, 198, 162);');
-            slash_message(type, text);
+            Slash.message(type, text);
             return;
         }
 
@@ -218,19 +220,34 @@ class Client {
     }
 };
 
+class Slash {
+
+    static values: { [name: string]: any } = {};
+
+    static store(name: string, value: any): void {
+        Slash.values[name] = value;
+    }
+
+    static value(name: string): any {
+        return Slash.values[name];
+    }
+
+    static message(type: string, message: string): void {
+        const div = create("div", { class: "message " + type }, [
+            create("span", { class: "icon" }),
+            create("span", {}, message)
+        ]);
+        setTimeout(() => div.classList.add("remove"), 5000);
+        setTimeout(() => div.remove(), 5200);
+        $("slash-messages")!.prepend(div);
+    }
+};
+
 let client: Client;
 
 function init() {
+    (window as any).Slash = Slash;
+
     client = new Client();
     client.connect();
-}
-
-function slash_message(type: string, message: string): void {
-    const div = create("div", { class: "message " + type }, [
-        create("span", { class: "icon" }),
-        create("span", {}, message)
-    ]);
-    setTimeout(() => div.classList.add("remove"), 5000);
-    setTimeout(() => div.remove(), 5200);
-    $("slash-messages")!.prepend(div);
 }

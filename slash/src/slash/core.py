@@ -34,13 +34,16 @@ class Page:
         """Get element by id."""
         return self._ids.get(id, None)
 
-    def broadcast(self, message: Message) -> None:
+    def reply(self, message: Message) -> None:
         self._message_queue.append(message)
 
     def poop(self) -> list[Message]:
         queue = self._message_queue
         self._message_queue = []
         return queue
+
+    def require_function(self, name: str, args: list[str], body: str):
+        self.reply(Message.function(name, args, body))
 
     @property
     def root(self) -> Elem:
@@ -183,6 +186,10 @@ class Elem:
                 child.page = page
 
     @property
+    def children(self) -> list[Elem | str]:
+        return self._children
+
+    @property
     def id(self) -> str:
         return self._id
 
@@ -238,20 +245,14 @@ class Elem:
                 attrs |= base.attrs(self)
         return Message(event="create", **attrs)
 
-    # TODO: Might move this function out of `Elem` class
-    def build(self) -> list[Message]:
-        messages = [self.create()]
-        for child in self._children:
-            if isinstance(child, Elem):
-                messages.extend(child.build())
-            else:
-                messages.append(
-                    Message(event="create", tag="text", parent=self.id, text=child)
-                )
-        return messages
-
     def update_attrs(self, attrs: dict[str, Any]) -> None:
-        self.page.broadcast(Message.update(self.id, **attrs))
+        self.page.reply(Message.update(self.id, **attrs))
+
+    def mount(self) -> None:
+        pass
+
+    def unmount(self) -> None:
+        pass
 
 
 Children = list[Elem | str] | Elem | str | None

@@ -46,8 +46,8 @@ class Message:
         return Message(event="function", name=name, args=args, body=body)
 
     @staticmethod
-    def execute(name: str, args: list[Any]) -> Message:
-        return Message(event="execute", name=name, args=args)
+    def execute(name: str, args: list[Any], store: str | None = None) -> Message:
+        return Message(event="execute", name=name, args=args, store=store)
 
     @staticmethod
     def log(type: str, message: str) -> Message:

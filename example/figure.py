@@ -8,28 +8,29 @@ from slash.figure import Figure
 from slash.layout import Column
 
 
-def update_graph(graph: Figure) -> None:
-    n = 100
+def update_graph(figure: Figure) -> None:
+    n = 50
     f = 1 + random.random()
     p = random.random() * 6.28
-    xs = [n / 10 for n in range(n + 1)]
+    xs = [n / 5 for n in range(n + 1)]
     ys = [0.5 + 0.4 * math.sin(f * x + p) for x in xs]
-    graph.plot(
-        xs,
-        ys,
-        xlabel="time (sec)",
-        ylabel="amplitude",
-        grid=True,
-        title="Amplitude vs time",
-        color="red",
-    )
+
+    figure.clear()
+    figure.graph(xs, ys, color="--secondary-color")
+    figure.scatter(xs, ys, color="--primary-color")
+    figure.draw()
 
 
 def home() -> e.Elem:
     return Column(
         [
             e.H1("Graph demo"),
-            graph := Figure(),
+            graph := Figure(
+                title="Some random graph",
+                xlabel="time (sec)",
+                ylabel="amplitude",
+                grid=True,
+            ),
             e.Button("Click me!", onclick=lambda _: update_graph(graph)),
         ],
         style={"width": "512px", "align-items": "center", "margin": "0px auto"},

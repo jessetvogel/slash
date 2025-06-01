@@ -10,6 +10,18 @@ class Graph {
     }
 }
 
+class Scatter {
+    pts: [number, number][];
+    options: { [key: string]: any };
+
+    constructor(pts: [number, number][], options: { [key: string]: any }) {
+        this.pts = pts;
+        this.options = options;
+    }
+}
+
+type Plot = Graph | Scatter;
+
 type FigureOptions = {
     title?: string,
     xlabel?: string,
@@ -26,11 +38,11 @@ class Figure {
     view: Box;
     margin: Box;
     ticks: { xMin: number, xMax: number, yMin: number, yMax: number, xStep: number, yStep: number };
+
     options: FigureOptions;
+    plots: Plot[];
 
-    graphs: Graph[];
-
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, options: FigureOptions = {}) {
         this.canvas = canvas;
         this.ctx = this.canvas.getContext('2d')!;
         this.width = canvas.width;
@@ -39,9 +51,9 @@ class Figure {
         this.view = { top: 1.0, bottom: 0.0, left: 0.0, right: 1.0 };
         this.margin = { top: 32, bottom: 32, left: 32, right: 32 };
         this.ticks = { xMin: 0.0, xMax: 1.0, yMin: 0.0, yMax: 1.0, xStep: 0.2, yStep: 0.2 };
-        this.options = {};
 
-        this.graphs = [];
+        this.options = options;
+        this.plots = [];
 
         this.initCanvas();
     }
@@ -61,6 +73,15 @@ class Figure {
         this.height = this.canvas.height / dpr;
     }
 
+    clear(): void {
+        this.plots = [];
+        this.draw();
+    }
+
+    plot(plot: Plot): void {
+        this.plots.push(plot);
+    }
+
     draw(): void {
         // Update values
         this.updateMargin();
@@ -76,8 +97,13 @@ class Figure {
         this.drawTicks();
         this.drawLabels();
 
-        for (const graph of this.graphs)
-            this.drawGraph(graph);
+        for (const plot of this.plots) {
+            if (plot instanceof Graph)
+                this.drawGraph(plot);
+            else if (plot instanceof Scatter) {
+                this.drawScatter(plot);
+            }
+        }
     }
 
     drawLine(xys: [number, number][]): void {
@@ -86,6 +112,12 @@ class Figure {
         for (let i = 1; i < xys.length; ++i)
             this.ctx.lineTo(xys[i][0], xys[i][1]);
         this.ctx.stroke();
+    }
+
+    drawCircle(xy: [number, number], radius: number): void {
+        this.ctx.beginPath();
+        this.ctx.arc(xy[0], xy[1], radius, 0.0, 2.0 * Math.PI);
+        this.ctx.fill();
     }
 
     drawGrid(): void {
@@ -175,9 +207,20 @@ class Figure {
     drawGraph(graph: Graph): void {
         this.ctx.strokeStyle = this.variable("--primary-color");
         if (graph.options.color)
-            this.ctx.strokeStyle = graph.options.color;
+            this.ctx.strokeStyle = this.parseColor(graph.options.color);
         this.ctx.lineWidth = 2;
         this.drawLine(graph.pts.map((xy) => this.xy2uv(xy[0], xy[1])));
+    }
+
+    drawScatter(scatter: Scatter): void {
+        this.ctx.fillStyle = this.variable("--primary-color");
+        if (scatter.options.color)
+            this.ctx.fillStyle = this.parseColor(scatter.options.color);
+        this.ctx.lineWidth = 2;
+        for (const xy of scatter.pts) {
+            const uv = this.xy2uv(...xy);
+            this.drawCircle(uv, 3);
+        }
     }
 
     updateMargin(): void {
@@ -190,14 +233,14 @@ class Figure {
     }
 
     updateView(): void {
-        if (this.graphs.length == 0) {
+        if (this.plots.length == 0) {
             this.view = { top: 1.0, bottom: 0.0, left: 0.0, right: 1.0 };
             return;
         }
 
         const view = { top: 1.0, bottom: 0.0, left: 0.0, right: 1.0 };
-        for (const graph of this.graphs) {
-            for (const [x, y] of graph.pts) {
+        for (const plot of this.plots) {
+            for (const [x, y] of plot.pts) {
                 view.left = Math.min(view.left, x);
                 view.right = Math.max(view.right, x);
                 view.top = Math.max(view.top, y);
@@ -237,6 +280,13 @@ class Figure {
         if (Math.abs(Math.round(100 * x) - 100 * x) < epsilon)
             return x.toFixed(2);
         return x.toFixed(3);
+    }
+
+    parseColor(color: string): string {
+        if (color.startsWith("--"))
+            return this.variable(color);
+        else
+            return color;
     }
 
 }

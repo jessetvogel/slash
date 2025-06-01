@@ -31,9 +31,11 @@ class App:
     def _handle_ws_connect(self) -> list[str]:
         page = self.pages["/"]
         try:
-            return [message.to_json() for message in page.root.build()]
+            messages = [message for message in self._build_and_mount_all(page.root)]
+            messages.extend(page.poop())
+            return [message.to_json() for message in messages]
         except Exception as err:
-            return [Message.log("error", str(err)).to_json()]
+            return [Message.log("error", "Server error: " + str(err)).to_json()]
 
     def _handle_ws_message(self, data: str) -> list[str]:
         page = self.pages["/"]
@@ -45,7 +47,7 @@ class App:
                 id = message.data["id"]
                 elem = page.find(id)
                 if not isinstance(elem, SupportsOnClick):
-                    page.broadcast(
+                    page.reply(
                         Message.log("error", f"Element '{id}' does not support click")
                     )
                 else:
@@ -56,7 +58,7 @@ class App:
                 id = message.data["id"]
                 elem = page.find(id)
                 if not isinstance(elem, SupportsOnInput):
-                    page.broadcast(
+                    page.reply(
                         Message.log("error", f"Element '{id}' does not support input")
                     )
                 else:
@@ -67,7 +69,7 @@ class App:
                 id = message.data["id"]
                 elem = page.find(id)
                 if not isinstance(elem, SupportsOnChange):
-                    page.broadcast(
+                    page.reply(
                         Message.log("error", f"Element '{id}' does not support change")
                     )
                 else:
@@ -76,3 +78,15 @@ class App:
             return [message.to_json() for message in page.poop()]
         except Exception as err:
             return [Message.log("error", str(err)).to_json()]
+
+    def _build_and_mount_all(self, elem: Elem) -> list[Message]:
+        elem.mount()
+        messages = [elem.create()]
+        for child in elem.children:
+            if isinstance(child, Elem):
+                messages.extend(self._build_and_mount_all(child))
+            else:
+                messages.append(
+                    Message(event="create", tag="text", parent=elem.id, text=child)
+                )
+        return messages
