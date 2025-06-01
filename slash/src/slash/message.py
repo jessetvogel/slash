@@ -46,9 +46,12 @@ class Message:
         return Message(event="function", name=name, args=args, body=body)
 
     @staticmethod
-    def execute(name: str, args: list[str | int | float]) -> Message:
+    def execute(name: str, args: list[Any]) -> Message:
         return Message(event="execute", name=name, args=args)
 
     @staticmethod
     def log(type: str, message: str) -> Message:
         return Message(event="log", type=type, message=message)
+
+    def __repr__(self) -> str:
+        return str(self.__dict__)

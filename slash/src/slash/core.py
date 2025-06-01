@@ -11,7 +11,7 @@ from slash.message import Message
 
 def random_id() -> str:
     characters = string.ascii_letters + string.digits  # A-Z, a-z, 0-9
-    return "".join(random.choices(characters, k=8))
+    return "_" + "".join(random.choices(characters, k=8))
 
 
 class Page:
@@ -59,11 +59,11 @@ class ClickEvent:
         return self._target
 
 
-ClickEventHandlder = Callable[[ClickEvent], None]
+ClickEventHandler = Callable[[ClickEvent], None]
 
 
 class SupportsOnClick:
-    def __init__(self, onclick: ClickEventHandlder | None = None) -> None:
+    def __init__(self, onclick: ClickEventHandler | None = None) -> None:
         self._onclick = onclick
 
     def click(self, event: ClickEvent) -> None:
@@ -71,7 +71,7 @@ class SupportsOnClick:
         if self._onclick:
             self._onclick(event)
 
-    def onclick(self, handler: ClickEventHandlder | None) -> None:
+    def onclick(self, handler: ClickEventHandler | None) -> None:
         self._onclick = handler
 
     def attrs(self) -> dict[str, Any]:
@@ -262,14 +262,20 @@ class HTML(Elem):
         self,
         tag: str,
         children: Children = None,
+        *,
+        style: dict[str, Any] | None = None,
         **attrs: Any,
     ) -> None:
-        super().__init__(children, **attrs)
+        super().__init__(children, style=style)
         self._tag = tag
+        self._attrs = attrs
 
     @property
     def tag(self) -> str:
         return self._tag
+
+    def attrs(self) -> dict[str, Any]:
+        return self._attrs
 
     def __repr__(self) -> str:
         s = ""
@@ -290,7 +296,7 @@ class Div(HTML, SupportsOnClick):
         children: Children = None,
         *,
         style: dict[str, str] | None = None,
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
     ) -> None:
         super().__init__("div", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
@@ -302,7 +308,7 @@ class P(HTML, SupportsOnClick):
         children: Children = None,
         *,
         style: dict[str, str] | None = None,
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
     ) -> None:
         super().__init__("p", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
@@ -314,7 +320,7 @@ class Span(HTML, SupportsOnClick):
         children: Children = None,
         *,
         style: dict[str, str] | None = None,
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
     ) -> None:
         super().__init__("span", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
@@ -326,7 +332,7 @@ class H1(HTML, SupportsOnClick):
         children: Children = None,
         *,
         style: dict[str, str] | None = None,
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
     ) -> None:
         super().__init__("h1", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
@@ -338,7 +344,7 @@ class H2(HTML, SupportsOnClick):
         children: Children = None,
         *,
         style: dict[str, str] | None = None,
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
     ) -> None:
         super().__init__("h2", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
@@ -350,7 +356,7 @@ class H3(HTML, SupportsOnClick):
         children: Children = None,
         *,
         style: dict[str, str] | None = None,
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
     ) -> None:
         super().__init__("h3", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
@@ -362,7 +368,7 @@ class H4(HTML, SupportsOnClick):
         children: Children = None,
         *,
         style: dict[str, str] | None = None,
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
     ) -> None:
         super().__init__("h4", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
@@ -374,7 +380,7 @@ class H5(HTML, SupportsOnClick):
         children: Children = None,
         *,
         style: dict[str, str] | None = None,
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
     ) -> None:
         super().__init__("h5", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
@@ -386,7 +392,7 @@ class H6(HTML, SupportsOnClick):
         children: Children = None,
         *,
         style: dict[str, str] | None = None,
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
     ) -> None:
         super().__init__("h6", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
@@ -399,7 +405,7 @@ class A(HTML, SupportsOnClick):
         *,
         href: str = "#",
         style: dict[str, str] | None = None,
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
     ) -> None:
         super().__init__("a", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
@@ -424,7 +430,7 @@ class Button(HTML, SupportsOnClick):
         children: Children = None,
         *,
         style: dict[str, str] | None = None,
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
     ) -> None:
         super().__init__("button", children=children, style=style)
         SupportsOnClick.__init__(self, onclick)
@@ -437,7 +443,7 @@ class Input(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         *,
         style: dict[str, str] | None = None,
         placeholder: str = "",
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
         oninput: InputEventHandler | None = None,
         onchange: ChangeEventHandler | None = None,
     ) -> None:
@@ -467,7 +473,7 @@ class Textarea(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         *,
         style: dict[str, str] | None = None,
         placeholder: str = "",
-        onclick: ClickEventHandlder | None = None,
+        onclick: ClickEventHandler | None = None,
         oninput: InputEventHandler | None = None,
         onchange: ChangeEventHandler | None = None,
     ) -> None:

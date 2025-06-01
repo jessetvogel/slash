@@ -30,43 +30,49 @@ class App:
 
     def _handle_ws_connect(self) -> list[str]:
         page = self.pages["/"]
-        return [message.to_json() for message in page.root.build()]
+        try:
+            return [message.to_json() for message in page.root.build()]
+        except Exception as err:
+            return [Message.log("error", str(err)).to_json()]
 
     def _handle_ws_message(self, data: str) -> list[str]:
         page = self.pages["/"]
-        message = Message.from_json(data)
+        try:
+            message = Message.from_json(data)
 
-        # click
-        if message.event == "click":
-            id = message.data["id"]
-            elem = page.find(id)
-            if not isinstance(elem, SupportsOnClick):
-                page.broadcast(
-                    Message.log("error", f"Element '{id}' does not support click")
-                )
-            else:
-                elem.click(ClickEvent(elem))
+            # click
+            if message.event == "click":
+                id = message.data["id"]
+                elem = page.find(id)
+                if not isinstance(elem, SupportsOnClick):
+                    page.broadcast(
+                        Message.log("error", f"Element '{id}' does not support click")
+                    )
+                else:
+                    elem.click(ClickEvent(elem))
 
-        # input
-        if message.event == "input":
-            id = message.data["id"]
-            elem = page.find(id)
-            if not isinstance(elem, SupportsOnInput):
-                page.broadcast(
-                    Message.log("error", f"Element '{id}' does not support input")
-                )
-            else:
-                elem.input(InputEvent(elem, message.data["value"]))
+            # input
+            if message.event == "input":
+                id = message.data["id"]
+                elem = page.find(id)
+                if not isinstance(elem, SupportsOnInput):
+                    page.broadcast(
+                        Message.log("error", f"Element '{id}' does not support input")
+                    )
+                else:
+                    elem.input(InputEvent(elem, message.data["value"]))
 
-        # change
-        if message.event == "change":
-            id = message.data["id"]
-            elem = page.find(id)
-            if not isinstance(elem, SupportsOnChange):
-                page.broadcast(
-                    Message.log("error", f"Element '{id}' does not support change")
-                )
-            else:
-                elem.change(ChangeEvent(elem, message.data["value"]))
+            # change
+            if message.event == "change":
+                id = message.data["id"]
+                elem = page.find(id)
+                if not isinstance(elem, SupportsOnChange):
+                    page.broadcast(
+                        Message.log("error", f"Element '{id}' does not support change")
+                    )
+                else:
+                    elem.change(ChangeEvent(elem, message.data["value"]))
 
-        return [message.to_json() for message in page.poop()]
+            return [message.to_json() for message in page.poop()]
+        except Exception as err:
+            return [Message.log("error", str(err)).to_json()]

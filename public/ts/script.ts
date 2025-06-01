@@ -44,6 +44,7 @@ class Client {
             }
             catch (error) {
                 console.error(`Failed to parse message from server!\nmessage: ${event.data}\nerror: ${error}`);
+                slash_message('error', `Failed to parse message from server!\nmessage: ${event.data}\nerror: ${error}`);
             }
         };
 
