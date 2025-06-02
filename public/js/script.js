@@ -55,6 +55,11 @@ class Client {
             elem.remove();
             return;
         }
+        if (event == "clear") {
+            const elem = $(message.id);
+            elem.innerHTML = "";
+            return;
+        }
         if (event == "update") {
             const elem = $(message.id);
             this.update(elem, message);

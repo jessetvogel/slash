@@ -1,7 +1,7 @@
 import random
 from typing import Any
 
-from slash.core import Elem, HTML
+from slash.core import Elem
 from slash.jsfunction import JSFunction
 
 
@@ -9,8 +9,8 @@ class Figure(Elem):
     def __init__(
         self, *, title: str = "", xlabel: str = "", ylabel: str = "", grid: bool = False
     ):
-        self._canvas = HTML("canvas", width=512, height=384)
-        super().__init__(children=[self._canvas])
+        self._canvas = Elem("canvas", width=512, height=384)
+        super().__init__("div", children=[self._canvas])
         self._title = title
         self._xlabel = xlabel
         self._ylabel = ylabel

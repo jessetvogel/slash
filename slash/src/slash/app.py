@@ -16,6 +16,8 @@ from slash.logging import create_logger
 from slash.message import Message
 from slash.server import Server
 
+import traceback
+
 
 class App:
     def __init__(self) -> None:
@@ -92,8 +94,8 @@ class App:
                     elem.change(ChangeEvent(elem, message.data["value"]))
 
             return [message.to_json() for message in client.flush()]
-        except Exception as err:
-            return [Message.log("error", str(err)).to_json()]
+        except Exception:
+            return [Message.log("error", str(traceback.format_exc())).to_json()]
 
     def _handle_ws_disconnect(self, client_id: int) -> None:
         self._remove_client(client_id)

@@ -86,6 +86,13 @@ class Client {
             return;
         }
 
+        // clear
+        if (event == "clear") {
+            const elem = $(message.id)!;
+            elem.innerHTML = "";
+            return;
+        }
+
         // update
         if (event == "update") {
             const elem = $(message.id)!;

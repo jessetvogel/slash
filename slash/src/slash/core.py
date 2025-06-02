@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import abstractmethod
 from collections.abc import Callable
 import random
 import string
@@ -153,24 +152,65 @@ class SupportsOnChange:
 class Elem:
     def __init__(
         self,
+        tag: str,
         children: list[Elem | str] | Elem | str | None = None,
         *,
         style: dict[str, str] | None = None,
+        **attrs: Any,
     ) -> None:
-        self._page: Page | None = None
-        self._parent: Elem | None = None
-        self._id = random_id()
+        self._tag = tag
         if children is None:
             children = []
         if not isinstance(children, list):
             children = [children]
         self._children = children
         self._style = style or {}
+        self._attrs = attrs
+
+        self._id = random_id()
+        self._page: Page | None = None
+        self._parent: Elem | None = None
 
         # Set parent of children
         for child in self._children:
             if isinstance(child, Elem):
                 child._parent = self
+
+    @property
+    def tag(self) -> str:
+        return self._tag
+
+    @property
+    def children(self) -> list[Elem | str]:
+        return self._children
+
+    @property
+    def style(self) -> dict[str, str]:
+        return self._style
+
+    @style.setter
+    def style(self, style: dict[str, str]) -> None:
+        self._style.update(style)
+        self.update_attrs({"style": style})
+
+    @property
+    def id(self) -> str:
+        return self._id
+
+    @property
+    def parent(self) -> Elem | None:
+        return self._parent
+
+    def attrs(self) -> dict[str, Any]:
+        attrs: dict[str, Any] = {
+            "tag": self.tag,
+            "id": self.id,
+            "parent": self.parent.id if self.parent is not None else "body",
+            **self._attrs,
+        }
+        if self.style:
+            attrs["style"] = self.style
+        return attrs
 
     @property
     def client(self) -> Client:
@@ -183,27 +223,6 @@ class Elem:
         for child in self._children:
             if isinstance(child, Elem):
                 child.set_page(page)
-
-    @property
-    def children(self) -> list[Elem | str]:
-        return self._children
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @property
-    def parent(self) -> Elem | None:
-        return self._parent
-
-    @property
-    def style(self) -> dict[str, str]:
-        return self._style
-
-    @style.setter
-    def style(self, style: dict[str, str]) -> None:
-        self._style.update(style)
-        self.update_attrs({"style": style})
 
     def set_text(self, text: str) -> None:
         self._children = [text]
@@ -221,21 +240,6 @@ class Elem:
     @text.setter
     def text(self, value: str) -> None:
         self.set_text(value)
-
-    @property
-    @abstractmethod
-    def tag(self) -> str:
-        pass
-
-    def attrs(self) -> dict[str, Any]:
-        attrs: dict[str, Any] = {
-            "tag": self.tag,
-            "id": self.id,
-            "parent": self.parent.id if self.parent is not None else "body",
-        }
-        if self.style:
-            attrs["style"] = self.style
-        return attrs
 
     def create(self) -> Message:
         attrs: dict[str, Any] = {}
@@ -257,29 +261,28 @@ class Elem:
         self.unmount()
         self.client.reply(Message.remove(self.id))
 
+    def clear(self) -> None:
+        self.client.reply(Message.clear(self.id))
 
-Children = list[Elem | str] | Elem | str | None
+    def append(self, elem: Elem) -> None:
+        if elem.parent:
+            # TODO: remove element from its old parent, without unmounting it!
+            return
 
+        elem._parent = self
+        if self._page:
+            elem.set_page(self._page)
+            elem.create_recursively()
 
-class HTML(Elem):
-    def __init__(
-        self,
-        tag: str,
-        children: Children = None,
-        *,
-        style: dict[str, Any] | None = None,
-        **attrs: Any,
-    ) -> None:
-        super().__init__(children, style=style)
-        self._tag = tag
-        self._attrs = attrs
-
-    @property
-    def tag(self) -> str:
-        return self._tag
-
-    def attrs(self) -> dict[str, Any]:
-        return self._attrs
+    def create_recursively(self) -> None:
+        self.client.reply(self.create())
+        for child in self.children:
+            if isinstance(child, Elem):
+                child.create_recursively()
+            else:
+                self.client.reply(
+                    Message(event="create", tag="text", parent=self.id, text=child)
+                )
 
     def __repr__(self) -> str:
         s = ""
@@ -294,7 +297,10 @@ class HTML(Elem):
         return s
 
 
-class Div(HTML, SupportsOnClick):
+Children = list[Elem | str] | Elem | str | None
+
+
+class Div(Elem, SupportsOnClick):
     def __init__(
         self,
         children: Children = None,
@@ -306,7 +312,7 @@ class Div(HTML, SupportsOnClick):
         SupportsOnClick.__init__(self, onclick)
 
 
-class P(HTML, SupportsOnClick):
+class P(Elem, SupportsOnClick):
     def __init__(
         self,
         children: Children = None,
@@ -318,7 +324,7 @@ class P(HTML, SupportsOnClick):
         SupportsOnClick.__init__(self, onclick)
 
 
-class Span(HTML, SupportsOnClick):
+class Span(Elem, SupportsOnClick):
     def __init__(
         self,
         children: Children = None,
@@ -330,7 +336,7 @@ class Span(HTML, SupportsOnClick):
         SupportsOnClick.__init__(self, onclick)
 
 
-class H1(HTML, SupportsOnClick):
+class H1(Elem, SupportsOnClick):
     def __init__(
         self,
         children: Children = None,
@@ -342,7 +348,7 @@ class H1(HTML, SupportsOnClick):
         SupportsOnClick.__init__(self, onclick)
 
 
-class H2(HTML, SupportsOnClick):
+class H2(Elem, SupportsOnClick):
     def __init__(
         self,
         children: Children = None,
@@ -354,7 +360,7 @@ class H2(HTML, SupportsOnClick):
         SupportsOnClick.__init__(self, onclick)
 
 
-class H3(HTML, SupportsOnClick):
+class H3(Elem, SupportsOnClick):
     def __init__(
         self,
         children: Children = None,
@@ -366,7 +372,7 @@ class H3(HTML, SupportsOnClick):
         SupportsOnClick.__init__(self, onclick)
 
 
-class H4(HTML, SupportsOnClick):
+class H4(Elem, SupportsOnClick):
     def __init__(
         self,
         children: Children = None,
@@ -378,7 +384,7 @@ class H4(HTML, SupportsOnClick):
         SupportsOnClick.__init__(self, onclick)
 
 
-class H5(HTML, SupportsOnClick):
+class H5(Elem, SupportsOnClick):
     def __init__(
         self,
         children: Children = None,
@@ -390,7 +396,7 @@ class H5(HTML, SupportsOnClick):
         SupportsOnClick.__init__(self, onclick)
 
 
-class H6(HTML, SupportsOnClick):
+class H6(Elem, SupportsOnClick):
     def __init__(
         self,
         children: Children = None,
@@ -402,7 +408,7 @@ class H6(HTML, SupportsOnClick):
         SupportsOnClick.__init__(self, onclick)
 
 
-class A(HTML, SupportsOnClick):
+class A(Elem, SupportsOnClick):
     def __init__(
         self,
         children: Children = None,
@@ -428,7 +434,7 @@ class A(HTML, SupportsOnClick):
         return {"href": self.href}
 
 
-class Button(HTML, SupportsOnClick):
+class Button(Elem, SupportsOnClick):
     def __init__(
         self,
         children: Children = None,
@@ -440,7 +446,7 @@ class Button(HTML, SupportsOnClick):
         SupportsOnClick.__init__(self, onclick)
 
 
-class Input(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
+class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
     def __init__(
         self,
         type: str = "text",
@@ -470,7 +476,7 @@ class Input(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         return {"type": self.type, "placeholder": self.placeholder}
 
 
-class Textarea(HTML, SupportsOnClick, SupportsOnInput, SupportsOnChange):
+class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
     def __init__(
         self,
         text: str = "",

@@ -8,21 +8,22 @@ from slash.layout import Column
 
 
 def home() -> e.Elem:
-    state = {"counter": 0, "textarea": ""}
+    state_counter = {"count": 0}
+    state_textarea = {"text": ""}
 
     label = e.Span("Counter: ")
     counter = e.Span("0")
 
     def increment_counter(_: e.ClickEvent):
-        state["counter"] += 1
-        counter.text = str(state["counter"])
+        state_counter["count"] += 1
+        counter.text = str(state_counter["count"])
 
     def decrement_counter(_: e.ClickEvent):
-        state["counter"] -= 1
-        counter.text = str(state["counter"])
+        state_counter["count"] -= 1
+        counter.text = str(state_counter["count"])
 
     def reset_counter(_: e.ClickEvent):
-        state["counter"] = 0
+        state_counter["count"] = 0
         counter.text = "0"
 
     button_increment = e.Button("+1", onclick=increment_counter)
@@ -47,10 +48,10 @@ def home() -> e.Elem:
         event.target.client.log("error", "Example error message")
 
     def onchange_textarea(event: e.ChangeEvent):
-        state["textarea"] = event.value
+        state_textarea["text"] = event.value
 
     def onclick_execute_function(event: e.ClickEvent):
-        jsfunction = JSFunction([], str(state["textarea"]))
+        jsfunction = JSFunction([], state_textarea["text"])
         textarea.client.execute(jsfunction, [])
 
     return e.Div(

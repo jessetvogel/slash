@@ -37,6 +37,10 @@ class Message:
         return Message(event="update", id=id, **attrs)
 
     @staticmethod
+    def clear(id: str) -> Message:
+        return Message(event="clear", id=id)
+
+    @staticmethod
     def script(script: str) -> Message:
         # NOTE: not recommended
         return Message(event="script", script=script)

@@ -6,6 +6,7 @@ class Row(Elem):
         self, children: Children | None = None, *, style: dict[str, str] | None = None
     ):
         super().__init__(
+            "div",
             children,
             style={
                 "display": "flex",
@@ -24,6 +25,7 @@ class Column(Elem):
         self, children: Children | None = None, *, style: dict[str, str] | None = None
     ):
         super().__init__(
+            "div",
             children,
             style={
                 "display": "flex",
