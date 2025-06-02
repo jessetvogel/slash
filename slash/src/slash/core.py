@@ -6,6 +6,7 @@ import random
 import string
 from typing import Any
 
+from slash.client import Client
 from slash.message import Message
 
 
@@ -18,13 +19,13 @@ class Page:
     def __init__(self, root: Callable[[], Elem]) -> None:
         self._root = root()
         self._ids: dict[str, Elem] = {}
-        self._message_queue: list[Message] = []
+        self._client: Client | None = None
 
         self.register(self._root)
 
     def register(self, elem: Elem) -> None:
         """Register element by id."""
-        elem.page = self
+        elem.set_page(self)
         self._ids[elem.id] = elem
         for child in elem._children:
             if isinstance(child, Elem):
@@ -34,20 +35,19 @@ class Page:
         """Get element by id."""
         return self._ids.get(id, None)
 
-    def reply(self, message: Message) -> None:
-        self._message_queue.append(message)
-
-    def poop(self) -> list[Message]:
-        queue = self._message_queue
-        self._message_queue = []
-        return queue
-
-    def require_function(self, name: str, args: list[str], body: str):
-        self.reply(Message.function(name, args, body))
-
     @property
     def root(self) -> Elem:
         return self._root
+
+    @property
+    def client(self) -> Client:
+        if self._client is None:
+            raise Exception("Currently no client")
+        return self._client
+
+    @client.setter
+    def client(self, value: Client | None) -> None:
+        self._client = value
 
 
 # Events
@@ -173,17 +173,16 @@ class Elem:
                 child._parent = self
 
     @property
-    def page(self) -> Page:
+    def client(self) -> Client:
         if self._page is None:
-            raise Exception("Element has not been registered on page yet")
-        return self._page
+            raise Exception("Element is not on a page")
+        return self._page.client
 
-    @page.setter
-    def page(self, page: Page):
+    def set_page(self, page: Page) -> None:
         self._page = page
         for child in self._children:
             if isinstance(child, Elem):
-                child.page = page
+                child.set_page(page)
 
     @property
     def children(self) -> list[Elem | str]:
@@ -246,13 +245,17 @@ class Elem:
         return Message(event="create", **attrs)
 
     def update_attrs(self, attrs: dict[str, Any]) -> None:
-        self.page.reply(Message.update(self.id, **attrs))
+        self.client.reply(Message.update(self.id, **attrs))
 
     def mount(self) -> None:
         pass
 
     def unmount(self) -> None:
         pass
+
+    def remove(self) -> None:
+        self.unmount()
+        self.client.reply(Message.remove(self.id))
 
 
 Children = list[Elem | str] | Elem | str | None

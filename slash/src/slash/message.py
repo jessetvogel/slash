@@ -47,7 +47,10 @@ class Message:
 
     @staticmethod
     def execute(name: str, args: list[Any], store: str | None = None) -> Message:
-        return Message(event="execute", name=name, args=args, store=store)
+        if store:
+            return Message(event="execute", name=name, args=args, store=store)
+        else:
+            return Message(event="execute", name=name, args=args)
 
     @staticmethod
     def log(type: str, message: str) -> Message:

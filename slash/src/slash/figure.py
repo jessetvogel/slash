@@ -2,7 +2,7 @@ import random
 from typing import Any
 
 from slash.core import Elem, HTML
-from slash.message import Message
+from slash.jsfunction import JSFunction
 
 
 class Figure(Elem):
@@ -25,10 +25,8 @@ class Figure(Elem):
             "grid": self._grid,
         }
 
-        self.page.reply(
-            Message.execute(
-                FUNCTION_CREATE[0], [self._canvas.id, options], self._js_figure_id
-            )
+        self.client.execute(
+            FUNCTION_CREATE, [self._canvas.id, options], self._js_figure_id
         )
 
     @property
@@ -38,6 +36,9 @@ class Figure(Elem):
     def attrs(self) -> dict[str, Any]:
         return {"class": "slash-figure"}
 
+    def _update_options(self, options: dict[str, Any]) -> None:
+        self.client.execute(FUNCTION_SET, [self._js_figure_id, options])
+
     @property
     def title(self) -> str:
         return self._title
@@ -45,6 +46,7 @@ class Figure(Elem):
     @title.setter
     def title(self, value: str) -> None:
         self._title = value
+        self._update_options({"title": value})
 
     @property
     def xlabel(self) -> str:
@@ -53,6 +55,7 @@ class Figure(Elem):
     @xlabel.setter
     def xlabel(self, value: str) -> None:
         self._xlabel = value
+        self._update_options({"xlabel": value})
 
     @property
     def ylabel(self) -> str:
@@ -61,6 +64,7 @@ class Figure(Elem):
     @ylabel.setter
     def ylabel(self, value: str) -> None:
         self._ylabel = value
+        self._update_options({"ylabel": value})
 
     @property
     def grid(self) -> bool:
@@ -69,12 +73,13 @@ class Figure(Elem):
     @grid.setter
     def grid(self, value: bool) -> None:
         self._grid = value
+        self._update_options({"grid": value})
 
     def clear(self) -> None:
-        self.page.reply(Message.execute(FUNCTION_CLEAR[0], [self._js_figure_id]))
+        self.client.execute(FUNCTION_CLEAR, [self._js_figure_id])
 
     def draw(self) -> None:
-        self.page.reply(Message.execute(FUNCTION_DRAW[0], [self._js_figure_id]))
+        self.client.execute(FUNCTION_DRAW, [self._js_figure_id])
 
     def graph(
         self,
@@ -84,10 +89,8 @@ class Figure(Elem):
         color: str | None = None,
     ) -> None:
         options: dict[str, Any] = {"color": color or random_hex_color()}
-        self.page.reply(
-            Message.execute(
-                FUNCTION_GRAPH[0], [self._js_figure_id, list(zip(xs, ys)), options]
-            )
+        self.client.execute(
+            FUNCTION_GRAPH, [self._js_figure_id, list(zip(xs, ys)), options]
         )
 
     def scatter(
@@ -98,35 +101,21 @@ class Figure(Elem):
         color: str | None = None,
     ) -> None:
         options: dict[str, Any] = {"color": color or random_hex_color()}
-        self.page.reply(
-            Message.execute(
-                FUNCTION_SCATTER[0],
-                [self._js_figure_id, list(zip(xs, ys)), options],
-            )
+        self.client.execute(
+            FUNCTION_SCATTER,
+            [self._js_figure_id, list(zip(xs, ys)), options],
         )
 
     def mount(self) -> None:
-        self.page.require_function(*FUNCTION_CREATE)
-        self.page.require_function(*FUNCTION_SCATTER)
-        self.page.require_function(*FUNCTION_GRAPH)
-        self.page.require_function(*FUNCTION_CLEAR)
-        self.page.require_function(*FUNCTION_DRAW)
-
         self._create_js_figure()
 
 
-def random_hex_color() -> str:
-    return "#{:06x}".format(random.randint(0, 0xFFFFFF))
-
-
-FUNCTION_CREATE = (
-    "Figure_create",
+FUNCTION_CREATE = JSFunction(
     ["id", "options"],
     "return new Figure(document.getElementById(id), options)",
 )
 
-FUNCTION_SCATTER = (
-    "Figure_scatter",
+FUNCTION_SCATTER = JSFunction(
     ["id", "pts", "options"],
     """
     const figure = Slash.value(id);
@@ -135,8 +124,7 @@ FUNCTION_SCATTER = (
     """,
 )
 
-FUNCTION_GRAPH = (
-    "Figure_graph",
+FUNCTION_GRAPH = JSFunction(
     ["id", "pts", "options"],
     """
     const figure = Slash.value(id);
@@ -145,14 +133,25 @@ FUNCTION_GRAPH = (
     """,
 )
 
-FUNCTION_CLEAR = (
-    "Figure_clear",
+FUNCTION_CLEAR = JSFunction(
     ["id"],
     "Slash.value(id).clear()",
 )
 
-FUNCTION_DRAW = (
-    "Figure_draw",
+FUNCTION_SET = JSFunction(
+    ["id", "options"],
+    """
+    const figure = Slash.value(id);
+    for (const key in options)
+        figure.options[key] = options[key];
+    """,
+)
+
+FUNCTION_DRAW = JSFunction(
     ["id"],
     "Slash.value(id).draw()",
 )
+
+
+def random_hex_color() -> str:
+    return "#{:06x}".format(random.randint(0, 0xFFFFFF))

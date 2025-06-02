@@ -37,11 +37,16 @@ class Formatter(logging.Formatter):
         return formatter.format(record)
 
 
+logger: logging.Logger | None = None
+
+
 def create_logger() -> logging.Logger:
-    logger = logging.getLogger("slash")
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    ch.setFormatter(Formatter())
-    logger.addHandler(ch)
+    global logger
+    if logger is None:
+        logger = logging.getLogger("slash")
+        logger.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+        ch.setFormatter(Formatter())
+        logger.addHandler(ch)
     return logger
