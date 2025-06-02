@@ -131,6 +131,30 @@ def home() -> e.Elem:
                     e.P(
                         "Duis ac tempus eros, nec feugiat felis. Proin efficitur augue faucibus sapien condimentum interdum. Etiam a nibh ac ante scelerisque sodales. Sed eu orci aliquet, sodales dolor in, vestibulum diam. Ut sed est libero. Morbi erat elit, iaculis et scelerisque ultrices, eleifend non dui. Mauris id magna eget dolor posuere porttitor id at leo. Quisque porttitor sem quis sem dignissim ultrices. Fusce at tellus nec urna posuere suscipit interdum at nulla. Ut nec metus tristique, dictum dui non, scelerisque lacus. Nam consequat dolor non sodales molestie. Suspendisse laoreet dolor arcu, non pellentesque lacus vehicula quis."
                     ),
+                    e.Elem(
+                        "pre",
+                        """def fibonacci(n):
+    a = 0
+    b = 1
+    
+    # Check if n is less than 0
+    if n < 0:
+        print("Incorrect input")
+        
+    # Check if n is equal to 0
+    elif n == 0:
+        return 0
+      
+    # Check if n is equal to 1
+    elif n == 1:
+        return b
+    else:
+        for i in range(1, n):
+            c = a + b
+            a = b
+            b = c
+        return b""",
+                    ),
                 ]
             ),
         ]

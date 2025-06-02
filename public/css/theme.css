@@ -21,6 +21,10 @@ body {
     --table-bg-color: var(--white);
     --table-border: 1px solid #bbb;
 
+    --pre-bg-color: #eee;
+    --pre-text-color: #444;
+    --pre-border: 1px solid #bbb;
+
     --error-text-color: #ba5912;
     --info-text-color: #1a7d8e;
     --warning-text-color: #e2a32d;
@@ -158,4 +162,14 @@ div.table {
             background-color: #eee;
         }
     }
+}
+
+pre {
+    background-color: var(--pre-bg-color);
+    color: var(--pre-text-color);
+    border: var(--pre-border);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: var(--shadow);
+    overflow: auto;
 }

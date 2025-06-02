@@ -5,7 +5,7 @@ from slash.core import Elem
 class Table(Elem):
     def __init__(self, *, max_rows: int | None = 10, has_headers: bool = True) -> None:
         self._table = Elem("table")
-        super().__init__("div", self._table, attrs={"class": "table"})
+        super().__init__("div", self._table, **{"class": "table"})  # type: ignore[arg-type]
         self._max_rows = max_rows
         self._has_headers = has_headers
 

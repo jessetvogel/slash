@@ -14,34 +14,22 @@ def random_id() -> str:
     return "_" + "".join(random.choices(characters, k=8))
 
 
-class Page:
-    def __init__(self, root: Callable[[], Elem]) -> None:
-        self._root = root()
-        self._ids: dict[str, Elem] = {}
+class Context:
+    def __init__(self) -> None:
         self._client: Client | None = None
+        self._elems: dict[str, Elem] = {}
 
-        self.register(self._root)
-
-    def register(self, elem: Elem) -> None:
+    def add_elem(self, elem: Elem) -> None:
         """Register element by id."""
-        elem.set_page(self)
-        self._ids[elem.id] = elem
-        for child in elem._children:
-            if isinstance(child, Elem):
-                self.register(child)
+        self._elems[elem.id] = elem
 
-    def find(self, id: str) -> Elem | None:
+    def get_elem(self, id: str) -> Elem | None:
         """Get element by id."""
-        return self._ids.get(id, None)
+        return self._elems.get(id, None)
 
     @property
-    def root(self) -> Elem:
-        return self._root
-
-    @property
-    def client(self) -> Client:
-        if self._client is None:
-            raise Exception("Currently no client")
+    def client(self) -> Client | None:
+        """The current active client."""
         return self._client
 
     @client.setter
@@ -168,7 +156,7 @@ class Elem:
         self._attrs = attrs
 
         self._id = random_id()
-        self._page: Page | None = None
+        self._context: Context | None = None
         self._parent: Elem | None = None
 
         # Set parent of children
@@ -214,42 +202,50 @@ class Elem:
 
     @property
     def client(self) -> Client:
-        if self._page is None:
-            raise Exception("Element is not on a page")
-        return self._page.client
+        if self._context is None:
+            raise Exception("element has no context")
+        if self._context.client is None:
+            raise Exception("no current client")
+        return self._context.client
 
-    def set_page(self, page: Page) -> None:
-        self._page = page
-        for child in self._children:
-            if isinstance(child, Elem):
-                child.set_page(page)
+    def set_context(self, context: Context) -> None:
+        """Set context, and of children."""
+        if self._context is not context:
+            self._context = context
+            self._context.add_elem(self)
+            for child in self._children:
+                if isinstance(child, Elem):
+                    child.set_context(context)
 
-    def set_text(self, text: str) -> None:
-        self._children = [text]
-        self.update_attrs({"text": text})
+    def build(self) -> None:
+        # Check for context
+        if self.id in self.client._elems:
+            raise Exception("element already build")
 
-    def get_text(self) -> str:
-        return "".join(
-            child if isinstance(child, str) else child.text for child in self._children
-        )
-
-    @property
-    def text(self) -> str:
-        return self.get_text()
-
-    @text.setter
-    def text(self, value: str) -> None:
-        self.set_text(value)
-
-    def create(self) -> Message:
+        # Construct message
         attrs: dict[str, Any] = {}
         for base in type(self).mro():
             if hasattr(base, "attrs") and callable(base.attrs):
                 attrs |= base.attrs(self)
-        return Message(event="create", **attrs)
+        self.client.send(Message(event="create", **attrs))
+
+        # Build children
+        for child in self.children:
+            if isinstance(child, Elem):
+                child.build()
+            else:
+                self.client.send(
+                    Message(event="create", tag="text", parent=self.id, text=child)
+                )
+
+        # Mark as added
+        self.client._elems.add(self.id)
+
+        # Call mount
+        self.mount()
 
     def update_attrs(self, attrs: dict[str, Any]) -> None:
-        self.client.reply(Message.update(self.id, **attrs))
+        self.client.send(Message.update(self.id, **attrs))
 
     def mount(self) -> None:
         pass
@@ -259,10 +255,10 @@ class Elem:
 
     def remove(self) -> None:
         self.unmount()
-        self.client.reply(Message.remove(self.id))
+        self.client.send(Message.remove(self.id))
 
     def clear(self) -> None:
-        self.client.reply(Message.clear(self.id))
+        self.client.send(Message.clear(self.id))
 
     def append(self, elem: Elem) -> None:
         if elem.parent:
@@ -270,19 +266,21 @@ class Elem:
             return
 
         elem._parent = self
-        if self._page:
-            elem.set_page(self._page)
-            elem.create_recursively()
 
-    def create_recursively(self) -> None:
-        self.client.reply(self.create())
-        for child in self.children:
-            if isinstance(child, Elem):
-                child.create_recursively()
-            else:
-                self.client.reply(
-                    Message(event="create", tag="text", parent=self.id, text=child)
-                )
+        if self._context is not None:
+            elem.set_context(self._context)
+            elem.build()
+
+    @property
+    def text(self) -> str:
+        return "".join(
+            child if isinstance(child, str) else child.text for child in self._children
+        )
+
+    @text.setter
+    def text(self, value: str) -> None:
+        self._children = [value]
+        self.update_attrs({"text": value})
 
     def __repr__(self) -> str:
         s = ""
