@@ -1,3 +1,58 @@
+#slash-loading {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100dvw;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    background-color: var(--main-bg-color);
+    animation: fade-in 1.0s forwards;
+
+    span {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    div {
+        width: 48px;
+        height: 48px;
+        border: 3px solid var(--white);
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+        box-sizing: border-box;
+        animation: rotate 1s linear infinite;
+
+        &::after {
+            content: '';
+            box-sizing: border-box;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 3px solid;
+            border-color: var(--primary-color) transparent;
+        }
+    }
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 #slash-messages {
     position: absolute;
     top: 0px;

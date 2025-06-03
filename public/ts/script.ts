@@ -33,10 +33,10 @@ class Client {
 
         this.socket.onopen = function (event) {
             console.log('Connection established!');
-            // socket.send("get");
         };
 
         this.socket.onmessage = function (event) {
+            $("slash-loading")?.remove();
             try {
                 console.info(`%c${event.data}`, 'color: gray;');
                 const message = JSON.parse(event.data) as Message;

@@ -18,6 +18,8 @@ class Client {
             console.log('Connection established!');
         };
         this.socket.onmessage = function (event) {
+            var _a;
+            (_a = $("slash-loading")) === null || _a === void 0 ? void 0 : _a.remove();
             try {
                 console.info(`%c${event.data}`, 'color: gray;');
                 const message = JSON.parse(event.data);
