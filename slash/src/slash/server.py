@@ -27,6 +27,8 @@ class Server:
         self._ws_message_callback: Callable[[int, str], list[str]] | None = None
         self._ws_disconnect_callback: Callable[[int], None] | None = None
 
+        self._files: dict[str, Path] = {}
+
         self._client_counter = 0
 
     def on_ws_connect(self, callback: Callable[[int], list[str]]) -> None:
@@ -66,6 +68,10 @@ class Server:
         # `/` -> `/index.html`
         if path == "/":
             path = "/index.html"
+
+        # Check if path in `self._files`
+        if path in self._files:
+            return self._response_file(self._files[path])
 
         # Remove initial `/`
         while path.startswith("/"):
@@ -136,3 +142,6 @@ class Server:
         # Send file
         with path.open("rb") as file:
             return web.Response(status=200, content_type=mime_type, body=file.read())
+
+    def host(self, url: str, path: Path) -> None:
+        self._files[url] = path

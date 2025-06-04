@@ -60,7 +60,7 @@ class App:
             client.log("error", msg)
         self._context.client = None  # unset client
 
-        return [message.to_json() for message in client.flush()]
+        return self._respond_client(client)
 
     def _handle_ws_message(self, client_id: int, data: str) -> list[str]:
         client = self._get_client(client_id)
@@ -102,7 +102,20 @@ class App:
 
         self._context.client = None  # unset client
 
-        return [message.to_json() for message in client.flush()]
+        return self._respond_client(client)
 
     def _handle_ws_disconnect(self, client_id: int) -> None:
         self._remove_client(client_id)
+
+    def _respond_client(self, client: Client) -> list[str]:
+        try:
+            # Host files
+            for url, path in client.flush_files().items():
+                self._server.host(url, path)
+
+            # Serialize messages
+            messages = [message.to_json() for message in client.flush()]
+        except Exception:
+            return [Message.log("error", traceback.format_exc()).to_json()]
+
+        return messages

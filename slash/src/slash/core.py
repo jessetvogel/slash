@@ -1,17 +1,11 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-import random
-import string
 from typing import Any
 
 from slash.client import Client
 from slash.message import Message
-
-
-def random_id() -> str:
-    characters = string.ascii_letters + string.digits  # A-Z, a-z, 0-9
-    return "_" + "".join(random.choices(characters, k=8))
+from slash.utils import random_id
 
 
 class Context:

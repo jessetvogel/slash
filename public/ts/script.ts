@@ -54,6 +54,7 @@ class Client {
 
         this.socket.onclose = function (event) {
             console.log('Connection closed.');
+            Slash.message('warning', 'Connection lost..');
         };
     }
 
