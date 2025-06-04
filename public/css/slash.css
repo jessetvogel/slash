@@ -65,11 +65,10 @@
     --icon-size: 24px;
 
     .message {
-        display: flex;
-        flex-direction: row;
-        align-items: top;
-        width: 256px;
-        padding: 8px;
+        position: relative;
+        min-width: 256px;
+        max-width: 384px;
+        padding: 10px 10px 8px 38px;
         border-radius: 8px;
         border: var(--button-border);
         background-color: var(--white);
@@ -81,13 +80,15 @@
         }
 
         .icon {
-            position: relative;
+            position: absolute;
+            top: 8px;
+            left: 8px;
             display: block;
             mask-size: var(--icon-size);
             mask-position: center;
             width: var(--icon-size);
             height: var(--icon-size);
-            margin-right: 8px;
+            margin-right: 6px;
             flex-basis: 1;
             flex-grow: 0;
             flex-shrink: 0;

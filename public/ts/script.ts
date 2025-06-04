@@ -35,16 +35,28 @@ class Client {
             console.log('Connection established!');
         };
 
+        const loading = $("slash-loading");
+
         this.socket.onmessage = function (event) {
-            $("slash-loading")?.remove();
+            loading?.remove();
+            let message: Message;
+
             try {
                 console.info(`%c${event.data}`, 'color: gray;');
-                const message = JSON.parse(event.data) as Message;
+                message = JSON.parse(event.data) as Message;
+            }
+            catch (error) {
+                console.error(`Received invalid message from server\nmessage: ${event.data}`);
+                Slash.message('error', `<span>Received invalid message from server</span><pre>${event.data}</pre><span>${error}</span>`);
+                return;
+            }
+
+            try {
                 client.handle(message);
             }
             catch (error) {
-                console.error(`Failed to parse message from server!\nmessage: ${event.data}\nerror: ${error}`);
-                Slash.message('error', `Failed to parse message from server!\nmessage: ${event.data}\nerror: ${error}`);
+                Slash.message('error', `<span>Failed to handle message from server</span><pre>${event.data}</pre><span>${error}</span>`);
+                return;
             }
         };
 
@@ -54,7 +66,7 @@ class Client {
 
         this.socket.onclose = function (event) {
             console.log('Connection closed.');
-            Slash.message('warning', 'Connection lost..');
+            Slash.message('warning', 'Connection lost');
         };
     }
 
@@ -243,10 +255,11 @@ class Slash {
     static message(type: string, message: string): void {
         const div = create("div", { class: "message " + type }, [
             create("span", { class: "icon" }),
-            create("span", {}, message)
+            message
         ]);
-        setTimeout(() => div.classList.add("remove"), 5000);
-        setTimeout(() => div.remove(), 5200);
+        const timeout = 10000;
+        setTimeout(() => div.classList.add("remove"), timeout);
+        setTimeout(() => div.remove(), timeout + 500);
         $("slash-messages")!.prepend(div);
     }
 };

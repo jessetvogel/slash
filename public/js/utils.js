@@ -19,9 +19,14 @@ export function create(tag, properties, content) {
             elem.innerHTML = content;
         if (content instanceof HTMLElement)
             elem.append(content);
-        if (Array.isArray(content))
-            for (const child of content)
-                elem.append(child);
+        if (Array.isArray(content)) {
+            for (const child of content) {
+                if (child instanceof HTMLElement)
+                    elem.append(child);
+                else
+                    elem.insertAdjacentHTML('beforeend', child);
+            }
+        }
     }
     return elem;
 }

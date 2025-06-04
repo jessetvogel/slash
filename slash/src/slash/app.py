@@ -98,7 +98,7 @@ class App:
 
         except Exception:
             client.flush()
-            client.log("error", str(traceback.format_exc()))
+            client.send(self._message_server_error(traceback.format_exc()))
 
         self._context.client = None  # unset client
 
@@ -116,6 +116,12 @@ class App:
             # Serialize messages
             messages = [message.to_json() for message in client.flush()]
         except Exception:
-            return [Message.log("error", traceback.format_exc()).to_json()]
+            return [self._message_server_error(traceback.format_exc()).to_json()]
 
         return messages
+
+    def _message_server_error(self, error: str) -> Message:
+        return Message.log(
+            "error",
+            f"<span>Unexpected server error.</span><pre>{error}</pre>",
+        )

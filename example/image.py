@@ -24,7 +24,7 @@ def update_image(image: Image) -> None:
 
 
 def generate_graph(image: Image) -> None:
-    path = Path("/Users/jessetvogel/Projects/slash/tmp.png")
+    path = Path("./tmp/graph.png")
 
     f = 1 + random.random() * 10.0
 

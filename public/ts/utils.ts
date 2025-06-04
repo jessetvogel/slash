@@ -21,7 +21,14 @@ export function create(tag: string, properties?: { [key: string]: any }, content
     if (content !== undefined) {
         if (typeof (content) === 'string') elem.innerHTML = content;
         if (content instanceof HTMLElement) elem.append(content);
-        if (Array.isArray(content)) for (const child of content) elem.append(child);
+        if (Array.isArray(content)) {
+            for (const child of content) {
+                if (child instanceof HTMLElement)
+                    elem.append(child);
+                else
+                    elem.insertAdjacentHTML('beforeend', child);
+            }
+        }
     }
 
     return elem;
