@@ -4,6 +4,7 @@ import random
 
 from slash.app import App
 import slash.core as e
+import slash.html as h
 from slash.image import Image
 from slash.layout import Column
 
@@ -42,13 +43,13 @@ def generate_graph(image: Image) -> None:
 def home() -> e.Elem:
     return Column(
         [
-            e.H1("Image demo"),
+            h.H1("Image demo"),
             image := Image(
                 "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
                 alt="This is the alt text.",
             ),
-            e.Button("Click me!", onclick=lambda _: update_image(image)),
-            e.Button("Generate graph!", onclick=lambda _: generate_graph(image)),
+            h.Button("Show an icon!", onclick=lambda _: update_image(image)),
+            h.Button("Show a graph!", onclick=lambda _: generate_graph(image)),
         ],
         style={"width": "512px", "align-items": "center", "margin": "0px auto"},
     )

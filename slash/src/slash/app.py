@@ -79,7 +79,7 @@ class App:
                     elem.click(ClickEvent(elem))
 
             # input
-            if message.event == "input":
+            elif message.event == "input":
                 id = message.data["id"]
                 elem = self._context.get_elem(id)
                 if not isinstance(elem, SupportsOnInput):
@@ -88,7 +88,7 @@ class App:
                     elem.input(InputEvent(elem, message.data["value"]))
 
             # change
-            if message.event == "change":
+            elif message.event == "change":
                 id = message.data["id"]
                 elem = self._context.get_elem(id)
                 if not isinstance(elem, SupportsOnChange):

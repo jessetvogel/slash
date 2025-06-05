@@ -4,13 +4,16 @@ from typing import Any
 from slash.core import Elem
 from slash.jsfunction import JSFunction
 
+# class FigureOption:
+#   TODO
+
 
 class Figure(Elem):
     def __init__(
         self, *, title: str = "", xlabel: str = "", ylabel: str = "", grid: bool = False
     ):
         self._canvas = Elem("canvas", width=512, height=384)
-        super().__init__("div", children=[self._canvas])
+        super().__init__("div", children=[self._canvas], **{"class": "slash-figure"})  # type: ignore[arg-type]
         self._title = title
         self._xlabel = xlabel
         self._ylabel = ylabel
@@ -28,13 +31,6 @@ class Figure(Elem):
         self.client.execute(
             FUNCTION_CREATE, [self._canvas.id, options], self._js_figure_id
         )
-
-    @property
-    def tag(self) -> str:
-        return "div"
-
-    def attrs(self) -> dict[str, Any]:
-        return {"class": "slash-figure"}
 
     def _update_options(self, options: dict[str, Any]) -> None:
         self.client.execute(FUNCTION_SET, [self._js_figure_id, options])

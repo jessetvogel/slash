@@ -31,6 +31,27 @@ class Context:
         self._client = value
 
 
+# Attributes
+
+
+class Attr(property):
+    def __init__(self, name: str) -> None:
+        super().__init__(self._get, self._set)
+        self._name = name
+        self._private = "_" + name
+
+    def _get(self, elem: Elem):
+        return getattr(elem, self._private)
+
+    def _set(self, elem: Elem, value: Any):
+        setattr(elem, self._private, value)
+        elem._update_attrs({self._name: value})
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+
 # Events
 
 
@@ -47,19 +68,15 @@ ClickEventHandler = Callable[[ClickEvent], None]
 
 
 class SupportsOnClick:
+    onclick = Attr("onclick")
+
     def __init__(self, onclick: ClickEventHandler | None = None) -> None:
-        self._onclick = onclick
+        self.onclick = onclick
 
     def click(self, event: ClickEvent) -> None:
         """Trigger click event."""
-        if self._onclick:
-            self._onclick(event)
-
-    def onclick(self, handler: ClickEventHandler | None) -> None:
-        self._onclick = handler
-
-    def attrs(self) -> dict[str, Any]:
-        return {"onclick": True} if self._onclick else {}
+        if self.onclick:
+            self.onclick(event)
 
 
 class InputEvent:
@@ -80,19 +97,15 @@ InputEventHandler = Callable[[InputEvent], None]
 
 
 class SupportsOnInput:
+    oninput = Attr("oninput")
+
     def __init__(self, oninput: InputEventHandler | None = None) -> None:
-        self._oninput = oninput
+        self.oninput = oninput
 
     def input(self, event: InputEvent) -> None:
         """Trigger input event."""
-        if self._oninput:
-            self._oninput(event)
-
-    def oninput(self, handler: InputEventHandler | None) -> None:
-        self._oninput = handler
-
-    def attrs(self) -> dict[str, Any]:
-        return {"oninput": True} if self._oninput else {}
+        if self.oninput:
+            self.oninput(event)
 
 
 class ChangeEvent:
@@ -113,19 +126,15 @@ ChangeEventHandler = Callable[[ChangeEvent], None]
 
 
 class SupportsOnChange:
+    onchange = Attr("onchange")
+
     def __init__(self, onchange: ChangeEventHandler | None = None) -> None:
-        self._onchange = onchange
+        self.onchange = onchange
 
     def change(self, event: ChangeEvent) -> None:
         """Trigger change event."""
-        if self._onchange:
-            self._onchange(event)
-
-    def onchange(self, handler: ChangeEventHandler | None) -> None:
-        self._onchange = handler
-
-    def attrs(self) -> dict[str, Any]:
-        return {"onchange": True} if self._onchange else {}
+        if self.onchange:
+            self.onchange(event)
 
 
 # Elements
@@ -173,7 +182,7 @@ class Elem:
     @style.setter
     def style(self, style: dict[str, str]) -> None:
         self._style.update(style)
-        self.update_attrs({"style": style})
+        self._update_attrs({"style": style})
 
     @property
     def id(self) -> str:
@@ -183,6 +192,7 @@ class Elem:
     def parent(self) -> Elem | None:
         return self._parent
 
+    @property
     def attrs(self) -> dict[str, Any]:
         attrs: dict[str, Any] = {
             "tag": self.tag,
@@ -190,8 +200,21 @@ class Elem:
             "parent": self.parent.id if self.parent is not None else "body",
             **self._attrs,
         }
+
         if self.style:
             attrs["style"] = self.style
+
+        for name in dir(type(self)):
+            field = getattr(type(self), name)
+            if isinstance(field, Attr):
+                value = getattr(self, name)
+                if value is None:
+                    continue
+                if callable(value):
+                    attrs[field.name] = True
+                else:
+                    attrs[field.name] = value
+
         return attrs
 
     @property
@@ -217,11 +240,7 @@ class Elem:
             raise Exception("element already build")
 
         # Construct message
-        attrs: dict[str, Any] = {}
-        for base in type(self).mro():
-            if hasattr(base, "attrs") and callable(base.attrs):
-                attrs |= base.attrs(self)
-        self.client.send(Message(event="create", **attrs))
+        self.client.send(Message(event="create", **self.attrs))
 
         # Build children
         for child in self.children:
@@ -235,11 +254,12 @@ class Elem:
         # Mark as added
         self.client._elems.add(self.id)
 
-        # Call mount
+        # Call mount hook
         self.mount()
 
-    def update_attrs(self, attrs: dict[str, Any]) -> None:
-        self.client.send(Message.update(self.id, **attrs))
+    def _update_attrs(self, attrs: dict[str, Any]) -> None:
+        if self._context:
+            self.client.send(Message.update(self.id, **attrs))
 
     def mount(self) -> None:
         pass
@@ -274,7 +294,7 @@ class Elem:
     @text.setter
     def text(self, value: str) -> None:
         self._children = [value]
-        self.update_attrs({"text": value})
+        self._update_attrs({"text": value})
 
     def __repr__(self) -> str:
         s = ""
@@ -290,204 +310,3 @@ class Elem:
 
 
 Children = list[Elem | str] | Elem | str | None
-
-
-class Div(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-        onclick: ClickEventHandler | None = None,
-    ) -> None:
-        super().__init__("div", children=children, style=style)
-        SupportsOnClick.__init__(self, onclick)
-
-
-class P(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-        onclick: ClickEventHandler | None = None,
-    ) -> None:
-        super().__init__("p", children=children, style=style)
-        SupportsOnClick.__init__(self, onclick)
-
-
-class Span(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-        onclick: ClickEventHandler | None = None,
-    ) -> None:
-        super().__init__("span", children=children, style=style)
-        SupportsOnClick.__init__(self, onclick)
-
-
-class H1(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-        onclick: ClickEventHandler | None = None,
-    ) -> None:
-        super().__init__("h1", children=children, style=style)
-        SupportsOnClick.__init__(self, onclick)
-
-
-class H2(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-        onclick: ClickEventHandler | None = None,
-    ) -> None:
-        super().__init__("h2", children=children, style=style)
-        SupportsOnClick.__init__(self, onclick)
-
-
-class H3(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-        onclick: ClickEventHandler | None = None,
-    ) -> None:
-        super().__init__("h3", children=children, style=style)
-        SupportsOnClick.__init__(self, onclick)
-
-
-class H4(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-        onclick: ClickEventHandler | None = None,
-    ) -> None:
-        super().__init__("h4", children=children, style=style)
-        SupportsOnClick.__init__(self, onclick)
-
-
-class H5(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-        onclick: ClickEventHandler | None = None,
-    ) -> None:
-        super().__init__("h5", children=children, style=style)
-        SupportsOnClick.__init__(self, onclick)
-
-
-class H6(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-        onclick: ClickEventHandler | None = None,
-    ) -> None:
-        super().__init__("h6", children=children, style=style)
-        SupportsOnClick.__init__(self, onclick)
-
-
-class A(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        href: str = "#",
-        style: dict[str, str] | None = None,
-        onclick: ClickEventHandler | None = None,
-    ) -> None:
-        super().__init__("a", children=children, style=style)
-        SupportsOnClick.__init__(self, onclick)
-        self._href = href
-
-    @property
-    def href(self) -> str:
-        return self._href
-
-    @href.setter
-    def href(self, value: str) -> None:
-        self._href = value
-        self.update_attrs({"href": self.href})
-
-    def attrs(self) -> dict[str, Any]:
-        return {"href": self.href}
-
-
-class Button(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-        onclick: ClickEventHandler | None = None,
-    ) -> None:
-        super().__init__("button", children=children, style=style)
-        SupportsOnClick.__init__(self, onclick)
-
-
-class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
-    def __init__(
-        self,
-        type: str = "text",
-        *,
-        style: dict[str, str] | None = None,
-        placeholder: str = "",
-        onclick: ClickEventHandler | None = None,
-        oninput: InputEventHandler | None = None,
-        onchange: ChangeEventHandler | None = None,
-    ) -> None:
-        super().__init__("input", style=style)
-        SupportsOnClick.__init__(self, onclick)
-        SupportsOnInput.__init__(self, oninput)
-        SupportsOnChange.__init__(self, onchange)
-        self._type = type
-        self._placeholder = placeholder
-
-    @property
-    def type(self) -> str:
-        return self._type
-
-    @property
-    def placeholder(self) -> str:
-        return self._placeholder
-
-    def attrs(self) -> dict[str, Any]:
-        return {"type": self.type, "placeholder": self.placeholder}
-
-
-class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
-    def __init__(
-        self,
-        text: str = "",
-        *,
-        style: dict[str, str] | None = None,
-        placeholder: str = "",
-        onclick: ClickEventHandler | None = None,
-        oninput: InputEventHandler | None = None,
-        onchange: ChangeEventHandler | None = None,
-    ) -> None:
-        super().__init__("textarea", [text], style=style)
-        SupportsOnClick.__init__(self, onclick)
-        SupportsOnInput.__init__(self, oninput)
-        SupportsOnChange.__init__(self, onchange)
-        self._placeholder = placeholder
-
-    @property
-    def placeholder(self) -> str:
-        return self._placeholder
-
-    def attrs(self) -> dict[str, Any]:
-        return {"placeholder": self.placeholder}

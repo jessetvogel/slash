@@ -1,17 +1,15 @@
 from __future__ import annotations
 
 from slash.app import App
-import slash.core as e
+import slash.html as e
 from slash.layout import Column
 from slash.table import Table
+from slash.utils import random_id
 
 
 def update_table(table: Table) -> None:
     table.data(
-        [
-            [e.random_id(), e.random_id(), e.random_id(), e.random_id()]
-            for _ in range(10)
-        ]
+        [[random_id(), random_id(), random_id(), random_id()] for _ in range(10)]
     )
 
 
