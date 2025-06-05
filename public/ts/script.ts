@@ -75,19 +75,23 @@ class Client {
 
         // create
         if (event == "create") {
-            const parent = $(message.parent)!;
             const tag = message.tag;
 
             // text
             if (tag == "text") {
-                parent.append(message.text);
+                $(message.parent)!.append(message.text);
                 return;
             }
 
             // html
-            const id = message.id;
-            const elem = create(tag, { id: id });
-            parent.append(elem);
+            const elem = create(tag, { id: message.id });
+            this.update(elem, message);
+            return;
+        }
+
+        // update
+        if (event == "update") {
+            const elem = $(message.id)!;
             this.update(elem, message);
             return;
         }
@@ -103,13 +107,6 @@ class Client {
         if (event == "clear") {
             const elem = $(message.id)!;
             elem.innerHTML = "";
-            return;
-        }
-
-        // update
-        if (event == "update") {
-            const elem = $(message.id)!;
-            this.update(elem, message);
             return;
         }
 
@@ -153,8 +150,13 @@ class Client {
 
     update(elem: HTMLElement, message: Message) {
         for (const attr in message) {
-            if (attr == "event" || attr == "id" || attr == "parent" || attr == "tag")
+            if (attr == "event" || attr == "id" || attr == "tag")
                 continue;
+
+            if (attr == "parent") {
+                $(message.parent)!.append(elem);
+                continue;
+            }
 
             if (attr == "style") {
                 for (const [key, value] of Object.entries(message.style)) {

@@ -102,7 +102,7 @@ class Figure(Elem):
             [self._js_figure_id, list(zip(xs, ys)), options],
         )
 
-    def mount(self) -> None:
+    def onmount(self) -> None:
         self._create_js_figure()
 
 

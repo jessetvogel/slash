@@ -9,7 +9,7 @@ class Client:
     def __init__(self) -> None:
         self._queue: list[Message] = []
         self._files: dict[str, Path] = {}
-        self._elems: set[str] = set()  # elements that client already has
+        self._mounted_elems: set[str] = set()  # elements that client already has
         self._functions: set[str] = set()  # functions that client already has
 
     def send(self, message: Message) -> None:

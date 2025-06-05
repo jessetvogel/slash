@@ -192,7 +192,6 @@ class Elem:
     def parent(self) -> Elem | None:
         return self._parent
 
-    @property
     def attrs(self) -> dict[str, Any]:
         attrs: dict[str, Any] = {
             "tag": self.tag,
@@ -234,56 +233,83 @@ class Elem:
                 if isinstance(child, Elem):
                     child.set_context(context)
 
-    def build(self) -> None:
-        # Check for context
-        if self.id in self.client._elems:
-            raise Exception("element already build")
+    def is_mounted(self) -> bool:
+        return self.id in self.client._mounted_elems
 
-        # Construct message
-        self.client.send(Message(event="create", **self.attrs))
+    def mount(self) -> None:
+        # If already mounted, raise exception
+        if self.is_mounted():
+            raise Exception(f"Element {self.id} already mounted")
 
-        # Build children
+        # Send create message
+        self.client.send(Message(event="create", **self.attrs()))
+
+        # Mount children
         for child in self.children:
             if isinstance(child, Elem):
-                child.build()
+                child.mount()
             else:
                 self.client.send(
-                    Message(event="create", tag="text", parent=self.id, text=child)
+                    Message(event="create", tag="text", parent=self.id, text=child),
                 )
 
-        # Mark as added
-        self.client._elems.add(self.id)
+        # Mark as mounted
+        self.client._mounted_elems.add(self.id)
 
         # Call mount hook
-        self.mount()
+        self.onmount()
+
+    def unmount(self) -> None:
+        # If not yet mounted, raise exception
+        if not self.is_mounted():
+            raise Exception(f"Element {self.id} was not mounted")
+
+        # Unmount children
+        for child in self.children:
+            if isinstance(child, Elem):
+                child.unmount()
+
+        # Unmark as mounted
+        self.client._mounted_elems.remove(self.id)
+
+        # Send remove message
+        self.client.send(Message.remove(self.id))
+
+        # Call unmount hook
+        self.onunmount()
+
+    def onmount(self) -> None:
+        pass
+
+    def onunmount(self) -> None:
+        pass
 
     def _update_attrs(self, attrs: dict[str, Any]) -> None:
         if self._context:
             self.client.send(Message.update(self.id, **attrs))
 
-    def mount(self) -> None:
-        pass
-
-    def unmount(self) -> None:
-        pass
-
-    def remove(self) -> None:
-        self.unmount()
-        self.client.send(Message.remove(self.id))
-
     def clear(self) -> None:
         self.client.send(Message.clear(self.id))
 
     def append(self, elem: Elem) -> None:
-        if elem.parent:
-            # TODO: remove element from its old parent, without unmounting it!
+        if self._context is None:
+            raise Exception("element has no context")
+        elem.set_context(self._context)
+
+        # If elem is not mounted yet, set its parent and mount it
+        if not elem.is_mounted():
+            elem._parent = self
+            elem.mount()
             return
 
+        # Otherwise, set its parent and send update message
         elem._parent = self
+        self.client.send(Message.update(elem.id, parent=self.id))
 
-        if self._context is not None:
-            elem.set_context(self._context)
-            elem.build()
+    def contains(self, elem: Elem) -> bool:
+        return elem._parent is self or (
+            elem._parent is not None and self.contains(elem._parent)
+        )
 
     @property
     def text(self) -> str:

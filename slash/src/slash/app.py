@@ -52,7 +52,7 @@ class App:
         client = self._get_client(client_id)
         self._context.client = client  # set client
         try:
-            root.build()
+            root.mount()
         except Exception as err:
             client.flush()
             msg = "Server error: " + str(err)
