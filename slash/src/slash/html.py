@@ -10,6 +10,7 @@ from slash.core import (
     SupportsOnClick,
     SupportsOnInput,
 )
+from slash.js import JSFunction
 
 
 class Div(Elem, SupportsOnClick):
@@ -236,3 +237,27 @@ class Select(Elem, SupportsOnChange):
                     child.remove_attr("selected")
         if self.onchange:
             self.onchange(event)
+
+
+class Dialog(Elem):
+    def __init__(
+        self, children: Children | None = None, *, style: dict[str, str] | None = None
+    ):
+        super().__init__("dialog", children, style=style)
+
+    def show(self) -> None:
+        self.client.execute(JS_DIALOG_SHOW, [self.id])
+
+    def show_modal(self) -> None:
+        self.client.execute(JS_DIALOG_SHOW_MODAL, [self.id])
+
+    def close(self) -> None:
+        self.client.execute(JS_DIALOG_CLOSE, [self.id])
+
+
+JS_DIALOG_SHOW = JSFunction(["id"], "document.getElementById(id).show()")
+JS_DIALOG_SHOW_MODAL = JSFunction(
+    ["id"],
+    "const dialog = document.getElementById(id).showModal()",
+)
+JS_DIALOG_CLOSE = JSFunction(["id"], "document.getElementById(id).close()")

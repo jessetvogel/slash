@@ -152,6 +152,16 @@
     }
 }
 
+@keyframes slide-in-up {
+    from {
+        transform: translateY(16px);
+    }
+
+    to {
+        transform: translateY(0px);
+    }
+}
+
 @keyframes fade-in {
     from {
         opacity: 0.0;

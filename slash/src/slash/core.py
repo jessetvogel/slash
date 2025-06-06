@@ -301,6 +301,7 @@ class Elem:
             self.client.send(Message.update(self.id, **attrs))
 
     def clear(self) -> None:
+        # TODO: actually unmount all children
         self.client.send(Message.clear(self.id))
 
     def append(self, elem: Elem) -> None:

@@ -25,12 +25,16 @@ body {
     --pre-text-color: #444;
     --pre-border: 1px solid #bbb;
 
+    --dialog-bg-color: var(--white);
+    --dialog-border: 1px solid #bbb;
+    --dialog-backdrop-color: rgba(0, 0, 0, 0.075);
+
     --error-text-color: #ba5912;
     --info-text-color: #1a7d8e;
     --warning-text-color: #e2a32d;
     --debug-text-color: #7faa6c;
 
-    --shadow: 0px 0px 8px rgba(0, 0, 0, 0.12);
+    --shadow: 0px 0px 8px rgba(0, 0, 0, 0.05);
 
     /* Fonts */
     --main-font: 'DM Sans';
@@ -173,4 +177,19 @@ pre {
     padding: 8px;
     box-shadow: var(--shadow);
     overflow: auto;
+}
+
+dialog {
+    background-color: var(--dialog-bg-color);
+    border: var(--dialog-border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+
+    &::backdrop {
+        background-color: var(--dialog-backdrop-color);
+    }
+
+    animation: fade-in 0.5s forwards,
+    slide-in-up 0.5s forwards;
 }
