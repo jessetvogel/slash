@@ -57,6 +57,7 @@ class Server:
         web.run_app(self.app, host=self._host, port=self._port, print=None)
 
     async def _on_shutdown(self, _: web.Application) -> None:
+        self._logger.info("Server shutdown")
         for ws in set(self._websockets):
             await ws.close(code=WSCloseCode.GOING_AWAY, message=b"server shutdown")
 

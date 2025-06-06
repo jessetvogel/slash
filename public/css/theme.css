@@ -110,7 +110,8 @@ input[type~="tel"],
 input[type~="time"],
 input[type~="url"],
 input[type~="week"],
-textarea {
+textarea,
+select {
     background-color: var(--input-bg-color);
     color: var(--input-text-color);
     border: var(--input-border);

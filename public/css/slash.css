@@ -13,14 +13,15 @@
     animation: fade-in 1.0s forwards;
 
     span {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: bold;
+        text-align: center;
     }
 
     div {
         width: 48px;
         height: 48px;
-        border: 3px solid var(--white);
+        border: 4px solid var(--main-text-color);
         border-radius: 50%;
         display: inline-block;
         position: relative;
@@ -34,11 +35,11 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            width: 56px;
-            height: 56px;
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
-            border: 3px solid;
-            border-color: var(--primary-color) transparent;
+            border: 4px solid;
+            border-color: var(--primary-color) transparent var(--secondary-color) transparent;
         }
     }
 }
@@ -61,19 +62,21 @@
     flex-direction: column;
     gap: 8px;
     padding: 8px;
+    max-width: 100dvw;
+    box-sizing: border-box;
 
     --icon-size: 24px;
 
     .message {
         position: relative;
-        min-width: 256px;
-        max-width: 384px;
-        padding: 9px 10px 8px 38px;
+        max-width: 512px;
+        padding: 8px 8px 8px 38px;
         border-radius: 8px;
         border: var(--button-border);
         background-color: var(--white);
         box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.12);
         animation: slide-in-right 0.5s forwards, fade-in 0.5s forwards;
+        line-height: 22px;
 
         &.remove {
             animation: fade-out 0.5s forwards;
@@ -81,8 +84,8 @@
 
         .icon {
             position: absolute;
-            top: 8px;
-            left: 8px;
+            top: 7px;
+            left: 7px;
             display: block;
             mask-size: var(--icon-size);
             mask-position: center;

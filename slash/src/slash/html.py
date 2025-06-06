@@ -1,5 +1,6 @@
 from slash.core import (
     Attr,
+    ChangeEvent,
     ChangeEventHandler,
     Children,
     ClickEventHandler,
@@ -148,14 +149,16 @@ class Button(Elem, SupportsOnClick):
 
 
 class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
-    placeholder = Attr("placeholder")
     type = Attr("type")
+    value = Attr("value")
+    placeholder = Attr("placeholder")
 
     def __init__(
         self,
         type: str = "text",
         *,
         style: dict[str, str] | None = None,
+        value: str = "",
         placeholder: str = "",
         onclick: ClickEventHandler | None = None,
         oninput: InputEventHandler | None = None,
@@ -164,9 +167,15 @@ class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         super().__init__("input", style=style)
         SupportsOnClick.__init__(self, onclick)
         SupportsOnInput.__init__(self, oninput)
-        SupportsOnChange.__init__(self, onchange)
+        SupportsOnChange.__init__(self, onchange or (lambda _: None))
         self.type = type
+        self.value = value
         self.placeholder = placeholder
+
+    def change(self, event: ChangeEvent) -> None:
+        Input.value.set_silently(self, event.value)
+        if self.onchange:
+            self.onchange(event)
 
 
 class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
@@ -185,5 +194,11 @@ class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         super().__init__("textarea", [text], style=style)
         SupportsOnClick.__init__(self, onclick)
         SupportsOnInput.__init__(self, oninput)
-        SupportsOnChange.__init__(self, onchange)
+        SupportsOnChange.__init__(self, onchange or (lambda _: None))
         self.placeholder = placeholder
+        self.text = text
+
+    def change(self, event: ChangeEvent) -> None:
+        self._text = event.value
+        if self.onchange:
+            self.onchange(event)

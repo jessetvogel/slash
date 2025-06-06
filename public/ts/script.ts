@@ -199,8 +199,11 @@ class Client {
                 continue;
             }
 
-            elem.setAttribute(attr, message[attr])
-            // throw new Error(`Unknown attribute ${attr}`)
+            const value = message[attr];
+            if (value === null) // null means to remove the attribute
+                elem.removeAttribute(attr);
+            else
+                elem.setAttribute(attr, value);
         }
     }
 

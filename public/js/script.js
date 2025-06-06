@@ -149,7 +149,11 @@ class Client {
                 elem.innerText = message.text;
                 continue;
             }
-            elem.setAttribute(attr, message[attr]);
+            const value = message[attr];
+            if (value === null)
+                elem.removeAttribute(attr);
+            else
+                elem.setAttribute(attr, value);
         }
     }
     onclick(event) {

@@ -47,6 +47,9 @@ class Attr(property):
         setattr(elem, self._private, value)
         elem._update_attrs({self._name: value})
 
+    def set_silently(self, elem: Elem, value: Any):
+        setattr(elem, self._private, value)
+
     @property
     def name(self) -> str:
         return self._name
@@ -215,6 +218,15 @@ class Elem:
                     attrs[field.name] = value
 
         return attrs
+
+    def set_attr(self, name: str, value: str = "") -> None:
+        self._attrs[name] = value
+        self._update_attrs({name: value})
+
+    def remove_attr(self, name: str) -> None:
+        if name in self._attrs:
+            del self._attrs[name]
+            self._update_attrs({name: None})
 
     @property
     def client(self) -> Client:
