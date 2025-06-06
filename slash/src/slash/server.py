@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import Callable
 import urllib.parse
+import weakref
 
 import slash.logging
 
-from aiohttp import WSMsgType, web
+from aiohttp import WSCloseCode, WSMsgType, web
 
 PATH_PUBLIC = Path("../public")
 
@@ -23,37 +24,47 @@ class Server:
         self._port = port
         self._logger = slash.logging.create_logger()
 
-        self._ws_connect_callback: Callable[[int], list[str]] | None = None
-        self._ws_message_callback: Callable[[int, str], list[str]] | None = None
-        self._ws_disconnect_callback: Callable[[int], None] | None = None
+        self._callback_ws_connect: Callable[[int], list[str]] | None = None
+        self._callback_ws_message: Callable[[int, str], list[str]] | None = None
+        self._callback_ws_disconnect: Callable[[int], None] | None = None
 
         self._files: dict[str, Path] = {}
 
         self._client_counter = 0
 
     def on_ws_connect(self, callback: Callable[[int], list[str]]) -> None:
-        self._ws_connect_callback = callback
+        self._callback_ws_connect = callback
 
     def on_ws_message(self, callback: Callable[[int, str], list[str]]) -> None:
-        self._ws_message_callback = callback
+        self._callback_ws_message = callback
 
     def on_ws_disconnect(self, callback: Callable[[int], None]) -> None:
-        self._ws_disconnect_callback = callback
+        self._callback_ws_disconnect = callback
 
     def serve(self) -> None:
         self._logger.info(f"Serving on http://{self._host}:{self._port} ..")
 
+        # Create web.Application
         self.app = web.Application()
-        self.app.router.add_get("/ws", self._ws_handler)
-        self.app.router.add_route("*", "/{tail:.*}", self._http_handler)
+        self.app.router.add_get("/ws", self._on_ws_request)
+        self.app.router.add_route("*", "/{tail:.*}", self._on_http_request)
 
+        # Keep track of websocket connections (to close on shutdown)
+        self._websockets: weakref.WeakSet[web.WebSocketResponse] = weakref.WeakSet()
+        self.app.on_shutdown.append(self._on_shutdown)
+
+        # Run web app
         web.run_app(self.app, host=self._host, port=self._port, print=None)
 
-    async def _http_handler(self, request: web.Request) -> web.Response:
+    async def _on_shutdown(self, _: web.Application) -> None:
+        for ws in set(self._websockets):
+            await ws.close(code=WSCloseCode.GOING_AWAY, message=b"server shutdown")
+
+    async def _on_http_request(self, request: web.Request) -> web.Response:
         path = request.path
         method = request.method
 
-        # Must be GET
+        # Method must be GET
         if method != "GET":
             return self._response_405_method_not_allowed()
 
@@ -80,38 +91,40 @@ class Server:
         # Respond with file
         return self._response_file(PATH_PUBLIC / path)
 
-    def _create_client_id(self) -> int:
-        self._client_counter += 1
-        return self._client_counter
-
-    async def _ws_handler(self, request: web.Request) -> web.StreamResponse:
+    async def _on_ws_request(self, request: web.Request) -> web.StreamResponse:
         ws = web.WebSocketResponse()
         await ws.prepare(request)
 
         self._logger.debug("WebSocket connect")
 
-        client_id = self._create_client_id()
+        # Keep track of websocket connection
+        self._websockets.add(ws)
 
-        # Call `_ws_connect_callback`
-        if self._ws_connect_callback is not None:
-            for data in self._ws_connect_callback(client_id):
-                await ws.send_str(data)
+        try:
+            client_id = self._create_client_id()
 
-        # Call `ws_connect_message` for every message
-        async for msg in ws:
-            self._logger.debug(f"WebSocket message: {msg.data}")
-            if msg.type == WSMsgType.TEXT:
-                if self._ws_message_callback is not None:
-                    for data in self._ws_message_callback(client_id, msg.data):
-                        await ws.send_str(data)
-            elif msg.type == WSMsgType.ERROR:
-                self._logger.warning(f"WebSocket error: {ws.exception()}")
+            # Call `_callback_ws_connect`
+            if self._callback_ws_connect is not None:
+                for data in self._callback_ws_connect(client_id):
+                    await ws.send_str(data)
 
-        self._logger.debug("WebSocket disconnected")
+            # Call `_callback_ws_message` for every message
+            async for msg in ws:
+                self._logger.debug(f"WebSocket message: {msg.data}")
+                if msg.type == WSMsgType.TEXT:
+                    if self._callback_ws_message is not None:
+                        for data in self._callback_ws_message(client_id, msg.data):
+                            await ws.send_str(data)
+                elif msg.type == WSMsgType.ERROR:
+                    self._logger.warning(f"WebSocket error: {ws.exception()}")
 
-        # Call `_ws_disconnect_callback`
-        if self._ws_disconnect_callback is not None:
-            self._ws_disconnect_callback(client_id)
+            self._logger.debug("WebSocket disconnected")
+
+            # Call `_callback_ws_disconnect`
+            if self._callback_ws_disconnect is not None:
+                self._callback_ws_disconnect(client_id)
+        finally:
+            self._websockets.discard(ws)
 
         return ws
 
@@ -142,6 +155,10 @@ class Server:
         # Send file
         with path.open("rb") as file:
             return web.Response(status=200, content_type=mime_type, body=file.read())
+
+    def _create_client_id(self) -> int:
+        self._client_counter += 1
+        return self._client_counter
 
     def host(self, url: str, path: Path) -> None:
         self._files[url] = path

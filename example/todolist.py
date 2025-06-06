@@ -57,11 +57,21 @@ def home() -> e.Elem:
             Row(
                 [
                     tasks := Column(
-                        [e.H2("Tasks 📝", style={"text-align": "center"})],
+                        [
+                            e.H2(
+                                "Tasks 📝",
+                                style={"text-align": "center", "color": "blue"},
+                            )
+                        ],
                         style={"width": "256px"},
                     ),
                     finished := Column(
-                        [e.H2("Finished 🎉", style={"text-align": "center"})],
+                        [
+                            e.H2(
+                                "Finished 🎉",
+                                style={"text-align": "center", "color": "green"},
+                            )
+                        ],
                         style={"width": "256px"},
                     ),
                 ],

@@ -292,19 +292,23 @@ class Elem:
         self.client.send(Message.clear(self.id))
 
     def append(self, elem: Elem) -> None:
-        if self._context is None:
-            raise Exception("element has no context")
-        elem.set_context(self._context)
-
-        # If elem is not mounted yet, set its parent and mount it
-        if not elem.is_mounted():
-            elem._parent = self
-            elem.mount()
-            return
-
-        # Otherwise, set its parent and send update message
+        # Set parent and children variables
+        if elem._parent is not None:
+            elem._parent._children.remove(elem)
         elem._parent = self
-        self.client.send(Message.update(elem.id, parent=self.id))
+        self._children.append(elem)
+
+        # Set context
+        if self._context is not None:
+            elem.set_context(self._context)
+
+            # If elem is not mounted yet, set its parent and mount it
+            if not elem.is_mounted():
+                elem._parent = self
+                elem.mount()
+            else:
+                # Otherwise, set its parent and send update message
+                self.client.send(Message.update(elem.id, parent=self.id))
 
     def contains(self, elem: Elem) -> bool:
         return elem._parent is self or (

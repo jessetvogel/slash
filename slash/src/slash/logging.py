@@ -10,30 +10,25 @@ class Formatter(logging.Formatter):
     WHITE = "\x1b[37m"
     BOLD = "\x1b[1m"
     RESET = "\x1b[0m"
-    format_str = (
-        "["
-        + BLUE
-        + "%(name)s"
-        + RESET
-        + "]["
-        + GRAY
-        + "%(levelname)s"
-        + RESET
-        + "] "
-        + "%(message)s"
-    )
+
+    fmt_prefix = "[" + GRAY + "%(asctime)s" + RESET + "]"
+    fmt_date = "%H:%M:%S"
 
     FORMATS = {
-        logging.DEBUG: format_str,
-        logging.INFO: format_str,
-        logging.WARNING: format_str,
-        logging.ERROR: format_str,
-        logging.CRITICAL: format_str,
+        logging.INFO: fmt_prefix + " " + WHITE + "INFO" + RESET + ": %(message)s",
+        logging.DEBUG: fmt_prefix + " " + BLUE + "DEBUG" + RESET + ": %(message)s",
+        logging.WARNING: fmt_prefix
+        + " "
+        + YELLOW
+        + "WARNING"
+        + RESET
+        + ": %(message)s",
+        logging.ERROR: fmt_prefix + " " + RED + "ERROR" + RESET + ": %(message)s",
+        logging.CRITICAL: fmt_prefix + " " + RED + "CRITICAL" + RESET + ": %(message)s",
     }
 
     def format(self, record):
-        log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt)
+        formatter = logging.Formatter(self.FORMATS.get(record.levelno), self.fmt_date)
         return formatter.format(record)
 
 
