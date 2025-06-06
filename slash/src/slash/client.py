@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Any
-from slash.jsfunction import JSFunction
+from slash.js import JSFunction
 from slash.message import Message
 from slash.utils import random_id
 

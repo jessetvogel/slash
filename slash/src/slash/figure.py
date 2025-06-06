@@ -2,7 +2,7 @@ import random
 from typing import Any
 
 from slash.core import Elem
-from slash.jsfunction import JSFunction
+from slash.js import JSFunction
 
 # class FigureOption:
 #   TODO

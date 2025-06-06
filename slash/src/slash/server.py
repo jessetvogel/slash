@@ -42,7 +42,9 @@ class Server:
         self._callback_ws_disconnect = callback
 
     def serve(self) -> None:
-        self._logger.info(f"Serving on http://{self._host}:{self._port} ..")
+        self._logger.info(
+            f"Serving on http://{self._host}:{self._port} .. (Press Ctrl+C to quit)"
+        )
 
         # Create web.Application
         self.app = web.Application()

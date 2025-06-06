@@ -4,7 +4,7 @@ import random
 from slash.app import App
 import slash.core as e
 import slash.html as h
-from slash.jsfunction import JSFunction
+from slash.js import JSFunction
 from slash.layout import Column
 
 

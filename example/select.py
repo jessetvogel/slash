@@ -5,7 +5,7 @@ import slash.core as e
 import slash.html as h
 from slash.layout import Column
 
-from slash.select import Select
+from slash.html import Select
 
 
 def update_span(span: h.Span, text: str) -> None:
