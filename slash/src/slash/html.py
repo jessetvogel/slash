@@ -202,3 +202,13 @@ class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         self._text = event.value
         if self.onchange:
             self.onchange(event)
+
+
+class Img(Elem):
+    src = Attr("src")
+    alt = Attr("alt")
+
+    def __init__(self, src: str, *, alt: str = "") -> None:
+        super().__init__("img")
+        self.src = src
+        self.alt = alt

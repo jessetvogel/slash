@@ -5,14 +5,13 @@ import random
 from slash.app import App
 import slash.core as e
 import slash.html as h
-from slash.image import Image
 from slash.layout import Column
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-def update_image(image: Image) -> None:
+def update_image(img: h.Img) -> None:
     path = [
         Path("/Users/jessetvogel/Projects/slash/public/img/debug.png"),
         Path("/Users/jessetvogel/Projects/slash/public/img/info.png"),
@@ -20,11 +19,11 @@ def update_image(image: Image) -> None:
         Path("/Users/jessetvogel/Projects/slash/public/img/error.png"),
     ][int(4 * random.random())]
 
-    image.src = image.client.host(path)
-    image.style = {"height": "64px"}
+    img.src = img.client.host(path)
+    img.style = {"height": "64px"}
 
 
-def generate_graph(image: Image) -> None:
+def generate_graph(image: h.Img) -> None:
     path = Path("./tmp/graph.png")
 
     f = 1 + random.random() * 10.0
@@ -44,7 +43,7 @@ def home() -> e.Elem:
     return Column(
         [
             h.H1("Image demo"),
-            image := Image(
+            image := h.Img(
                 "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
                 alt="This is the alt text.",
             ),
