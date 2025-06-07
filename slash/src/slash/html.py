@@ -240,24 +240,23 @@ class Select(Elem, SupportsOnChange):
 
 
 class Dialog(Elem):
+    JS_SHOW = JSFunction(["id"], "document.getElementById(id).show()")
+    JS_SHOW_MODAL = JSFunction(
+        ["id"],
+        "document.getElementById(id).showModal()",
+    )
+    JS_CLOSE = JSFunction(["id"], "document.getElementById(id).close()")
+
     def __init__(
         self, children: Children | None = None, *, style: dict[str, str] | None = None
     ):
         super().__init__("dialog", children, style=style)
 
     def show(self) -> None:
-        self.client.execute(JS_DIALOG_SHOW, [self.id])
+        self.client.execute(self.JS_SHOW, [self.id])
 
     def show_modal(self) -> None:
-        self.client.execute(JS_DIALOG_SHOW_MODAL, [self.id])
+        self.client.execute(self.JS_SHOW_MODAL, [self.id])
 
     def close(self) -> None:
-        self.client.execute(JS_DIALOG_CLOSE, [self.id])
-
-
-JS_DIALOG_SHOW = JSFunction(["id"], "document.getElementById(id).show()")
-JS_DIALOG_SHOW_MODAL = JSFunction(
-    ["id"],
-    "const dialog = document.getElementById(id).showModal()",
-)
-JS_DIALOG_CLOSE = JSFunction(["id"], "document.getElementById(id).close()")
+        self.client.execute(self.JS_CLOSE, [self.id])

@@ -301,8 +301,10 @@ class Elem:
             self.client.send(Message.update(self.id, **attrs))
 
     def clear(self) -> None:
-        # TODO: actually unmount all children
-        self.client.send(Message.clear(self.id))
+        for child in self.children:
+            if isinstance(child, Elem):
+                child.unmount()
+        self._children = []
 
     def append(self, elem: Elem) -> None:
         # Set parent and children variables
@@ -350,6 +352,22 @@ class Elem:
                 s += "\n"
         s += f"</{self.tag}>"
         return s
+
+    def add_class(self, name: str) -> None:
+        if "class" not in self._attrs:
+            self._attrs["class"] = name
+        else:
+            self._attrs["class"] += " " + name
+        self._update_attrs({"class": self._attrs["class"]})
+
+    def remove_class(self, name: str) -> None:
+        if "class" not in self._attrs:
+            return
+
+        self._attrs["class"] = (
+            str(self._attrs["class"]).replace(name, "").replace("  ", " ")
+        )
+        self._update_attrs({"class": self._attrs["class"]})
 
 
 Children = list[Elem | str] | Elem | str | None
