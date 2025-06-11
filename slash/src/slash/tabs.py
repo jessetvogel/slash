@@ -1,26 +1,20 @@
-from slash.core import ChangeEvent, ChangeEventHandler, Elem, SupportsOnChange
+from slash.core import ChangeEvent, Elem, SupportsOnChange
 from slash import html
 
 
 class Tabs(Elem, SupportsOnChange):
-    def __init__(
-        self,
-        labels: list[str],
-        *,
-        value: str | None = None,
-        onchange: ChangeEventHandler | None = None,
-    ) -> None:
+    def __init__(self, labels: list[str], *, value: str | None = None) -> None:
         super().__init__(
             "div",
             [
-                html.Div(label, onclick=lambda event: self._onclick_tab(event.target))
+                html.Div(label).onclick(lambda event: self._onclick_tab(event.target))
                 for label in labels
             ],
-            **{"class": "slash-tabs"}, # type: ignore[arg-type]
+            **{"class": "slash-tabs"},  # type: ignore[arg-type]
         )
-        SupportsOnChange.__init__(self, onchange)
+        SupportsOnChange.__init__(self)
         self._labels = labels
-        self.value = value or labels[0]
+        self._value: str = value or labels[0]
 
         for child in self.children:
             if isinstance(child, Elem) and child.text == value:

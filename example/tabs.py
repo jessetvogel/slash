@@ -21,12 +21,11 @@ def tab_1() -> Elem:
 def tab_2() -> Elem:
     figure = Figure()
 
-    def tmp(figure: Figure) -> None:
-        Figure.onmount(figure)
+    def tmp() -> None:
         figure.graph([0, 1, 2, 3], [1, 0, 1, 0])
         figure.draw()
 
-    figure.onmount = lambda: tmp(figure)
+    figure.onmount(tmp)
     return figure
 
 
@@ -34,28 +33,27 @@ def tab_3() -> Elem:
     return html.Span("Some more text.")
 
 
-def set_tab(content: Elem, value: str) -> None:
-    if value == "Tab 1":
-        content.clear()
-        content.append(tab_1())
-
-    elif value == "Tab 2":
-        content.clear()
-        content.append(tab_2())
-
-    elif value == "Tab 3":
-        content.clear()
-        content.append(tab_3())
-
-
 def home() -> Elem:
     content = html.Div()
+
+    def set_tab(value: str) -> None:
+        if value == "Tab 1":
+            content.clear()
+            content.append(tab_1())
+
+        elif value == "Tab 2":
+            content.clear()
+            content.append(tab_2())
+
+        elif value == "Tab 3":
+            content.clear()
+            content.append(tab_3())
+
     return layout.Column(
         [
             Tabs(
                 ["Tab 1", "Tab 2", "Tab 3"],
-                onchange=lambda event: set_tab(content, event.value),
-            ),
+            ).onchange(lambda event: set_tab(event.value)),
             content,
         ]
     )

@@ -98,8 +98,9 @@ def home() -> e.Elem:
                     "Bullfinch",
                     "Emu",
                     "Condor",
-                ],
-                onchange=lambda _: update_span(span, select.value),
+                ]
+            ).onchange(
+                lambda _: update_span(span, select.value),
             ),
             span := h.Span(style={"padding": "8px"}),
         ],

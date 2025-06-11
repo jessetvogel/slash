@@ -19,6 +19,7 @@ class Figure(Elem):
         self._ylabel = ylabel
         self._grid = grid
         self._js_figure_id = self.id + "_js_figure"
+        self.onmount(self._create_js_figure)
 
     def _create_js_figure(self) -> None:
         options = {
@@ -101,9 +102,6 @@ class Figure(Elem):
             FUNCTION_SCATTER,
             [self._js_figure_id, list(zip(xs, ys)), options],
         )
-
-    def onmount(self) -> None:
-        self._create_js_figure()
 
 
 FUNCTION_CREATE = JSFunction(

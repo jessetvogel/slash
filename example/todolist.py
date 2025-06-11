@@ -30,10 +30,10 @@ def add_task(tasks: Elem, finished: Elem) -> None:
                 e.Span(
                     input_text, style={"margin-right": "auto", "font-weight": "bold"}
                 ),
-                e.Button(
-                    "move", onclick=lambda _: swap_column(new_task, tasks, finished)
+                e.Button("move").onclick(
+                    lambda _: swap_column(new_task, tasks, finished)
                 ),
-                e.Button("delete", onclick=lambda _: new_task.unmount()),
+                e.Button("delete").onclick(lambda _: new_task.unmount()),
             ],
             style={"align-items": "center"},
         )
@@ -50,8 +50,8 @@ def home() -> e.Elem:
         [
             Row(
                 [
-                    e.Input("text", onchange=lambda event: set_text(event.value)),
-                    e.Button("add task", onclick=lambda _: add_task(tasks, finished)),
+                    e.Input("text").onchange(lambda event: set_text(event.value)),
+                    e.Button("add task").onclick(lambda _: add_task(tasks, finished)),
                 ]
             ),
             Row(

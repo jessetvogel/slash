@@ -11,15 +11,15 @@ def home() -> Elem:
             html.H2("Dialog demo"),
             html.Div(
                 [
-                    html.Button("Dialog.show()", onclick=lambda _: dialog.show()),
-                    html.Button(
-                        "Dialog.show_modal()", onclick=lambda _: dialog.show_modal()
+                    html.Button("Dialog.show()").onclick(lambda _: dialog.show()),
+                    html.Button("Dialog.show_modal()").onclick(
+                        lambda _: dialog.show_modal()
                     ),
                     dialog := html.Dialog(
                         layout.Column(
                             [
                                 html.Span("This is a dialog element!"),
-                                html.Button("Close", onclick=lambda _: dialog.close()),
+                                html.Button("Close").onclick(lambda _: dialog.close()),
                             ],
                             style={"gap": "16px"},
                         )

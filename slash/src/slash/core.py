@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Self
 
 from slash.client import Client
 from slash.message import Message
@@ -71,15 +71,21 @@ ClickEventHandler = Callable[[ClickEvent], None]
 
 
 class SupportsOnClick:
-    onclick = Attr("onclick")
+    def __init__(self) -> None:
+        self._onclick_handlers: list[ClickEventHandler] = []
 
-    def __init__(self, onclick: ClickEventHandler | None = None) -> None:
-        self.onclick = onclick
+    def onclick(self, handler: ClickEventHandler) -> Self:
+        """Add click event handler."""
+        self._onclick_handlers.append(handler)
+        return self
 
     def click(self, event: ClickEvent) -> None:
         """Trigger click event."""
-        if self.onclick:
-            self.onclick(event)
+        for handler in self._onclick_handlers:
+            handler(event)
+
+    def has_onclick_handlers(self) -> bool:
+        return bool(self._onclick_handlers)
 
 
 class InputEvent:
@@ -100,15 +106,21 @@ InputEventHandler = Callable[[InputEvent], None]
 
 
 class SupportsOnInput:
-    oninput = Attr("oninput")
+    def __init__(self) -> None:
+        self._oninput_handlers: list[InputEventHandler] = []
 
-    def __init__(self, oninput: InputEventHandler | None = None) -> None:
-        self.oninput = oninput
+    def oninput(self, handler: InputEventHandler) -> Self:
+        """Add input event handler."""
+        self._oninput_handlers.append(handler)
+        return self
 
     def input(self, event: InputEvent) -> None:
         """Trigger input event."""
-        if self.oninput:
-            self.oninput(event)
+        for handler in self._oninput_handlers:
+            handler(event)
+
+    def has_oninput_handlers(self) -> bool:
+        return bool(self._oninput_handlers)
 
 
 class ChangeEvent:
@@ -129,18 +141,27 @@ ChangeEventHandler = Callable[[ChangeEvent], None]
 
 
 class SupportsOnChange:
-    onchange = Attr("onchange")
+    def __init__(self) -> None:
+        self._onchange_handlers: list[ChangeEventHandler] = []
 
-    def __init__(self, onchange: ChangeEventHandler | None = None) -> None:
-        self.onchange = onchange
+    def onchange(self, handler: ChangeEventHandler) -> Self:
+        """Add change event handler."""
+        self._onchange_handlers.append(handler)
+        return self
 
     def change(self, event: ChangeEvent) -> None:
         """Trigger change event."""
-        if self.onchange:
-            self.onchange(event)
+        for handler in self._onchange_handlers:
+            handler(event)
+
+    def has_onchange_handlers(self) -> bool:
+        return bool(self._onchange_handlers)
 
 
 # Elements
+
+MountEventHandler = Callable[[], None]
+UnmountEventHandler = Callable[[], None]
 
 
 class Elem:
@@ -164,6 +185,9 @@ class Elem:
         self._id = random_id()
         self._context: Context | None = None
         self._parent: Elem | None = None
+
+        self._onmount_handlers: list[MountEventHandler] = []
+        self._onunmount_handlers: list[UnmountEventHandler] = []
 
         # Set parent of children
         for child in self._children:
@@ -203,9 +227,11 @@ class Elem:
             **self._attrs,
         }
 
+        # Style
         if self.style:
             attrs["style"] = self.style
 
+        # Attributes
         for name in dir(type(self)):
             field = getattr(type(self), name)
             if isinstance(field, Attr):
@@ -216,6 +242,14 @@ class Elem:
                     attrs[field.name] = True
                 else:
                     attrs[field.name] = value
+
+        # Indicate whether to set event handlers
+        if isinstance(self, SupportsOnClick) and self.has_onclick_handlers():
+            attrs["onclick"] = True
+        if isinstance(self, SupportsOnChange) and self.has_onchange_handlers():
+            attrs["onchange"] = True
+        if isinstance(self, SupportsOnInput) and self.has_oninput_handlers():
+            attrs["oninput"] = True
 
         return attrs
 
@@ -248,6 +282,14 @@ class Elem:
     def is_mounted(self) -> bool:
         return self.id in self.client._mounted_elems
 
+    def onmount(self, handler: MountEventHandler) -> Self:
+        self._onmount_handlers.append(handler)
+        return self
+
+    def onunmount(self, handler: UnmountEventHandler) -> Self:
+        self._onunmount_handlers.append(handler)
+        return self
+
     def mount(self) -> None:
         # If already mounted, raise exception
         if self.is_mounted():
@@ -268,8 +310,9 @@ class Elem:
         # Mark as mounted
         self.client._mounted_elems.add(self.id)
 
-        # Call mount hook
-        self.onmount()
+        # Call mount event handlers
+        for handler in self._onmount_handlers:
+            handler()
 
     def unmount(self) -> None:
         # If not yet mounted, raise exception
@@ -288,13 +331,8 @@ class Elem:
         self.client.send(Message.remove(self.id))
 
         # Call unmount hook
-        self.onunmount()
-
-    def onmount(self) -> None:
-        pass
-
-    def onunmount(self) -> None:
-        pass
+        for handler in self._onunmount_handlers:
+            handler()
 
     def _update_attrs(self, attrs: dict[str, Any]) -> None:
         if self._context:

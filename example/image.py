@@ -47,8 +47,8 @@ def home() -> e.Elem:
                 "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
                 alt="This is the alt text.",
             ),
-            h.Button("Show an icon!", onclick=lambda _: update_image(image)),
-            h.Button("Show a graph!", onclick=lambda _: generate_graph(image)),
+            h.Button("Show an icon!").onclick(lambda _: update_image(image)),
+            h.Button("Show a graph!").onclick(lambda _: generate_graph(image)),
         ],
         style={"width": "512px", "align-items": "center", "margin": "0px auto"},
     )

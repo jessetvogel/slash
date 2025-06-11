@@ -27,9 +27,9 @@ def home() -> e.Elem:
         state_counter["count"] = 0
         counter.text = "0"
 
-    button_increment = h.Button("+1", onclick=increment_counter)
-    button_decrement = h.Button("-1", onclick=decrement_counter)
-    reset = h.Button("Reset", onclick=reset_counter)
+    button_increment = h.Button("+1").onclick(increment_counter)
+    button_decrement = h.Button("-1").onclick(decrement_counter)
+    reset = h.Button("Reset").onclick(reset_counter)
 
     reversed_text = h.Span("Reversed text: ")
 
@@ -64,24 +64,24 @@ def home() -> e.Elem:
             h.Div([label, counter, button_decrement, button_increment, reset]),
             h.Div(
                 [
-                    h.Input(placeholder="Type something...", oninput=oninput_callback),
+                    h.Input(placeholder="Type something...").oninput(oninput_callback),
                     reversed_text,
                 ]
             ),
             h.Div(
                 [
-                    h.Button("Trigger info", onclick=trigger_info),
-                    h.Button("Trigger debug", onclick=trigger_debug),
-                    h.Button("Trigger warning", onclick=trigger_warning),
-                    h.Button("Trigger error", onclick=trigger_error),
+                    h.Button("Trigger info").onclick(trigger_info),
+                    h.Button("Trigger debug").onclick(trigger_debug),
+                    h.Button("Trigger warning").onclick(trigger_warning),
+                    h.Button("Trigger error").onclick(trigger_error),
                 ]
             ),
             h.Div(
                 [
-                    textarea := h.Textarea(
-                        placeholder="Write some JS here..", onchange=onchange_textarea
+                    textarea := h.Textarea(placeholder="Write some JS here..").onchange(
+                        onchange_textarea
                     ),
-                    h.Button("Execute as function", onclick=onclick_execute_function),
+                    h.Button("Execute as function").onclick(onclick_execute_function),
                 ]
             ),
             Column(
@@ -174,8 +174,7 @@ def square(n: int) -> e.Elem:
             "align-items": "center",
             "justify-content": "center",
         },
-        onclick=onclick_square,
-    )
+    ).onclick(onclick_square)
 
 
 def onclick_square(event: e.ClickEvent) -> None:

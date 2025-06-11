@@ -37,12 +37,13 @@ def home() -> e.Elem:
                 ylabel="amplitude",
                 grid=True,
             ),
-            h.Button("Click me!", onclick=lambda _: update_figure(figure)),
+            h.Button("Click me!").onclick(lambda _: update_figure(figure)),
             Row(
                 [
                     h.Input(
                         placeholder="Enter figure title",
-                        oninput=lambda event: set_figure_title(figure, event.value),
+                    ).oninput(
+                        lambda event: set_figure_title(figure, event.value),
                     )
                 ]
             ),
