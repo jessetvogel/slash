@@ -11,101 +11,56 @@ from slash.js import JSFunction
 
 
 class Div(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-    ) -> None:
-        super().__init__("div", children=children, style=style)
+    def __init__(self, children: Children = None) -> None:
+        super().__init__("div", children=children)
         SupportsOnClick.__init__(self)
 
 
 class P(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-    ) -> None:
-        super().__init__("p", children=children, style=style)
+    def __init__(self, children: Children = None) -> None:
+        super().__init__("p", children=children)
         SupportsOnClick.__init__(self)
 
 
 class Span(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-    ) -> None:
-        super().__init__("span", children=children, style=style)
+    def __init__(self, children: Children = None) -> None:
+        super().__init__("span", children=children)
         SupportsOnClick.__init__(self)
 
 
 class H1(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-    ) -> None:
-        super().__init__("h1", children=children, style=style)
+    def __init__(self, children: Children = None) -> None:
+        super().__init__("h1", children=children)
         SupportsOnClick.__init__(self)
 
 
 class H2(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-    ) -> None:
-        super().__init__("h2", children=children, style=style)
+    def __init__(self, children: Children = None) -> None:
+        super().__init__("h2", children=children)
         SupportsOnClick.__init__(self)
 
 
 class H3(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-    ) -> None:
-        super().__init__("h3", children=children, style=style)
+    def __init__(self, children: Children = None) -> None:
+        super().__init__("h3", children=children)
         SupportsOnClick.__init__(self)
 
 
 class H4(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-    ) -> None:
-        super().__init__("h4", children=children, style=style)
+    def __init__(self, children: Children = None) -> None:
+        super().__init__("h4", children=children)
         SupportsOnClick.__init__(self)
 
 
 class H5(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-    ) -> None:
-        super().__init__("h5", children=children, style=style)
+    def __init__(self, children: Children = None) -> None:
+        super().__init__("h5", children=children)
         SupportsOnClick.__init__(self)
 
 
 class H6(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-    ) -> None:
-        super().__init__("h6", children=children, style=style)
+    def __init__(self, children: Children = None) -> None:
+        super().__init__("h6", children=children)
         SupportsOnClick.__init__(self)
 
 
@@ -117,21 +72,15 @@ class A(Elem, SupportsOnClick):
         children: Children = None,
         *,
         href: str = "#",
-        style: dict[str, str] | None = None,
     ) -> None:
-        super().__init__("a", children=children, style=style)
+        super().__init__("a", children=children)
         SupportsOnClick.__init__(self)
         self.href = href
 
 
 class Button(Elem, SupportsOnClick):
-    def __init__(
-        self,
-        children: Children = None,
-        *,
-        style: dict[str, str] | None = None,
-    ) -> None:
-        super().__init__("button", children=children, style=style)
+    def __init__(self, children: Children = None) -> None:
+        super().__init__("button", children=children)
         SupportsOnClick.__init__(self)
 
 
@@ -144,11 +93,10 @@ class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         self,
         type: str = "text",
         *,
-        style: dict[str, str] | None = None,
         value: str = "",
         placeholder: str = "",
     ) -> None:
-        super().__init__("input", style=style)
+        super().__init__("input")
         SupportsOnClick.__init__(self)
         SupportsOnInput.__init__(self)
         SupportsOnChange.__init__(self)
@@ -168,10 +116,9 @@ class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         self,
         text: str = "",
         *,
-        style: dict[str, str] | None = None,
         placeholder: str = "",
     ) -> None:
-        super().__init__("textarea", [text], style=style)
+        super().__init__("textarea", [text])
         SupportsOnClick.__init__(self)
         SupportsOnInput.__init__(self)
         SupportsOnChange.__init__(self)
@@ -226,10 +173,8 @@ class Dialog(Elem):
     )
     JS_CLOSE = JSFunction(["id"], "document.getElementById(id).close()")
 
-    def __init__(
-        self, children: Children | None = None, *, style: dict[str, str] | None = None
-    ):
-        super().__init__("dialog", children, style=style)
+    def __init__(self, children: Children | None = None):
+        super().__init__("dialog", children)
 
     def show(self) -> None:
         self.client.execute(self.JS_SHOW, [self.id])

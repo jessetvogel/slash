@@ -20,7 +20,7 @@ def update_image(img: h.Img) -> None:
     ][int(4 * random.random())]
 
     img.src = img.client.host(path)
-    img.style = {"height": "64px"}
+    img.style({"height": "64px"})
 
 
 def generate_graph(image: h.Img) -> None:
@@ -36,7 +36,7 @@ def generate_graph(image: h.Img) -> None:
     plt.savefig(path)
 
     image.src = image.client.host(path)
-    image.style = {"height": "256px"}
+    image.style({"height": "256px"})
 
 
 def home() -> e.Elem:

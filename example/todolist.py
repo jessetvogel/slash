@@ -27,15 +27,16 @@ def add_task(tasks: Elem, finished: Elem) -> None:
     tasks.append(
         new_task := Row(
             [
-                e.Span(
-                    input_text, style={"margin-right": "auto", "font-weight": "bold"}
+                e.Span(input_text).style(
+                    {"margin-right": "auto", "font-weight": "bold"}
                 ),
                 e.Button("move").onclick(
                     lambda _: swap_column(new_task, tasks, finished)
                 ),
                 e.Button("delete").onclick(lambda _: new_task.unmount()),
-            ],
-            style={"align-items": "center"},
+            ]
+        ).style(
+            {"align-items": "center"},
         )
     )
 
@@ -58,27 +59,29 @@ def home() -> e.Elem:
                 [
                     tasks := Column(
                         [
-                            e.H2(
-                                "Tasks 📝",
-                                style={"text-align": "center", "color": "blue"},
+                            e.H2("Tasks 📝").style(
+                                {"text-align": "center", "color": "blue"},
                             )
-                        ],
-                        style={"width": "256px"},
+                        ]
+                    ).style(
+                        {"width": "256px"},
                     ),
                     finished := Column(
                         [
-                            e.H2(
-                                "Finished 🎉",
-                                style={"text-align": "center", "color": "green"},
+                            e.H2("Finished 🎉").style(
+                                {"text-align": "center", "color": "green"},
                             )
-                        ],
-                        style={"width": "256px"},
+                        ]
+                    ).style(
+                        {"width": "256px"},
                     ),
-                ],
-                style={"gap": "32px"},
+                ]
+            ).style(
+                {"gap": "32px"},
             ),
-        ],
-        style={"width": "512px", "align-items": "center", "margin": "0px auto"},
+        ]
+    ).style(
+        {"width": "512px", "align-items": "center", "margin": "0px auto"},
     )
 
 

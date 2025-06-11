@@ -102,10 +102,9 @@ def home() -> e.Elem:
             ).onchange(
                 lambda _: update_span(span, select.value),
             ),
-            span := h.Span(style={"padding": "8px"}),
-        ],
-        style={"width": "512px", "align-items": "center", "margin": "0px auto"},
-    )
+            span := h.Span().style({"padding": "8px"}),
+        ]
+    ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 
 
 def main():

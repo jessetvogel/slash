@@ -169,8 +169,6 @@ class Elem:
         self,
         tag: str,
         children: list[Elem | str] | Elem | str | None = None,
-        *,
-        style: dict[str, str] | None = None,
         **attrs: Any,
     ) -> None:
         self._tag = tag
@@ -179,8 +177,9 @@ class Elem:
         if not isinstance(children, list):
             children = [children]
         self._children = children
-        self._style = style or {}
+        self._style: dict[str, str] = {}
         self._attrs = attrs
+        self._classes: set[str] = set()
 
         self._id = random_id()
         self._context: Context | None = None
@@ -195,6 +194,10 @@ class Elem:
                 child._parent = self
 
     @property
+    def id(self) -> str:
+        return self._id
+
+    @property
     def tag(self) -> str:
         return self._tag
 
@@ -203,21 +206,21 @@ class Elem:
         return self._children
 
     @property
-    def style(self) -> dict[str, str]:
-        return self._style
-
-    @style.setter
-    def style(self, style: dict[str, str]) -> None:
-        self._style.update(style)
-        self._update_attrs({"style": style})
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @property
     def parent(self) -> Elem | None:
         return self._parent
+
+    @property
+    def client(self) -> Client:
+        if self._context is None:
+            raise Exception("element has no context")
+        if self._context.client is None:
+            raise Exception("no current client")
+        return self._context.client
+
+    def style(self, style: dict[str, str]) -> Self:
+        self._style.update(style)
+        self._update_attrs({"style": style})
+        return self
 
     def attrs(self) -> dict[str, Any]:
         attrs: dict[str, Any] = {
@@ -228,8 +231,8 @@ class Elem:
         }
 
         # Style
-        if self.style:
-            attrs["style"] = self.style
+        if self._style:
+            attrs["style"] = self._style
 
         # Attributes
         for name in dir(type(self)):
@@ -261,14 +264,6 @@ class Elem:
         if name in self._attrs:
             del self._attrs[name]
             self._update_attrs({name: None})
-
-    @property
-    def client(self) -> Client:
-        if self._context is None:
-            raise Exception("element has no context")
-        if self._context.client is None:
-            raise Exception("no current client")
-        return self._context.client
 
     def set_context(self, context: Context) -> None:
         """Set context, and of children."""
@@ -391,21 +386,17 @@ class Elem:
         s += f"</{self.tag}>"
         return s
 
-    def add_class(self, name: str) -> None:
-        if "class" not in self._attrs:
-            self._attrs["class"] = name
-        else:
-            self._attrs["class"] += " " + name
-        self._update_attrs({"class": self._attrs["class"]})
+    def add_class(self, name: str) -> Self:
+        self._classes.update(name.split(" "))
+        self._update_attrs({"class": " ".join(self._classes)})
+        return self
 
-    def remove_class(self, name: str) -> None:
-        if "class" not in self._attrs:
-            return
-
-        self._attrs["class"] = (
-            str(self._attrs["class"]).replace(name, "").replace("  ", " ")
-        )
-        self._update_attrs({"class": self._attrs["class"]})
+    def remove_class(self, name: str) -> Self:
+        for name in name.split(" "):
+            if name in self._classes:
+                self._classes.remove(name)
+        self._update_attrs({"class": " ".join(self._classes)})
+        return self
 
 
 Children = list[Elem | str] | Elem | str | None

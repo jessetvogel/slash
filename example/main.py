@@ -57,9 +57,8 @@ def home() -> e.Elem:
 
     return h.Div(
         [
-            h.Div(
-                [square(n) for n in range(1, 5)],
-                style={"display": "flex", "gap": "16px", "flex-wrap": "wrap"},
+            h.Div([square(n) for n in range(1, 5)]).style(
+                {"display": "flex", "gap": "16px", "flex-wrap": "wrap"},
             ),
             h.Div([label, counter, button_decrement, button_increment, reset]),
             h.Div(
@@ -108,8 +107,9 @@ def home() -> e.Elem:
                     h.Input("time"),
                     h.Input("url"),
                     h.Input("week"),
-                ],
-                style={"width": "512px"},
+                ]
+            ).style(
+                {"width": "512px"},
             ),
             h.Div(
                 [
@@ -163,22 +163,25 @@ def home() -> e.Elem:
 
 
 def square(n: int) -> e.Elem:
-    return h.Div(
-        f"Square {n}",
-        style={
-            "width": "100px",
-            "height": "100px",
-            "border": "1px solid black",
-            "border-radius": "8px",
-            "display": "flex",
-            "align-items": "center",
-            "justify-content": "center",
-        },
-    ).onclick(onclick_square)
+    return (
+        h.Div(f"Square {n}")
+        .style(
+            {
+                "width": "100px",
+                "height": "100px",
+                "border": "1px solid black",
+                "border-radius": "8px",
+                "display": "flex",
+                "align-items": "center",
+                "justify-content": "center",
+            },
+        )
+        .onclick(onclick_square)
+    )
 
 
 def onclick_square(event: e.ClickEvent) -> None:
-    event.target.style = {"background-color": random_hex_color()}
+    event.target.style({"background-color": random_hex_color()})
 
 
 def random_hex_color() -> str:
