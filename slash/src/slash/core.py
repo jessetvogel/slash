@@ -234,6 +234,10 @@ class Elem:
         if self._style:
             attrs["style"] = self._style
 
+        # Class
+        if self._classes:
+            attrs["class"] = " ".join(self._classes)
+
         # Attributes
         for name in dir(type(self)):
             field = getattr(type(self), name)
@@ -339,7 +343,7 @@ class Elem:
                 child.unmount()
         self._children = []
 
-    def append(self, elem: Elem) -> None:
+    def append(self, elem: Elem) -> Self:
         # Set parent and children variables
         if elem._parent is not None:
             elem._parent._children.remove(elem)
@@ -357,6 +361,8 @@ class Elem:
             else:
                 # Otherwise, set its parent and send update message
                 self.client.send(Message.update(elem.id, parent=self.id))
+
+        return self
 
     def contains(self, elem: Elem) -> bool:
         return elem._parent is self or (

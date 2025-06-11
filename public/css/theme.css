@@ -29,6 +29,9 @@ body {
     --dialog-border: 1px solid #bbb;
     --dialog-backdrop-color: rgba(0, 0, 0, 0.075);
 
+    --blockquote-bg-color: #eee;
+    --blockquote-text-color: #444;
+
     --error-text-color: #ba5912;
     --info-text-color: #1a7d8e;
     --warning-text-color: #e2a32d;
@@ -169,16 +172,6 @@ div.table {
     }
 }
 
-pre {
-    background-color: var(--pre-bg-color);
-    color: var(--pre-text-color);
-    border: var(--pre-border);
-    border-radius: 8px;
-    padding: 8px;
-    box-shadow: var(--shadow);
-    overflow: auto;
-}
-
 dialog {
     background-color: var(--dialog-bg-color);
     border: var(--dialog-border);
@@ -192,4 +185,35 @@ dialog {
 
     animation: fade-in 0.5s forwards,
     slide-in-up 0.5s forwards;
+}
+
+blockquote {
+    color: var(--blockquote-text-color);
+    /* padding: 0.01px; */
+    padding-left: 12px;
+    margin: 0px;
+    border-left: 8px solid #bbb;
+    font-style: italic;
+}
+
+code {
+    background-color: var(--pre-bg-color);
+    color: var(--pre-text-color);
+    border: var(--pre-border);
+    border-radius: 4px;
+    padding: 3px;
+    margin: 0px 2px;
+    box-shadow: var(--shadow);
+}
+
+pre code {
+    display: block;
+    border-radius: 8px;
+    padding: 8px;
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+hr {
+    border: 1px solid #bbb;
 }

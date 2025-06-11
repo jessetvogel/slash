@@ -73,6 +73,11 @@ class Client {
             elem.innerHTML = "";
             return;
         }
+        if (event == "html") {
+            const elem = $(message.id);
+            elem.innerHTML = message.html;
+            return;
+        }
         if (event == "script") {
             const script = message.script;
             eval === null || eval === void 0 ? void 0 : eval(`"use strict";(${script})`);

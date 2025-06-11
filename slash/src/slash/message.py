@@ -41,6 +41,10 @@ class Message:
         return Message(event="clear", id=id)
 
     @staticmethod
+    def html(id: str, html: str) -> Message:
+        return Message(event="html", id=id, html=html)
+
+    @staticmethod
     def script(script: str) -> Message:
         # NOTE: not recommended
         return Message(event="script", script=script)

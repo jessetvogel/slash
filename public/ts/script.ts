@@ -110,6 +110,13 @@ class Client {
             return;
         }
 
+        // html
+        if (event == "html") {
+            const elem = $(message.id)!;
+            elem.innerHTML = message.html;
+            return;
+        }
+
         // script
         if (event == "script") {
             const script = message.script;

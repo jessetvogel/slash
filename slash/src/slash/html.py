@@ -8,6 +8,7 @@ from slash.core import (
     SupportsOnInput,
 )
 from slash.js import JSFunction
+from slash.message import Message
 
 
 class Div(Elem, SupportsOnClick):
@@ -184,3 +185,13 @@ class Dialog(Elem):
 
     def close(self) -> None:
         self.client.execute(self.JS_CLOSE, [self.id])
+
+
+class HTML(Elem):
+    def __init__(self, html: str) -> None:
+        super().__init__("div")
+        self.onmount(self._set_html)
+        self._html = html
+
+    def _set_html(self) -> None:
+        self.client.send(Message.html(self.id, self._html))

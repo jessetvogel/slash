@@ -143,6 +143,7 @@
 /* Core components */
 
 .slash-figure {
+    display: inline-block;
     background-color: var(--white);
     border: var(--button-border);
     border-radius: 8px;

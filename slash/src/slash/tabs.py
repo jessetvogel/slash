@@ -10,15 +10,12 @@ class Tabs(Elem, SupportsOnChange):
                 html.Div(label).onclick(lambda event: self._onclick_tab(event.target))
                 for label in labels
             ],
-            **{"class": "slash-tabs"},  # type: ignore[arg-type]
         )
         SupportsOnChange.__init__(self)
-        self._labels = labels
-        self._value: str = value or labels[0]
+        self.add_class("slash-tabs")
 
-        for child in self.children:
-            if isinstance(child, Elem) and child.text == value:
-                child.add_class("selected")
+        self._labels = labels
+        self.value = value or labels[0]
 
     def _onclick_tab(self, tab: Elem) -> None:
         self.value = tab.text
@@ -31,7 +28,7 @@ class Tabs(Elem, SupportsOnChange):
     def value(self, value_: str) -> None:
         if hasattr(self, "_value") and value_ == self._value:
             return
-        self._value = value_
+        self._value: str = value_
         for child in self.children:
             if isinstance(child, Elem):
                 if child.text == self.value:
