@@ -70,7 +70,7 @@ class Client {
         };
     }
 
-    handle(message: Message) {
+    async handle(message: Message) {
         const event = message.event;
 
         // create

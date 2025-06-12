@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from slash.js import JSFunction
@@ -6,14 +7,15 @@ from slash.utils import random_id
 
 
 class Client:
-    def __init__(self) -> None:
-        self._queue: list[Message] = []
+    def __init__(self, output: Callable[[str], None]) -> None:
+        self._output = output
         self._files: dict[str, Path] = {}
         self._mounted_elems: set[str] = set()  # elements that client already has
         self._functions: set[str] = set()  # functions that client already has
 
     def send(self, message: Message) -> None:
-        self._queue.append(message)
+        self._output(message.to_json())
+        # self._queue.append(message)
 
     def log(self, type: str, message: str) -> None:
         self.send(Message.log(type, message))
@@ -27,11 +29,6 @@ class Client:
             self._functions.add(jsfunction.id)
         # Execute function with given arguments
         self.send(Message.execute(jsfunction.id, args, store))
-
-    def flush(self) -> list[Message]:
-        queue = self._queue
-        self._queue = []
-        return queue
 
     def flush_files(self) -> dict[str, Path]:
         files = self._files

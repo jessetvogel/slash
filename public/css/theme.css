@@ -2,6 +2,10 @@ body {
     /* Colors */
     --white: #ffffff;
     --black: #101010;
+    --green: #7faa6c;
+    --yellow: #e2a32d;
+    --blue: #1a7d8e;
+    --red: #ba5912;
 
     --primary-color: #1a7d8e;
     --secondary-color: #e2a32d;

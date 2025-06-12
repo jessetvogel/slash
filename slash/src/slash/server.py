@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from typing import Callable
 import urllib.parse
@@ -6,6 +7,7 @@ import weakref
 import slash.logging
 
 from aiohttp import WSCloseCode, WSMsgType, web
+from slash.utils import random_id
 
 PATH_PUBLIC = Path("../public")
 
@@ -24,21 +26,23 @@ class Server:
         self._port = port
         self._logger = slash.logging.create_logger()
 
-        self._callback_ws_connect: Callable[[int], list[str]] | None = None
-        self._callback_ws_message: Callable[[int, str], list[str]] | None = None
-        self._callback_ws_disconnect: Callable[[int], None] | None = None
+        self._callback_ws_connect: (
+            Callable[[str, Callable[[str], None]], None] | None
+        ) = None
+        self._callback_ws_message: Callable[[str, str], None] | None = None
+        self._callback_ws_disconnect: Callable[[str], None] | None = None
 
         self._files: dict[str, Path] = {}
 
-        self._client_counter = 0
-
-    def on_ws_connect(self, callback: Callable[[int], list[str]]) -> None:
+    def on_ws_connect(
+        self, callback: Callable[[str, Callable[[str], None]], None]
+    ) -> None:
         self._callback_ws_connect = callback
 
-    def on_ws_message(self, callback: Callable[[int, str], list[str]]) -> None:
+    def on_ws_message(self, callback: Callable[[str, str], None]) -> None:
         self._callback_ws_message = callback
 
-    def on_ws_disconnect(self, callback: Callable[[int], None]) -> None:
+    def on_ws_disconnect(self, callback: Callable[[str], None]) -> None:
         self._callback_ws_disconnect = callback
 
     def serve(self) -> None:
@@ -95,29 +99,32 @@ class Server:
         return self._response_file(PATH_PUBLIC / path)
 
     async def _on_ws_request(self, request: web.Request) -> web.StreamResponse:
+        # Construct websocket response
         ws = web.WebSocketResponse()
         await ws.prepare(request)
 
         self._logger.debug("WebSocket connect")
 
+        # Callback function to send messages over websocket
+        def responder(data: str) -> None:
+            asyncio.create_task(ws.send_str(data))
+
         # Keep track of websocket connection
         self._websockets.add(ws)
 
         try:
-            client_id = self._create_client_id()
+            client_id = random_id()
 
             # Call `_callback_ws_connect`
             if self._callback_ws_connect is not None:
-                for data in self._callback_ws_connect(client_id):
-                    await ws.send_str(data)
+                self._callback_ws_connect(client_id, responder)
 
             # Call `_callback_ws_message` for every message
             async for msg in ws:
                 self._logger.debug(f"WebSocket message: {msg.data}")
                 if msg.type == WSMsgType.TEXT:
                     if self._callback_ws_message is not None:
-                        for data in self._callback_ws_message(client_id, msg.data):
-                            await ws.send_str(data)
+                        self._callback_ws_message(client_id, msg.data)
                 elif msg.type == WSMsgType.ERROR:
                     self._logger.warning(f"WebSocket error: {ws.exception()}")
 
@@ -158,10 +165,6 @@ class Server:
         # Send file
         with path.open("rb") as file:
             return web.Response(status=200, content_type=mime_type, body=file.read())
-
-    def _create_client_id(self) -> int:
-        self._client_counter += 1
-        return self._client_counter
 
     def host(self, url: str, path: Path) -> None:
         self._files[url] = path

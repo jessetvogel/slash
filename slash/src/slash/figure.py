@@ -1,5 +1,5 @@
 import random
-from typing import Any
+from typing import Any, Self
 
 from slash.core import Elem
 from slash.js import JSFunction
@@ -75,8 +75,9 @@ class Figure(Elem):
     def clear(self) -> None:
         self.client.execute(FUNCTION_CLEAR, [self._js_figure_id])
 
-    def draw(self) -> None:
+    def draw(self) -> Self:
         self.client.execute(FUNCTION_DRAW, [self._js_figure_id])
+        return self
 
     def graph(
         self,
@@ -84,11 +85,12 @@ class Figure(Elem):
         ys: list[float],
         *,
         color: str | None = None,
-    ) -> None:
+    ) -> Self:
         options: dict[str, Any] = {"color": color or random_hex_color()}
         self.client.execute(
             FUNCTION_GRAPH, [self._js_figure_id, list(zip(xs, ys)), options]
         )
+        return self
 
     def scatter(
         self,
@@ -96,12 +98,13 @@ class Figure(Elem):
         ys: list[float],
         *,
         color: str | None = None,
-    ) -> None:
+    ) -> Self:
         options: dict[str, Any] = {"color": color or random_hex_color()}
         self.client.execute(
             FUNCTION_SCATTER,
             [self._js_figure_id, list(zip(xs, ys)), options],
         )
+        return self
 
 
 FUNCTION_CREATE = JSFunction(

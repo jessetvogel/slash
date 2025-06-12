@@ -23,7 +23,7 @@ class App:
     def __init__(self) -> None:
         self._server = Server("127.0.0.1", 8080)
         self._endpoints: dict[str, Elem] = {}
-        self._clients: dict[int, Client] = {}
+        self._clients: dict[str, Client] = {}
         self._context = Context()
         self._logger = create_logger()
 
@@ -38,32 +38,28 @@ class App:
         self._server.on_ws_disconnect(self._handle_ws_disconnect)
         self._server.serve()
 
-    def _get_client(self, client_id: int) -> Client:
-        if client_id not in self._clients:
-            self._clients[client_id] = Client()
-        return self._clients[client_id]
-
-    def _remove_client(self, client_id: int) -> None:
-        self._clients.pop(client_id)
-
-    def _handle_ws_connect(self, client_id: int) -> list[str]:
+    def _handle_ws_connect(
+        self, client_id: str, responder: Callable[[str], None]
+    ) -> None:
         root = self._endpoints["/"]
 
-        client = self._get_client(client_id)
+        self._clients[client_id] = (client := Client(responder))
+
         self._context.client = client  # set client
         try:
             root.mount()
         except Exception as err:
-            client.flush()
             msg = "Server error: " + str(err)
             self._logger.error(msg)
             client.log("error", msg)
         self._context.client = None  # unset client
 
-        return self._respond_client(client)
+    def _handle_ws_message(self, client_id: str, data: str) -> None:
+        if client_id not in self._clients:
+            self._logger.error(f"Unknown client id {client_id}")
+            return
 
-    def _handle_ws_message(self, client_id: int, data: str) -> list[str]:
-        client = self._get_client(client_id)
+        client = self._clients[client_id]
 
         self._context.client = client  # set client
         try:
@@ -97,31 +93,28 @@ class App:
                     elem.change(ChangeEvent(elem, message.data["value"]))
 
         except Exception:
-            client.flush()
             client.send(self._message_server_error(traceback.format_exc()))
 
         self._context.client = None  # unset client
 
-        return self._respond_client(client)
+    def _handle_ws_disconnect(self, client_id: str) -> None:
+        self._clients.pop(client_id)
 
-    def _handle_ws_disconnect(self, client_id: int) -> None:
-        self._remove_client(client_id)
+    # def _respond_client(self, client: Client) -> list[str]:
+    #     try:
+    #         # Host files
+    #         for url, path in client.flush_files().items():
+    #             self._server.host(url, path)
 
-    def _respond_client(self, client: Client) -> list[str]:
-        try:
-            # Host files
-            for url, path in client.flush_files().items():
-                self._server.host(url, path)
+    #         # Serialize messages
+    #         messages = [message.to_json() for message in client.flush()]
+    #     except Exception:
+    #         return [self._message_server_error(traceback.format_exc()).to_json()]
 
-            # Serialize messages
-            messages = [message.to_json() for message in client.flush()]
-        except Exception:
-            return [self._message_server_error(traceback.format_exc()).to_json()]
-
-        return messages
+    #     return messages
 
     def _message_server_error(self, error: str) -> Message:
         return Message.log(
             "error",
-            f"<span>Unexpected server error.</span><pre>{error}</pre>",
+            f"<span>Unexpected server error.</span><pre><code>{error}</code></pre>",
         )

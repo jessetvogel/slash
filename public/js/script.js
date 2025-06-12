@@ -46,7 +46,7 @@ class Client {
             Slash.message('warning', 'Connection lost');
         };
     }
-    handle(message) {
+    async handle(message) {
         const event = message.event;
         if (event == "create") {
             const tag = message.tag;
