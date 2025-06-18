@@ -35,7 +35,7 @@ class Formatter(logging.Formatter):
 logger: logging.Logger | None = None
 
 
-def create_logger() -> logging.Logger:
+def get_logger() -> logging.Logger:
     global logger
     if logger is None:
         logger = logging.getLogger("slash")

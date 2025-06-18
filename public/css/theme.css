@@ -221,3 +221,7 @@ pre code {
 hr {
     border: 1px solid #bbb;
 }
+
+p {
+    line-height: 1.4;
+}

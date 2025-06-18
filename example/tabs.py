@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from slash import html, layout
 from slash.app import App
-from slash.core import Elem
+from slash.core import Elem, MountEvent
 from slash.figure import Figure
 from slash.markdown import Markdown
 from slash.tabs import Tabs
@@ -22,7 +22,7 @@ def tab_1() -> Elem:
 def tab_2() -> Elem:
     figure = Figure()
 
-    def tmp() -> None:
+    def tmp(event: MountEvent) -> None:
         figure.graph([0, 1, 2, 3], [1, 0, 1, 0])
         figure.draw()
 
@@ -96,7 +96,7 @@ def home() -> Elem:
             tabs := Tabs(
                 ["Latin", "Figure", "Markdown"],
             ).onchange(lambda event: set_tab(event.value)),
-            content.onmount(lambda: set_tab(tabs.value)),
+            content.onmount(lambda _: set_tab(tabs.value)),
         ]
     )
 

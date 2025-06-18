@@ -190,7 +190,7 @@ class Dialog(Elem):
 class HTML(Elem):
     def __init__(self, html: str) -> None:
         super().__init__("div")
-        self.onmount(self._set_html)
+        self.onmount(lambda _: self._set_html())
         self._html = html
 
     def _set_html(self) -> None:

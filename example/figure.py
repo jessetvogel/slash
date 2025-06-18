@@ -48,8 +48,7 @@ def home() -> e.Elem:
                 ]
             ),
         ],
-        style={"width": "512px", "align-items": "center", "margin": "0px auto"},
-    )
+    ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 
 
 def main():

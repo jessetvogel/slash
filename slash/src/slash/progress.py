@@ -7,7 +7,7 @@ class Progress(Elem):
         self.add_class("slash-progress")
         self._value = 0.0
         self._text = text
-        self.onmount(lambda: self._update())
+        self.onmount(lambda _: self._update())
 
     @property
     def value(self) -> float:

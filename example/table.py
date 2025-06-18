@@ -19,9 +19,8 @@ def home() -> e.Elem:
             e.H1("Table demo"),
             table := Table(),
             e.Button("Click me!").onclick(lambda _: update_table(table)),
-        ],
-        style={"width": "512px", "align-items": "center", "margin": "0px auto"},
-    )
+        ]
+    ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 
 
 def main():

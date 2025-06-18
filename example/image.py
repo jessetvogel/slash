@@ -49,9 +49,8 @@ def home() -> e.Elem:
             ),
             h.Button("Show an icon!").onclick(lambda _: update_image(image)),
             h.Button("Show a graph!").onclick(lambda _: generate_graph(image)),
-        ],
-        style={"width": "512px", "align-items": "center", "margin": "0px auto"},
-    )
+        ]
+    ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 
 
 def main():

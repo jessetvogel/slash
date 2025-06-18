@@ -1,10 +1,10 @@
-import asyncio
+from collections.abc import Awaitable
 from pathlib import Path
 from typing import Callable
 import urllib.parse
 import weakref
 
-import slash.logging
+from slash.logging import get_logger
 
 from aiohttp import WSCloseCode, WSMsgType, web
 from slash.utils import random_id
@@ -19,34 +19,50 @@ ALLOWED_MIME_TYPES = {
     ".ttf": "font/ttf",
 }
 
+LOGGER = get_logger()
+
+
+class WSClient:
+    def __init__(self, send: Callable[[str], Awaitable[None]]):
+        self._id = random_id()
+        self._send = send
+
+    @property
+    def id(self) -> str:
+        return self._id
+
+    async def send(self, data: str) -> None:
+        await self._send(data)
+
 
 class Server:
     def __init__(self, host: str, port: int) -> None:
         self._host = host
         self._port = port
-        self._logger = slash.logging.create_logger()
 
-        self._callback_ws_connect: (
-            Callable[[str, Callable[[str], None]], None] | None
-        ) = None
-        self._callback_ws_message: Callable[[str, str], None] | None = None
-        self._callback_ws_disconnect: Callable[[str], None] | None = None
+        self._callback_ws_connect: Callable[[WSClient], Awaitable[None]] | None = None
+        self._callback_ws_message: Callable[[WSClient, str], Awaitable[None]] | None = (
+            None
+        )
+        self._callback_ws_disconnect: Callable[[WSClient], Awaitable[None]] | None = (
+            None
+        )
 
         self._files: dict[str, Path] = {}
 
-    def on_ws_connect(
-        self, callback: Callable[[str, Callable[[str], None]], None]
-    ) -> None:
+    def on_ws_connect(self, callback: Callable[[WSClient], Awaitable[None]]) -> None:
         self._callback_ws_connect = callback
 
-    def on_ws_message(self, callback: Callable[[str, str], None]) -> None:
+    def on_ws_message(
+        self, callback: Callable[[WSClient, str], Awaitable[None]]
+    ) -> None:
         self._callback_ws_message = callback
 
-    def on_ws_disconnect(self, callback: Callable[[str], None]) -> None:
+    def on_ws_disconnect(self, callback: Callable[[WSClient], Awaitable[None]]) -> None:
         self._callback_ws_disconnect = callback
 
     def serve(self) -> None:
-        self._logger.info(
+        LOGGER.info(
             f"Serving on http://{self._host}:{self._port} .. (Press Ctrl+C to quit)"
         )
 
@@ -63,7 +79,7 @@ class Server:
         web.run_app(self.app, host=self._host, port=self._port, print=None)
 
     async def _on_shutdown(self, _: web.Application) -> None:
-        self._logger.info("Server shutdown")
+        LOGGER.info("Server shutdown")
         for ws in set(self._websockets):
             await ws.close(code=WSCloseCode.GOING_AWAY, message=b"server shutdown")
 
@@ -103,36 +119,33 @@ class Server:
         ws = web.WebSocketResponse()
         await ws.prepare(request)
 
-        self._logger.debug("WebSocket connect")
+        LOGGER.debug("WebSocket connect")
 
-        # Callback function to send messages over websocket
-        def responder(data: str) -> None:
-            asyncio.create_task(ws.send_str(data))
+        # Create WSClient instance to keep track of connection details
+        ws_client = WSClient(ws.send_str)
 
         # Keep track of websocket connection
         self._websockets.add(ws)
 
         try:
-            client_id = random_id()
-
             # Call `_callback_ws_connect`
             if self._callback_ws_connect is not None:
-                self._callback_ws_connect(client_id, responder)
+                await self._callback_ws_connect(ws_client)
 
             # Call `_callback_ws_message` for every message
             async for msg in ws:
-                self._logger.debug(f"WebSocket message: {msg.data}")
+                LOGGER.debug(f"WebSocket message: {msg.data}")
                 if msg.type == WSMsgType.TEXT:
                     if self._callback_ws_message is not None:
-                        self._callback_ws_message(client_id, msg.data)
+                        await self._callback_ws_message(ws_client, msg.data)
                 elif msg.type == WSMsgType.ERROR:
-                    self._logger.warning(f"WebSocket error: {ws.exception()}")
+                    LOGGER.warning(f"WebSocket error: {ws.exception()}")
 
-            self._logger.debug("WebSocket disconnected")
+            LOGGER.debug("WebSocket disconnected")
 
             # Call `_callback_ws_disconnect`
             if self._callback_ws_disconnect is not None:
-                self._callback_ws_disconnect(client_id)
+                await self._callback_ws_disconnect(ws_client)
         finally:
             self._websockets.discard(ws)
 
@@ -153,7 +166,7 @@ class Server:
     def _response_file(self, path: Path) -> web.Response:
         # Check file existence
         if not path.is_file():
-            self._logger.warning(f"Requested file '{path}' not found")
+            LOGGER.warning(f"Requested file '{path}' not found")
             return self._response_404_not_found()
 
         # Check mime type

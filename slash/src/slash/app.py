@@ -12,11 +12,13 @@ from slash.core import (
     SupportsOnClick,
     SupportsOnInput,
 )
-from slash.logging import create_logger
+from slash.logging import get_logger
 from slash.message import Message
-from slash.server import Server
+from slash.server import Server, WSClient
 
 import traceback
+
+LOGGER = get_logger()
 
 
 class App:
@@ -25,7 +27,6 @@ class App:
         self._endpoints: dict[str, Elem] = {}
         self._clients: dict[str, Client] = {}
         self._context = Context()
-        self._logger = create_logger()
 
     def add_endpoint(self, endpoint: str, root: Callable[[], Elem]) -> None:
         elem = root()
@@ -38,28 +39,28 @@ class App:
         self._server.on_ws_disconnect(self._handle_ws_disconnect)
         self._server.serve()
 
-    def _handle_ws_connect(
-        self, client_id: str, responder: Callable[[str], None]
-    ) -> None:
+    async def _handle_ws_connect(self, ws_client: WSClient) -> None:
         root = self._endpoints["/"]
 
-        self._clients[client_id] = (client := Client(responder))
+        self._clients[ws_client.id] = (client := Client(ws_client, self._server))
 
         self._context.client = client  # set client
         try:
             root.mount()
         except Exception as err:
             msg = "Server error: " + str(err)
-            self._logger.error(msg)
+            LOGGER.error(msg)
             client.log("error", msg)
         self._context.client = None  # unset client
 
-    def _handle_ws_message(self, client_id: str, data: str) -> None:
-        if client_id not in self._clients:
-            self._logger.error(f"Unknown client id {client_id}")
+        await client.flush()
+
+    async def _handle_ws_message(self, ws_client: WSClient, data: str) -> None:
+        if ws_client.id not in self._clients:
+            LOGGER.error(f"Unknown client id {ws_client.id}")
             return
 
-        client = self._clients[client_id]
+        client = self._clients[ws_client.id]
 
         self._context.client = client  # set client
         try:
@@ -97,8 +98,10 @@ class App:
 
         self._context.client = None  # unset client
 
-    def _handle_ws_disconnect(self, client_id: str) -> None:
-        self._clients.pop(client_id)
+        await client.flush()
+
+    async def _handle_ws_disconnect(self, ws_client: WSClient) -> None:
+        self._clients.pop(ws_client.id)
 
     # def _respond_client(self, client: Client) -> list[str]:
     #     try:

@@ -2,17 +2,16 @@ from slash.core import Children, Elem
 
 
 class Row(Elem):
-    def __init__(
-        self, children: Children | None = None, *, style: dict[str, str] | None = None
-    ):
+    def __init__(self, children: Children | None = None):
         super().__init__(
             "div",
             children,
-            style={
+        )
+        self.style(
+            {
                 "display": "flex",
                 "flex-direction": "row",
             }
-            | (style or {}),
         )
 
     @property
@@ -21,17 +20,16 @@ class Row(Elem):
 
 
 class Column(Elem):
-    def __init__(
-        self, children: Children | None = None, *, style: dict[str, str] | None = None
-    ):
+    def __init__(self, children: Children | None = None):
         super().__init__(
             "div",
             children,
-            style={
+        )
+        self.style(
+            {
                 "display": "flex",
                 "flex-direction": "column",
             }
-            | (style or {}),
         )
 
     @property

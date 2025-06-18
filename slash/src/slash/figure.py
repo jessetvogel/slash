@@ -19,7 +19,7 @@ class Figure(Elem):
         self._ylabel = ylabel
         self._grid = grid
         self._js_figure_id = self.id + "_js_figure"
-        self.onmount(self._create_js_figure)
+        self.onmount(lambda _: self._create_js_figure())
 
     def _create_js_figure(self) -> None:
         options = {

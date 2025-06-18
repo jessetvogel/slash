@@ -21,14 +21,12 @@ def home() -> Elem:
                                 html.Span("This is a dialog element!"),
                                 html.Button("Close").onclick(lambda _: dialog.close()),
                             ],
-                            style={"gap": "16px"},
-                        )
+                        ).style({"gap": "16px"})
                     ),
                 ]
             ),
         ],
-        style={"width": "512px", "align-items": "center", "margin": "0px auto"},
-    )
+    ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 
 
 def main():

@@ -1,11 +1,16 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Any, Self
+import asyncio
+from collections.abc import Awaitable, Callable
+import inspect
+from typing import Any, Self, TypeVar
 
 from slash.client import Client
+from slash.logging import get_logger
 from slash.message import Message
 from slash.utils import random_id
+
+LOGGER = get_logger()
 
 
 class Context:
@@ -29,6 +34,21 @@ class Context:
     @client.setter
     def client(self, value: Client | None) -> None:
         self._client = value
+
+    def call_handler(self, handler: Handler[T], event: T) -> None:
+        result = handler(event)
+        if inspect.isawaitable(result):
+            self.create_task(result)
+
+    def create_task(self, task: Awaitable[None]) -> None:
+        async def wrapper(client: Client, task: Awaitable[None]) -> None:
+            self.client = client
+            await task
+            self.client = None
+            await client.flush()
+
+        assert self.client is not None
+        asyncio.create_task(wrapper(self.client, task))
 
 
 # Attributes
@@ -55,113 +75,15 @@ class Attr(property):
         return self._name
 
 
-# Events
-
-
-class ClickEvent:
-    def __init__(self, target: Elem) -> None:
-        self._target = target
-
-    @property
-    def target(self) -> Elem:
-        return self._target
-
-
-ClickEventHandler = Callable[[ClickEvent], None]
-
-
-class SupportsOnClick:
-    def __init__(self) -> None:
-        self._onclick_handlers: list[ClickEventHandler] = []
-
-    def onclick(self, handler: ClickEventHandler) -> Self:
-        """Add click event handler."""
-        self._onclick_handlers.append(handler)
-        return self
-
-    def click(self, event: ClickEvent) -> None:
-        """Trigger click event."""
-        for handler in self._onclick_handlers:
-            handler(event)
-
-    def has_onclick_handlers(self) -> bool:
-        return bool(self._onclick_handlers)
-
-
-class InputEvent:
-    def __init__(self, target: Elem, value: str) -> None:
-        self._target = target
-        self._value = value
-
-    @property
-    def target(self) -> Elem:
-        return self._target
-
-    @property
-    def value(self) -> str:
-        return self._value
-
-
-InputEventHandler = Callable[[InputEvent], None]
-
-
-class SupportsOnInput:
-    def __init__(self) -> None:
-        self._oninput_handlers: list[InputEventHandler] = []
-
-    def oninput(self, handler: InputEventHandler) -> Self:
-        """Add input event handler."""
-        self._oninput_handlers.append(handler)
-        return self
-
-    def input(self, event: InputEvent) -> None:
-        """Trigger input event."""
-        for handler in self._oninput_handlers:
-            handler(event)
-
-    def has_oninput_handlers(self) -> bool:
-        return bool(self._oninput_handlers)
-
-
-class ChangeEvent:
-    def __init__(self, target: Elem, value: str) -> None:
-        self._target = target
-        self._value = value
-
-    @property
-    def target(self) -> Elem:
-        return self._target
-
-    @property
-    def value(self) -> str:
-        return self._value
-
-
-ChangeEventHandler = Callable[[ChangeEvent], None]
-
-
-class SupportsOnChange:
-    def __init__(self) -> None:
-        self._onchange_handlers: list[ChangeEventHandler] = []
-
-    def onchange(self, handler: ChangeEventHandler) -> Self:
-        """Add change event handler."""
-        self._onchange_handlers.append(handler)
-        return self
-
-    def change(self, event: ChangeEvent) -> None:
-        """Trigger change event."""
-        for handler in self._onchange_handlers:
-            handler(event)
-
-    def has_onchange_handlers(self) -> bool:
-        return bool(self._onchange_handlers)
-
-
 # Elements
 
-MountEventHandler = Callable[[], None]
-UnmountEventHandler = Callable[[], None]
+
+class MountEvent:
+    pass
+
+
+class UnmountEvent:
+    pass
 
 
 class Elem:
@@ -185,8 +107,8 @@ class Elem:
         self._context: Context | None = None
         self._parent: Elem | None = None
 
-        self._onmount_handlers: list[MountEventHandler] = []
-        self._onunmount_handlers: list[UnmountEventHandler] = []
+        self._onmount_handlers: list[Handler[MountEvent]] = []
+        self._onunmount_handlers: list[Handler[UnmountEvent]] = []
 
         # Set parent of children
         for child in self._children:
@@ -281,11 +203,11 @@ class Elem:
     def is_mounted(self) -> bool:
         return self.id in self.client._mounted_elems
 
-    def onmount(self, handler: MountEventHandler) -> Self:
+    def onmount(self, handler: Handler[MountEvent]) -> Self:
         self._onmount_handlers.append(handler)
         return self
 
-    def onunmount(self, handler: UnmountEventHandler) -> Self:
+    def onunmount(self, handler: Handler[UnmountEvent]) -> Self:
         self._onunmount_handlers.append(handler)
         return self
 
@@ -311,7 +233,7 @@ class Elem:
 
         # Call mount event handlers
         for handler in self._onmount_handlers:
-            handler()
+            handler(MountEvent())
 
     def unmount(self) -> None:
         # If not yet mounted, raise exception
@@ -331,7 +253,7 @@ class Elem:
 
         # Call unmount hook
         for handler in self._onunmount_handlers:
-            handler()
+            handler(UnmountEvent())
 
     def _update_attrs(self, attrs: dict[str, Any]) -> None:
         if self._context:
@@ -406,3 +328,109 @@ class Elem:
 
 
 Children = list[Elem | str] | Elem | str | None
+
+# Events
+
+T = TypeVar("T")
+Handler = Callable[[T], Awaitable[None] | None]
+
+
+class ClickEvent:
+    def __init__(self, target: Elem) -> None:
+        self._target = target
+
+    @property
+    def target(self) -> Elem:
+        return self._target
+
+
+class SupportsOnClick:
+    @property
+    def onclick_handlers(self) -> list[Handler[ClickEvent]]:
+        if not hasattr(self, "_onclick_handlers"):
+            self._onclick_handlers: list[Handler[ClickEvent]] = []
+        return self._onclick_handlers
+
+    def onclick(self, handler: Handler[ClickEvent]) -> Self:
+        """Add click event handler."""
+        self.onclick_handlers.append(handler)
+        return self
+
+    def click(self, event: ClickEvent) -> None:
+        """Trigger click event."""
+        assert isinstance(self, Elem) and self._context is not None
+        for handler in self.onclick_handlers:
+            self._context.call_handler(handler, event)
+
+    def has_onclick_handlers(self) -> bool:
+        return bool(self.onclick_handlers)
+
+
+class InputEvent:
+    def __init__(self, target: Elem, value: str) -> None:
+        self._target = target
+        self._value = value
+
+    @property
+    def target(self) -> Elem:
+        return self._target
+
+    @property
+    def value(self) -> str:
+        return self._value
+
+
+class SupportsOnInput:
+    @property
+    def oninput_handlers(self) -> list[Handler[InputEvent]]:
+        if not hasattr(self, "_oninput_handlers"):
+            self._oninput_handlers: list[Handler[InputEvent]] = []
+        return self._oninput_handlers
+
+    def oninput(self, handler: Handler[InputEvent]) -> Self:
+        """Add input event handler."""
+        self.oninput_handlers.append(handler)
+        return self
+
+    def input(self, event: InputEvent) -> None:
+        """Trigger input event."""
+        for handler in self.oninput_handlers:
+            handler(event)
+
+    def has_oninput_handlers(self) -> bool:
+        return bool(self.oninput_handlers)
+
+
+class ChangeEvent:
+    def __init__(self, target: Elem, value: str) -> None:
+        self._target = target
+        self._value = value
+
+    @property
+    def target(self) -> Elem:
+        return self._target
+
+    @property
+    def value(self) -> str:
+        return self._value
+
+
+class SupportsOnChange:
+    @property
+    def onchange_handlers(self) -> list[Handler[ChangeEvent]]:
+        if not hasattr(self, "_onchange_handlers"):
+            self._onchange_handlers: list[Handler[ChangeEvent]] = []
+        return self._onchange_handlers
+
+    def onchange(self, handler: Handler[ChangeEvent]) -> Self:
+        """Add change event handler."""
+        self.onchange_handlers.append(handler)
+        return self
+
+    def change(self, event: ChangeEvent) -> None:
+        """Trigger change event."""
+        for handler in self.onchange_handlers:
+            handler(event)
+
+    def has_onchange_handlers(self) -> bool:
+        return bool(self.onchange_handlers)
