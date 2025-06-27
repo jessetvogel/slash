@@ -3,6 +3,7 @@ from slash.core import (
     ChangeEvent,
     Children,
     Elem,
+    Session,
     SupportsOnChange,
     SupportsOnClick,
     SupportsOnInput,
@@ -178,13 +179,13 @@ class Dialog(Elem):
         super().__init__("dialog", children)
 
     def show(self) -> None:
-        self.client.execute(self.JS_SHOW, [self.id])
+        Session.require().execute(self.JS_SHOW, [self.id])
 
     def show_modal(self) -> None:
-        self.client.execute(self.JS_SHOW_MODAL, [self.id])
+        Session.require().execute(self.JS_SHOW_MODAL, [self.id])
 
     def close(self) -> None:
-        self.client.execute(self.JS_CLOSE, [self.id])
+        Session.require().execute(self.JS_CLOSE, [self.id])
 
 
 class HTML(Elem):
@@ -194,4 +195,4 @@ class HTML(Elem):
         self._html = html
 
     def _set_html(self) -> None:
-        self.client.send(Message.html(self.id, self._html))
+        Session.require().send(Message.html(self.id, self._html))

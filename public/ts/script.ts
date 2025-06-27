@@ -91,28 +91,32 @@ class Client {
 
         // update
         if (event == "update") {
-            const elem = $(message.id)!;
+            const elem = $(message.id);
+            if (elem == null) throw new Error(`No element exists with id '${message.id}'`);
             this.update(elem, message);
             return;
         }
 
         // remove
         if (event == "remove") {
-            const elem = $(message.id)!;
+            const elem = $(message.id);
+            if (elem == null) throw new Error(`No element exists with id '${message.id}'`);
             elem.remove();
             return;
         }
 
         // clear
         if (event == "clear") {
-            const elem = $(message.id)!;
+            const elem = $(message.id);
+            if (elem == null) throw new Error(`No element exists with id '${message.id}'`);
             elem.innerHTML = "";
             return;
         }
 
         // html
         if (event == "html") {
-            const elem = $(message.id)!;
+            const elem = $(message.id);
+            if (elem == null) throw new Error(`No element exists with id '${message.id}'`);
             elem.innerHTML = message.html;
             return;
         }

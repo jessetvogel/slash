@@ -1,39 +1,136 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable
+from contextvars import ContextVar
 import inspect
-from typing import Any, Self, TypeVar
-
-from slash.client import Client
+from pathlib import Path
+from typing import Any
+from slash.js import JSFunction
 from slash.logging import get_logger
 from slash.message import Message
+from slash.server import Server, Client
 from slash.utils import random_id
+
+
+from collections.abc import Callable
+from typing import Self, TypeVar
+
 
 LOGGER = get_logger()
 
 
-class Context:
-    def __init__(self) -> None:
-        self._client: Client | None = None
-        self._elems: dict[str, Elem] = {}
+# Session
+
+
+class Session:
+    _current: ContextVar[Session] = ContextVar("session")
+
+    def __init__(self, server: Server, client: Client) -> None:
+        """Initialize session instance.
+
+        Args:
+            server: Server object.
+            client: Client object.
+        """
+        self._server = server
+        self._client = client
+
+        self._queue_messages: list[str] = []
+        self._queue_files: list[tuple[str, Path]] = []
+
+        self._mounted_elems: dict[str, Elem] = {}  # elements that client already has
+        self._functions: set[str] = set()  # functions that client already has
+
+    @staticmethod
+    def current() -> Session | None:
+        try:
+            return Session._current.get()
+        except LookupError:
+            pass
+        return None
+
+    @staticmethod
+    def require() -> Session:
+        try:
+            return Session._current.get()
+        except LookupError as err:
+            raise RuntimeError("Session required, but no session was set") from err
 
     def add_elem(self, elem: Elem) -> None:
-        """Register element by id."""
-        self._elems[elem.id] = elem
+        """Mark element as mounted.
+
+        Args:
+            elem: Element to mark.
+        """
+        self._mounted_elems[elem.id] = elem
+
+    def remove_elem(self, elem: Elem) -> None:
+        """Unmark element as mounted.
+
+        Args:
+            elem: Element to unmark.
+        """
+        if elem.id in self._mounted_elems:
+            self._mounted_elems.pop(elem.id)
 
     def get_elem(self, id: str) -> Elem | None:
-        """Get element by id."""
-        return self._elems.get(id, None)
+        """Get element by id.
 
-    @property
-    def client(self) -> Client | None:
-        """The current active client."""
-        return self._client
+        Args:
+            id: Id of element.
 
-    @client.setter
-    def client(self, value: Client | None) -> None:
-        self._client = value
+        Returns:
+            Element with given id, or `None`.
+        """
+        return self._mounted_elems.get(id, None)
+
+    def send(self, message: Message) -> None:
+        """Send a message to the client.
+
+        Args:
+            message: Message to be sent.
+        """
+        try:
+            self._queue_messages.append(message.to_json())
+        except TypeError as err:
+            LOGGER.error(f"Failed to serialize message: {err}")
+
+    def log(self, type: str, message: str) -> None:
+        """Send logging message to the client.
+
+        Args:
+            type: Type of logging message. Can be 'info', 'debug', 'warning' or 'error'.
+            message: Contents of the message.
+        """
+        self.send(Message.log(type, message))
+
+    def execute(
+        self, jsfunction: JSFunction, args: list[Any], store: str | None = None
+    ) -> None:
+        # Define function if not defined yet
+        if jsfunction.id not in self._functions:
+            self.send(Message.function(jsfunction.id, jsfunction.args, jsfunction.body))
+            self._functions.add(jsfunction.id)
+        # Execute function with given arguments
+        self.send(Message.execute(jsfunction.id, args, store))
+
+    async def flush(self) -> None:
+        # Host all files and reset
+        for url, path in self._queue_files:
+            self._server.host(url, path)
+        self._queue_files = []
+
+        # Send all messages and reset queue
+        for data in self._queue_messages:
+            await self._client.send(data)
+        self._queue_messages = []
+
+    def host(self, path: Path) -> str:
+        """Returns URL at which the resource can be accessed."""
+        url = f"/tmp/{random_id()}"
+        self._queue_files.append((url, path))
+        return url
 
     def call_handler(self, handler: Handler[T], event: T) -> None:
         result = handler(event)
@@ -41,14 +138,24 @@ class Context:
             self.create_task(result)
 
     def create_task(self, task: Awaitable[None]) -> None:
-        async def wrapper(client: Client, task: Awaitable[None]) -> None:
-            self.client = client
+        async def wrapper(session: Session, task: Awaitable[None]) -> None:
+            token = Session._current.set(session)
             await task
-            self.client = None
-            await client.flush()
+            await session.flush()
+            Session._current.reset(token)
 
-        assert self.client is not None
-        asyncio.create_task(wrapper(self.client, task))
+        asyncio.create_task(wrapper(self, task))
+
+    def __enter__(self) -> None:
+        self._token = Session._current.set(self)
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: object | None,
+    ) -> None:
+        Session._current.reset(self._token)
 
 
 # Attributes
@@ -104,7 +211,6 @@ class Elem:
         self._classes: set[str] = set()
 
         self._id = random_id()
-        self._context: Context | None = None
         self._parent: Elem | None = None
 
         self._onmount_handlers: list[Handler[MountEvent]] = []
@@ -130,14 +236,6 @@ class Elem:
     @property
     def parent(self) -> Elem | None:
         return self._parent
-
-    @property
-    def client(self) -> Client:
-        if self._context is None:
-            raise Exception("element has no context")
-        if self._context.client is None:
-            raise Exception("no current client")
-        return self._context.client
 
     def style(self, style: dict[str, str]) -> Self:
         self._style.update(style)
@@ -191,17 +289,8 @@ class Elem:
             del self._attrs[name]
             self._update_attrs({name: None})
 
-    def set_context(self, context: Context) -> None:
-        """Set context, and of children."""
-        if self._context is not context:
-            self._context = context
-            self._context.add_elem(self)
-            for child in self._children:
-                if isinstance(child, Elem):
-                    child.set_context(context)
-
     def is_mounted(self) -> bool:
-        return self.id in self.client._mounted_elems
+        return Session.require().get_elem(self.id) is self
 
     def onmount(self, handler: Handler[MountEvent]) -> Self:
         self._onmount_handlers.append(handler)
@@ -212,30 +301,34 @@ class Elem:
         return self
 
     def mount(self) -> None:
+        session = Session.require()
+
         # If already mounted, raise exception
         if self.is_mounted():
             raise Exception(f"Element {self.id} already mounted")
 
         # Send create message
-        self.client.send(Message(event="create", **self.attrs()))
+        session.send(Message(event="create", **self.attrs()))
 
         # Mount children
         for child in self.children:
             if isinstance(child, Elem):
                 child.mount()
             else:
-                self.client.send(
+                session.send(
                     Message(event="create", tag="text", parent=self.id, text=child),
                 )
 
         # Mark as mounted
-        self.client._mounted_elems.add(self.id)
+        session._mounted_elems[self.id] = self
 
         # Call mount event handlers
         for handler in self._onmount_handlers:
             handler(MountEvent())
 
     def unmount(self) -> None:
+        session = Session.require()
+
         # If not yet mounted, raise exception
         if not self.is_mounted():
             raise Exception(f"Element {self.id} was not mounted")
@@ -246,18 +339,18 @@ class Elem:
                 child.unmount()
 
         # Unmark as mounted
-        self.client._mounted_elems.remove(self.id)
+        session._mounted_elems.pop(self.id)
 
         # Send remove message
-        self.client.send(Message.remove(self.id))
+        session.send(Message.remove(self.id))
 
         # Call unmount hook
         for handler in self._onunmount_handlers:
-            handler(UnmountEvent())
+            session.call_handler(handler, UnmountEvent())
 
     def _update_attrs(self, attrs: dict[str, Any]) -> None:
-        if self._context:
-            self.client.send(Message.update(self.id, **attrs))
+        if (session := Session.current()) is not None and self.is_mounted():
+            session.send(Message.update(self.id, **attrs))
 
     def clear(self) -> None:
         for child in self.children:
@@ -272,18 +365,14 @@ class Elem:
         elem._parent = self
         self._children.append(elem)
 
-        # Set context
-        if self._context is not None:
-            elem.set_context(self._context)
-
-            # If elem is not mounted yet, set its parent and mount it
+        # Set update
+        if (session := Session.current()) is not None:
+            # If elem is not mounted yet, mount it
             if not elem.is_mounted():
-                elem._parent = self
                 elem.mount()
             else:
-                # Otherwise, set its parent and send update message
-                self.client.send(Message.update(elem.id, parent=self.id))
-
+                # Otherwise, send update message with new `parent` value
+                session.send(Message.update(elem.id, parent=self.id))
         return self
 
     def contains(self, elem: Elem) -> bool:
@@ -358,9 +447,10 @@ class SupportsOnClick:
 
     def click(self, event: ClickEvent) -> None:
         """Trigger click event."""
-        assert isinstance(self, Elem) and self._context is not None
+        assert isinstance(self, Elem)
+        session = Session.require()
         for handler in self.onclick_handlers:
-            self._context.call_handler(handler, event)
+            session.call_handler(handler, event)
 
     def has_onclick_handlers(self) -> bool:
         return bool(self.onclick_handlers)
@@ -394,8 +484,10 @@ class SupportsOnInput:
 
     def input(self, event: InputEvent) -> None:
         """Trigger input event."""
+        assert isinstance(self, Elem)
+        session = Session.require()
         for handler in self.oninput_handlers:
-            handler(event)
+            session.call_handler(handler, event)
 
     def has_oninput_handlers(self) -> bool:
         return bool(self.oninput_handlers)
@@ -429,8 +521,10 @@ class SupportsOnChange:
 
     def change(self, event: ChangeEvent) -> None:
         """Trigger change event."""
+        assert isinstance(self, Elem)
+        session = Session.require()
         for handler in self.onchange_handlers:
-            handler(event)
+            session.call_handler(handler, event)
 
     def has_onchange_handlers(self) -> bool:
         return bool(self.onchange_handlers)

@@ -60,21 +60,29 @@ class Client {
         }
         if (event == "update") {
             const elem = $(message.id);
+            if (elem == null)
+                throw new Error(`No element exists with id '${message.id}'`);
             this.update(elem, message);
             return;
         }
         if (event == "remove") {
             const elem = $(message.id);
+            if (elem == null)
+                throw new Error(`No element exists with id '${message.id}'`);
             elem.remove();
             return;
         }
         if (event == "clear") {
             const elem = $(message.id);
+            if (elem == null)
+                throw new Error(`No element exists with id '${message.id}'`);
             elem.innerHTML = "";
             return;
         }
         if (event == "html") {
             const elem = $(message.id);
+            if (elem == null)
+                throw new Error(`No element exists with id '${message.id}'`);
             elem.innerHTML = message.html;
             return;
         }

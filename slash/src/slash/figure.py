@@ -1,7 +1,7 @@
 import random
 from typing import Any, Self
 
-from slash.core import Elem
+from slash.core import Elem, Session
 from slash.js import JSFunction
 
 # class FigureOption:
@@ -29,12 +29,12 @@ class Figure(Elem):
             "grid": self._grid,
         }
 
-        self.client.execute(
+        Session.require().execute(
             FUNCTION_CREATE, [self._canvas.id, options], self._js_figure_id
         )
 
     def _update_options(self, options: dict[str, Any]) -> None:
-        self.client.execute(FUNCTION_SET, [self._js_figure_id, options])
+        Session.require().execute(FUNCTION_SET, [self._js_figure_id, options])
 
     @property
     def title(self) -> str:
@@ -73,10 +73,10 @@ class Figure(Elem):
         self._update_options({"grid": value})
 
     def clear(self) -> None:
-        self.client.execute(FUNCTION_CLEAR, [self._js_figure_id])
+        Session.require().execute(FUNCTION_CLEAR, [self._js_figure_id])
 
     def draw(self) -> Self:
-        self.client.execute(FUNCTION_DRAW, [self._js_figure_id])
+        Session.require().execute(FUNCTION_DRAW, [self._js_figure_id])
         return self
 
     def graph(
@@ -87,7 +87,7 @@ class Figure(Elem):
         color: str | None = None,
     ) -> Self:
         options: dict[str, Any] = {"color": color or random_hex_color()}
-        self.client.execute(
+        Session.require().execute(
             FUNCTION_GRAPH, [self._js_figure_id, list(zip(xs, ys)), options]
         )
         return self
@@ -100,7 +100,7 @@ class Figure(Elem):
         color: str | None = None,
     ) -> Self:
         options: dict[str, Any] = {"color": color or random_hex_color()}
-        self.client.execute(
+        Session.require().execute(
             FUNCTION_SCATTER,
             [self._js_figure_id, list(zip(xs, ys)), options],
         )

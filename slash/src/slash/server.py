@@ -22,7 +22,7 @@ ALLOWED_MIME_TYPES = {
 LOGGER = get_logger()
 
 
-class WSClient:
+class Client:
     def __init__(self, send: Callable[[str], Awaitable[None]]):
         self._id = random_id()
         self._send = send
@@ -40,25 +40,21 @@ class Server:
         self._host = host
         self._port = port
 
-        self._callback_ws_connect: Callable[[WSClient], Awaitable[None]] | None = None
-        self._callback_ws_message: Callable[[WSClient, str], Awaitable[None]] | None = (
+        self._callback_ws_connect: Callable[[Client], Awaitable[None]] | None = None
+        self._callback_ws_message: Callable[[Client, str], Awaitable[None]] | None = (
             None
         )
-        self._callback_ws_disconnect: Callable[[WSClient], Awaitable[None]] | None = (
-            None
-        )
+        self._callback_ws_disconnect: Callable[[Client], Awaitable[None]] | None = None
 
         self._files: dict[str, Path] = {}
 
-    def on_ws_connect(self, callback: Callable[[WSClient], Awaitable[None]]) -> None:
+    def on_ws_connect(self, callback: Callable[[Client], Awaitable[None]]) -> None:
         self._callback_ws_connect = callback
 
-    def on_ws_message(
-        self, callback: Callable[[WSClient, str], Awaitable[None]]
-    ) -> None:
+    def on_ws_message(self, callback: Callable[[Client, str], Awaitable[None]]) -> None:
         self._callback_ws_message = callback
 
-    def on_ws_disconnect(self, callback: Callable[[WSClient], Awaitable[None]]) -> None:
+    def on_ws_disconnect(self, callback: Callable[[Client], Awaitable[None]]) -> None:
         self._callback_ws_disconnect = callback
 
     def serve(self) -> None:
@@ -121,8 +117,8 @@ class Server:
 
         LOGGER.debug("WebSocket connect")
 
-        # Create WSClient instance to keep track of connection details
-        ws_client = WSClient(ws.send_str)
+        # Create client instance to keep track of connection details
+        client = Client(ws.send_str)
 
         # Keep track of websocket connection
         self._websockets.add(ws)
@@ -130,14 +126,14 @@ class Server:
         try:
             # Call `_callback_ws_connect`
             if self._callback_ws_connect is not None:
-                await self._callback_ws_connect(ws_client)
+                await self._callback_ws_connect(client)
 
             # Call `_callback_ws_message` for every message
             async for msg in ws:
                 LOGGER.debug(f"WebSocket message: {msg.data}")
                 if msg.type == WSMsgType.TEXT:
                     if self._callback_ws_message is not None:
-                        await self._callback_ws_message(ws_client, msg.data)
+                        await self._callback_ws_message(client, msg.data)
                 elif msg.type == WSMsgType.ERROR:
                     LOGGER.warning(f"WebSocket error: {ws.exception()}")
 
@@ -145,7 +141,7 @@ class Server:
 
             # Call `_callback_ws_disconnect`
             if self._callback_ws_disconnect is not None:
-                await self._callback_ws_disconnect(ws_client)
+                await self._callback_ws_disconnect(client)
         finally:
             self._websockets.discard(ws)
 
