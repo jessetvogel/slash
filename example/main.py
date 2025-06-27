@@ -2,28 +2,28 @@ from __future__ import annotations
 
 import random
 from slash.app import App
-import slash.core as e
+from slash.core import ChangeEvent, ClickEvent, Elem, InputEvent, Session
 import slash.html as h
 from slash.js import JSFunction
 from slash.layout import Column
 
 
-def home() -> e.Elem:
+def home() -> Elem:
     state_counter = {"count": 0}
     state_textarea = {"text": ""}
 
     label = h.Span("Counter: ")
     counter = h.Span("0")
 
-    def increment_counter(_: e.ClickEvent):
+    def increment_counter(_: ClickEvent):
         state_counter["count"] += 1
         counter.text = str(state_counter["count"])
 
-    def decrement_counter(_: e.ClickEvent):
+    def decrement_counter(_: ClickEvent):
         state_counter["count"] -= 1
         counter.text = str(state_counter["count"])
 
-    def reset_counter(_: e.ClickEvent):
+    def reset_counter(_: ClickEvent):
         state_counter["count"] = 0
         counter.text = "0"
 
@@ -33,27 +33,27 @@ def home() -> e.Elem:
 
     reversed_text = h.Span("Reversed text: ")
 
-    def oninput_callback(event: e.InputEvent):
+    def oninput_callback(event: InputEvent):
         reversed_text.text = f"Reversed text: {''.join(reversed(event.value))}"
 
-    def trigger_info(event: e.ClickEvent):
-        event.target.client.log("info", "Example info message")
+    def trigger_info(_: ClickEvent):
+        Session.require().log("info", "Example info message")
 
-    def trigger_debug(event: e.ClickEvent):
-        event.target.client.log("debug", "Example debug message")
+    def trigger_debug(_: ClickEvent):
+        Session.require().log("debug", "Example debug message")
 
-    def trigger_warning(event: e.ClickEvent):
-        event.target.client.log("warning", "Example warning message")
+    def trigger_warning(_: ClickEvent):
+        Session.require().log("warning", "Example warning message")
 
-    def trigger_error(event: e.ClickEvent):
-        event.target.client.log("error", "Example error message")
+    def trigger_error(_: ClickEvent):
+        Session.require().log("error", "Example error message")
 
-    def onchange_textarea(event: e.ChangeEvent):
+    def onchange_textarea(event: ChangeEvent):
         state_textarea["text"] = event.value
 
-    def onclick_execute_function(event: e.ClickEvent):
+    def onclick_execute_function(event: ClickEvent):
         jsfunction = JSFunction([], state_textarea["text"])
-        textarea.client.execute(jsfunction, [])
+        Session.require().execute(jsfunction, [])
 
     return h.Div(
         [
@@ -77,7 +77,7 @@ def home() -> e.Elem:
             ),
             h.Div(
                 [
-                    textarea := h.Textarea(placeholder="Write some JS here..").onchange(
+                    h.Textarea(placeholder="Write some JS her.").onchange(
                         onchange_textarea
                     ),
                     h.Button("Execute as function").onclick(onclick_execute_function),
@@ -130,9 +130,9 @@ def home() -> e.Elem:
                     ),
                     h.H2("Duis ac tempus eros"),
                     h.P(
-                        "Duis ac tempus eros, nec feugiat felis. Proin efficitur augue faucibus sapien condimentum interdum. Etiam a nibh ac ante scelerisque sodales. Sed eu orci aliquet, sodales dolor in, vestibulum diam. Ut sed est libero. Morbi erat elit, iaculis et scelerisque ultrices, eleifend non dui. Mauris id magna eget dolor posuere porttitor id at leo. Quisque porttitor sem quis sem dignissim ultrices. Fusce at tellus nec urna posuere suscipit interdum at nulla. Ut nec metus tristique, dictum dui non, scelerisque lacus. Nam consequat dolor non sodales molestie. Suspendisse laoreet dolor arcu, non pellentesque lacus vehicula quis."
+                        "Duis ac tempus eros, nec feugiat felis. Proin efficitur augue faucibus sapien condimentum interdum. Etiam a nibh ac ante scelerisque sodales. Sed eu orci aliquet, sodales dolor in, vestibulum diam. Ut sed est libero. Morbi erat elit, iaculis et scelerisque ultrices, eleifend non dui. Mauris id magna eget dolor posuere porttitor id at leo. Quisque porttitor sem quis sem dignissim ultrices. Fusce at tellus nec urna posuere suscipit interdum at nulla. Ut nec metus tristique, dictum dui non, scelerisque lacus. Nam consequat dolor non sodales molesti Suspendisse laoreet dolor arcu, non pellentesque lacus vehicula quis."
                     ),
-                    e.Elem(
+                    Elem(
                         "pre",
                         """def fibonacci(n):
     a = 0
@@ -162,7 +162,7 @@ def home() -> e.Elem:
     )
 
 
-def square(n: int) -> e.Elem:
+def square(n: int) -> Elem:
     return (
         h.Div(f"Square {n}")
         .style(
@@ -180,7 +180,7 @@ def square(n: int) -> e.Elem:
     )
 
 
-def onclick_square(event: e.ClickEvent) -> None:
+def onclick_square(event: ClickEvent) -> None:
     event.target.style({"background-color": random_hex_color()})
 
 

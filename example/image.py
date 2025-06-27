@@ -3,7 +3,7 @@ from pathlib import Path
 import random
 
 from slash.app import App
-import slash.core as e
+from slash.core import Elem, Session
 import slash.html as h
 from slash.layout import Column
 
@@ -19,7 +19,7 @@ def update_image(img: h.Img) -> None:
         Path("/Users/jessetvogel/Projects/slash/public/img/error.png"),
     ][int(4 * random.random())]
 
-    img.src = img.client.host(path)
+    img.src = Session.require().host(path)
     img.style({"height": "64px"})
 
 
@@ -35,11 +35,11 @@ def generate_graph(image: h.Img) -> None:
     plt.plot(xs, ys)
     plt.savefig(path)
 
-    image.src = image.client.host(path)
+    image.src = Session.require().host(path)
     image.style({"height": "256px"})
 
 
-def home() -> e.Elem:
+def home() -> Elem:
     return Column(
         [
             h.H1("Image demo"),

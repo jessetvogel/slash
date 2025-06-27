@@ -4,11 +4,13 @@ import asyncio
 import numpy as np
 from slash.app import App
 from slash import html, layout
-from slash.core import Elem
+from slash.core import Elem, Session
 from slash.progress import Progress
 
 
 async def move_to_value(progress: Progress, value: float) -> None:
+    session = Session.require()
+
     old_value = progress.value
     new_value = value
     diff = new_value - old_value
@@ -18,8 +20,8 @@ async def move_to_value(progress: Progress, value: float) -> None:
     sign = diff / abs(diff)
     for v in np.arange(old_value, new_value + sign * 0.001, sign * 0.01):
         progress.set_value(float(v))
-        await progress.client.flush()
-        await asyncio.sleep(0.01)
+        await session.flush()
+        await asyncio.sleep(0.05)
 
 
 def home() -> Elem:
