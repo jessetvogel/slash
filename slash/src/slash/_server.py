@@ -6,7 +6,7 @@ from typing import Callable
 
 from aiohttp import WSCloseCode, WSMsgType, web
 
-from slash._logging import get_logger
+from slash._logging import LOGGER
 from slash._utils import random_id
 
 PATH_PUBLIC = Path("../public")
@@ -18,8 +18,6 @@ ALLOWED_MIME_TYPES = {
     ".png": "image/png",
     ".ttf": "font/ttf",
 }
-
-LOGGER = get_logger()
 
 
 class Client:

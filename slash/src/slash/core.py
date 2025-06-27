@@ -9,14 +9,16 @@ from contextvars import ContextVar
 from pathlib import Path
 from typing import Any, Self, TypeAlias, TypeVar
 
-from slash._logging import get_logger
+from slash._logging import LOGGER
 from slash._message import Message
 from slash._server import Client, Server
 from slash._utils import random_id
 from slash.js import JSFunction
 
-LOGGER = get_logger()
+# Types
 
+T = TypeVar("T")
+Handler = Callable[[T], Awaitable[None] | None]
 
 # Session
 
@@ -410,8 +412,5 @@ class Elem:
 
 
 # Types
-
-T = TypeVar("T")
-Handler = Callable[[T], Awaitable[None] | None]
 
 Children: TypeAlias = list[Elem | str] | Elem | str | None
