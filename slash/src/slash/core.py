@@ -18,12 +18,15 @@ from slash.js import JSFunction
 # Types
 
 T = TypeVar("T")
+
 Handler = Callable[[T], Awaitable[None] | None]
 
 # Session
 
 
 class Session:
+    """The `Session` class is used to communicate with the currently-connected user."""
+
     _current: ContextVar[Session] = ContextVar("session")
 
     def __init__(self, server: Server, client: Client) -> None:
@@ -44,6 +47,7 @@ class Session:
 
     @staticmethod
     def current() -> Session | None:
+        """Get the current session."""
         try:
             return Session._current.get()
         except LookupError:
@@ -52,6 +56,7 @@ class Session:
 
     @staticmethod
     def require() -> Session:
+        """Get the current session. Raises an error if there is no current session."""
         try:
             return Session._current.get()
         except LookupError as err:
@@ -108,6 +113,7 @@ class Session:
     def execute(
         self, jsfunction: JSFunction, args: list[Any], store: str | None = None
     ) -> None:
+        """Execute a JS function."""
         # Define function if not defined yet
         if jsfunction.id not in self._functions:
             self.send(Message.function(jsfunction.id, jsfunction.args, jsfunction.body))
@@ -116,28 +122,36 @@ class Session:
         self.send(Message.execute(jsfunction.id, args, store))
 
     async def flush(self) -> None:
-        # Host all files and reset
+        """Send all queued messages."""
+        # Host files
         for url, path in self._queue_files:
             self._server.host(url, path)
         self._queue_files = []
 
-        # Send all messages and reset queue
+        # Send all messages
         for data in self._queue_messages:
             await self._client.send(data)
         self._queue_messages = []
 
     def host(self, path: Path) -> str:
-        """Returns URL at which the resource can be accessed."""
+        """Expose file via web server.
+
+        Returns:
+            URL at which the resource can be accessed.
+        """
         url = f"/tmp/{random_id()}"
         self._queue_files.append((url, path))
         return url
 
     def call_handler(self, handler: Handler[T], event: T) -> None:
+        """Call event handler in the context of the session."""
         result = handler(event)
         if inspect.isawaitable(result):
             self.create_task(result)
 
     def create_task(self, task: Awaitable[None]) -> None:
+        """Create task in the context of the session."""
+
         async def wrapper(session: Session, task: Awaitable[None]) -> None:
             token = Session._current.set(session)
             await task
@@ -162,6 +176,8 @@ class Session:
 
 
 class Attr(property):
+    """The `Attr` class represents an attribute of an element."""
+
     def __init__(self, name: str) -> None:
         super().__init__(self._get, self._set)
         self._name = name
@@ -174,9 +190,6 @@ class Attr(property):
         setattr(elem, self._private, value)
         elem._update_attrs({self._name: value})
 
-    def set_silently(self, elem: Elem, value: Any):
-        setattr(elem, self._private, value)
-
     @property
     def name(self) -> str:
         return self._name
@@ -186,17 +199,19 @@ class Attr(property):
 
 
 class MountEvent:
-    pass
+    """Event that fires when an element is mounted."""
 
 
 class UnmountEvent:
-    pass
+    """Event that fires when an element is unmounted."""
 
 
 # Elements
 
 
 class Elem:
+    """Base element class. All elements and components derive from this class."""
+
     def __init__(
         self,
         tag: str,
@@ -226,26 +241,32 @@ class Elem:
 
     @property
     def id(self) -> str:
+        """Element id."""
         return self._id
 
     @property
     def tag(self) -> str:
+        """Element tag."""
         return self._tag
 
     @property
     def children(self) -> list[Elem | str]:
+        """Element children."""
         return self._children
 
     @property
     def parent(self) -> Elem | None:
+        """Element parent."""
         return self._parent
 
     def style(self, style: dict[str, str]) -> Self:
+        """Update style."""
         self._style.update(style)
         self._update_attrs({"style": style})
         return self
 
     def attrs(self) -> dict[str, Any]:
+        """Get attributes."""
         attrs: dict[str, Any] = {
             "tag": self.tag,
             "id": self.id,
@@ -276,26 +297,32 @@ class Elem:
         return attrs
 
     def set_attr(self, name: str, value: str = "") -> None:
+        """Set attribute."""
         self._attrs[name] = value
         self._update_attrs({name: value})
 
     def remove_attr(self, name: str) -> None:
+        """Remove attribute."""
         if name in self._attrs:
             del self._attrs[name]
             self._update_attrs({name: None})
 
     def is_mounted(self) -> bool:
+        """Check if element is mounted."""
         return Session.require().get_elem(self.id) is self
 
     def onmount(self, handler: Handler[MountEvent]) -> Self:
+        """Add event handler for mount event."""
         self._onmount_handlers.append(handler)
         return self
 
     def onunmount(self, handler: Handler[UnmountEvent]) -> Self:
+        """Add event handler for unmount event."""
         self._onunmount_handlers.append(handler)
         return self
 
     def mount(self) -> None:
+        """Mount element."""
         session = Session.require()
 
         # If already mounted, raise exception
@@ -322,6 +349,7 @@ class Elem:
             handler(MountEvent())
 
     def unmount(self) -> None:
+        """Unmount element."""
         session = Session.require()
 
         # If not yet mounted, raise exception
@@ -348,12 +376,14 @@ class Elem:
             session.send(Message.update(self.id, **attrs))
 
     def clear(self) -> None:
+        """Unmount all children."""
         for child in self.children:
             if isinstance(child, Elem):
                 child.unmount()
         self._children = []
 
     def append(self, elem: Elem) -> Self:
+        """Append element to the children of this element."""
         # Set parent and children variables
         if elem._parent is not None:
             elem._parent._children.remove(elem)
@@ -371,12 +401,14 @@ class Elem:
         return self
 
     def contains(self, elem: Elem) -> bool:
+        """Check if element is contained by this element."""
         return elem._parent is self or (
             elem._parent is not None and self.contains(elem._parent)
         )
 
     @property
     def text(self) -> str:
+        """Element text contents."""
         return "".join(
             child if isinstance(child, str) else child.text for child in self._children
         )
@@ -399,11 +431,13 @@ class Elem:
         return s
 
     def add_class(self, name: str) -> Self:
+        """Add class."""
         self._classes.update(name.split(" "))
         self._update_attrs({"class": " ".join(self._classes)})
         return self
 
     def remove_class(self, name: str) -> Self:
+        """Remove class."""
         for name in name.split(" "):
             if name in self._classes:
                 self._classes.remove(name)

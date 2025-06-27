@@ -15,11 +15,14 @@ Handler = Callable[[T], Awaitable[None] | None]
 
 
 class ClickEvent:
+    """Event that fires when an element is clicked."""
+
     def __init__(self, target: Elem) -> None:
         self._target = target
 
     @property
     def target(self) -> Elem:
+        """Element that was clicked."""
         return self._target
 
 
@@ -31,7 +34,7 @@ class SupportsOnClick:
         return self._onclick_handlers
 
     def onclick(self, handler: Handler[ClickEvent]) -> Self:
-        """Add click event handler."""
+        """Add event handler for click event."""
         assert isinstance(self, Elem)
         self.onclick_handlers.append(handler)
         self.set_attr("onclick", True)
@@ -49,16 +52,20 @@ class SupportsOnClick:
 
 
 class InputEvent:
+    """Event that fires when the editable content of an element is updated."""
+
     def __init__(self, target: Elem, value: str) -> None:
         self._target = target
         self._value = value
 
     @property
     def target(self) -> Elem:
+        """Element whose content was updated."""
         return self._target
 
     @property
     def value(self) -> str:
+        """Value of the updated content."""
         return self._value
 
 
@@ -70,7 +77,7 @@ class SupportsOnInput:
         return self._oninput_handlers
 
     def oninput(self, handler: Handler[InputEvent]) -> Self:
-        """Add input event handler."""
+        """Add event handler for input event."""
         assert isinstance(self, Elem)
         self.oninput_handlers.append(handler)
         self.set_attr("oninput", True)
@@ -88,16 +95,20 @@ class SupportsOnInput:
 
 
 class ChangeEvent:
+    """Event that fires when the editable content of an element is changed."""
+
     def __init__(self, target: Elem, value: str) -> None:
         self._target = target
         self._value = value
 
     @property
     def target(self) -> Elem:
+        """Element whose content was changed."""
         return self._target
 
     @property
     def value(self) -> str:
+        """Value of the changed content."""
         return self._value
 
 
@@ -109,7 +120,7 @@ class SupportsOnChange:
         return self._onchange_handlers
 
     def onchange(self, handler: Handler[ChangeEvent]) -> Self:
-        """Add change event handler."""
+        """Add event handler for change event."""
         assert isinstance(self, Elem)
         self.onchange_handlers.append(handler)
         self.set_attr("onchange", True)

@@ -1,3 +1,5 @@
+"""Slash server."""
+
 import urllib.parse
 import weakref
 from collections.abc import Awaitable

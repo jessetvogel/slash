@@ -4,6 +4,8 @@ from slash.core import Children, Elem
 
 
 class Row(Elem):
+    """Row element."""
+
     def __init__(self, children: Children = None):
         super().__init__(
             "div",
@@ -22,6 +24,8 @@ class Row(Elem):
 
 
 class Column(Elem):
+    """Column element."""
+
     def __init__(self, children: Children = None):
         super().__init__(
             "div",
