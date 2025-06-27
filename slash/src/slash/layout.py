@@ -1,4 +1,6 @@
-from slash.core import Elem, Children
+"""Slash layout components."""
+
+from slash.core import Children, Elem
 
 
 class Row(Elem):

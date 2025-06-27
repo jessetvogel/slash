@@ -1,3 +1,5 @@
+"""Slash JS functionality."""
+
 from slash._utils import random_id
 
 

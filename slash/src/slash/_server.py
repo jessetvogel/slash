@@ -1,12 +1,12 @@
+import urllib.parse
+import weakref
 from collections.abc import Awaitable
 from pathlib import Path
 from typing import Callable
-import urllib.parse
-import weakref
-
-from slash._logging import get_logger
 
 from aiohttp import WSCloseCode, WSMsgType, web
+
+from slash._logging import get_logger
 from slash._utils import random_id
 
 PATH_PUBLIC = Path("../public")

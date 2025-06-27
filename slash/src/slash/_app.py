@@ -1,6 +1,13 @@
+"""Slash app."""
+
 from __future__ import annotations
 
+import traceback
 from collections.abc import Callable
+
+from slash._logging import get_logger
+from slash._message import Message
+from slash._server import Client, Server
 from slash.core import Elem, Session
 from slash.events import (
     ChangeEvent,
@@ -10,11 +17,6 @@ from slash.events import (
     SupportsOnClick,
     SupportsOnInput,
 )
-from slash._logging import get_logger
-from slash._message import Message
-from slash._server import Server, Client
-
-import traceback
 
 LOGGER = get_logger()
 

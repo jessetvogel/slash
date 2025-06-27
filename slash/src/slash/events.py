@@ -1,10 +1,11 @@
+"""Slash events."""
+
 from __future__ import annotations
 
-from collections.abc import Awaitable
-from slash.core import Elem, Session, UnmountEvent, MountEvent
-
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from typing import Self, TypeVar
+
+from slash.core import Elem, MountEvent, Session, UnmountEvent
 
 MountEvent
 UnmountEvent

@@ -1,7 +1,9 @@
-from slash.core import Elem, Attr, Session, Children
+"""Slash HTML elements."""
+
+from slash._message import Message
+from slash.core import Attr, Children, Elem, Session
 from slash.events import ChangeEvent, SupportsOnChange, SupportsOnClick, SupportsOnInput
 from slash.js import JSFunction
-from slash._message import Message
 
 
 class Div(Elem, SupportsOnClick):

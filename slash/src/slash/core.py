@@ -1,21 +1,19 @@
+"""Slash core."""
+
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Awaitable
-from contextvars import ContextVar
 import inspect
+from collections.abc import Awaitable, Callable
+from contextvars import ContextVar
 from pathlib import Path
-from typing import Any, TypeAlias
-from slash.js import JSFunction
+from typing import Any, Self, TypeAlias, TypeVar
+
 from slash._logging import get_logger
 from slash._message import Message
-from slash._server import Server, Client
+from slash._server import Client, Server
 from slash._utils import random_id
-
-
-from collections.abc import Callable
-from typing import Self, TypeVar
-
+from slash.js import JSFunction
 
 LOGGER = get_logger()
 
