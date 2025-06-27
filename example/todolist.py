@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from slash import App
 from slash.core import Elem
-import slash.html as e
+from slash.html import H2, Button, Input, Span
 from slash.layout import Column, Row
 
 
@@ -27,13 +27,11 @@ def add_task(tasks: Elem, finished: Elem) -> None:
     tasks.append(
         new_task := Row(
             [
-                e.Span(input_text).style(
-                    {"margin-right": "auto", "font-weight": "bold"}
-                ),
-                e.Button("move").onclick(
+                Span(input_text).style({"margin-right": "auto", "font-weight": "bold"}),
+                Button("move").onclick(
                     lambda _: swap_column(new_task, tasks, finished)
                 ),
-                e.Button("delete").onclick(lambda _: new_task.unmount()),
+                Button("delete").onclick(lambda _: new_task.unmount()),
             ]
         ).style(
             {"align-items": "center"},
@@ -46,20 +44,20 @@ def set_text(value: str) -> None:
     input_text = value
 
 
-def home() -> e.Elem:
+def home() -> Elem:
     return Column(
         [
             Row(
                 [
-                    e.Input("text").onchange(lambda event: set_text(event.value)),
-                    e.Button("add task").onclick(lambda _: add_task(tasks, finished)),
+                    Input("text").onchange(lambda event: set_text(event.value)),
+                    Button("add task").onclick(lambda _: add_task(tasks, finished)),
                 ]
             ),
             Row(
                 [
                     tasks := Column(
                         [
-                            e.H2("Tasks 📝").style(
+                            H2("Tasks 📝").style(
                                 {"text-align": "center", "color": "blue"},
                             )
                         ]
@@ -68,7 +66,7 @@ def home() -> e.Elem:
                     ),
                     finished := Column(
                         [
-                            e.H2("Finished 🎉").style(
+                            H2("Finished 🎉").style(
                                 {"text-align": "center", "color": "green"},
                             )
                         ]

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from slash import App
-import slash.html as e
+from slash.core import Elem
+from slash.html import H1, Button
 from slash.layout import Column
-from slash.basic.table import Table
+from slash.basic import Table
 from slash._utils import random_id
 
 
@@ -13,12 +14,12 @@ def update_table(table: Table) -> None:
     )
 
 
-def home() -> e.Elem:
+def home() -> Elem:
     return Column(
         [
-            e.H1("Table demo"),
+            H1("Table demo"),
             table := Table(),
-            e.Button("Click me!").onclick(lambda _: update_table(table)),
+            Button("Click me!").onclick(lambda _: update_table(table)),
         ]
     ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 

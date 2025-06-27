@@ -4,8 +4,8 @@ import random
 
 from slash.core import Elem
 from slash import App
-import slash.html as h
 from slash.basic import Figure
+from slash.html import H1, Button, Input
 from slash.layout import Column, Row
 
 
@@ -30,17 +30,17 @@ def set_figure_title(figure: Figure, title: str) -> None:
 def home() -> Elem:
     return Column(
         [
-            h.H1("Figure demo"),
+            H1("Figure demo"),
             figure := Figure(
                 title="Some random figure",
                 xlabel="time (sec)",
                 ylabel="amplitude",
                 grid=True,
             ),
-            h.Button("Click me!").onclick(lambda _: update_figure(figure)),
+            Button("Click me!").onclick(lambda _: update_figure(figure)),
             Row(
                 [
-                    h.Input(
+                    Input(
                         placeholder="Enter figure title",
                     ).oninput(
                         lambda event: set_figure_title(figure, event.value),

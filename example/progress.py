@@ -4,8 +4,9 @@ import asyncio
 import numpy as np
 from slash.core import Session, Elem
 from slash import App
-from slash import html, layout
 from slash.basic import Progress
+from slash.html import Button
+from slash.layout import Column, Row
 
 
 async def move_to_value(progress: Progress, value: float) -> None:
@@ -25,14 +26,14 @@ async def move_to_value(progress: Progress, value: float) -> None:
 
 
 def home() -> Elem:
-    return layout.Column(
+    return Column(
         [
             progress := Progress(),
-            layout.Row(
+            Row(
                 [
-                    html.Button("0%").onclick(lambda _: move_to_value(progress, 0.0)),
-                    html.Button("50%").onclick(lambda _: move_to_value(progress, 0.5)),
-                    html.Button("100%").onclick(lambda _: move_to_value(progress, 1.0)),
+                    Button("0%").onclick(lambda _: move_to_value(progress, 0.0)),
+                    Button("50%").onclick(lambda _: move_to_value(progress, 0.5)),
+                    Button("100%").onclick(lambda _: move_to_value(progress, 1.0)),
                 ]
             ),
         ]

@@ -1,25 +1,26 @@
 from __future__ import annotations
 
 from slash import App
-from slash import html, layout
 from slash.core import Elem
+from slash.html import H2, Button, Dialog, Div, Span
+from slash.layout import Column
 
 
 def home() -> Elem:
-    return layout.Column(
+    return Column(
         [
-            html.H2("Dialog demo"),
-            html.Div(
+            H2("Dialog demo"),
+            Div(
                 [
-                    html.Button("Dialog.show()").onclick(lambda _: dialog.show()),
-                    html.Button("Dialog.show_modal()").onclick(
+                    Button("Dialog.show()").onclick(lambda _: dialog.show()),
+                    Button("Dialog.show_modal()").onclick(
                         lambda _: dialog.show_modal()
                     ),
-                    dialog := html.Dialog(
-                        layout.Column(
+                    dialog := Dialog(
+                        Column(
                             [
-                                html.Span("This is a dialog element!"),
-                                html.Button("Close").onclick(lambda _: dialog.close()),
+                                Span("This is a dialog element!"),
+                                Button("Close").onclick(lambda _: dialog.close()),
                             ],
                         ).style({"gap": "16px"})
                     ),
