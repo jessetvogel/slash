@@ -1,19 +1,18 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from slash.core import (
+from slash.core import Elem, Session
+from slash.events import (
     ChangeEvent,
-    Elem,
-    InputEvent,
     ClickEvent,
+    InputEvent,
     SupportsOnChange,
     SupportsOnClick,
     SupportsOnInput,
-    Session,
 )
-from slash.logging import get_logger
-from slash.message import Message
-from slash.server import Server, Client
+from slash._logging import get_logger
+from slash._message import Message
+from slash._server import Server, Client
 
 import traceback
 

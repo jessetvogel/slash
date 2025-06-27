@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from slash.app import App
+from slash import App
 from slash.core import Elem
 import slash.html as e
 from slash.layout import Column, Row

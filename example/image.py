@@ -2,7 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 import random
 
-from slash.app import App
+from slash import App
 from slash.core import Elem, Session
 import slash.html as h
 from slash.layout import Column

@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from slash import html, layout
-from slash.app import App
-from slash.core import Elem, MountEvent
-from slash.figure import Figure
-from slash.markdown import Markdown
-from slash.tabs import Tabs
+from slash import App
+from slash.core import Elem
+from slash.basic import Figure, Markdown, Tabs
+from slash.events import MountEvent
 
 
 def tab_1() -> Elem:

@@ -4,10 +4,10 @@ from typing import Callable
 import urllib.parse
 import weakref
 
-from slash.logging import get_logger
+from slash._logging import get_logger
 
 from aiohttp import WSCloseCode, WSMsgType, web
-from slash.utils import random_id
+from slash._utils import random_id
 
 PATH_PUBLIC = Path("../public")
 

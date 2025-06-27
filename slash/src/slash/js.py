@@ -1,4 +1,4 @@
-from slash.utils import random_id
+from slash._utils import random_id
 
 
 class JSFunction:

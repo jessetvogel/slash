@@ -2,10 +2,10 @@ from __future__ import annotations
 import math
 import random
 
-from slash.app import App
-import slash.core as e
+from slash.core import Elem
+from slash import App
 import slash.html as h
-from slash.figure import Figure
+from slash.basic import Figure
 from slash.layout import Column, Row
 
 
@@ -27,7 +27,7 @@ def set_figure_title(figure: Figure, title: str) -> None:
     figure.draw()
 
 
-def home() -> e.Elem:
+def home() -> Elem:
     return Column(
         [
             h.H1("Figure demo"),

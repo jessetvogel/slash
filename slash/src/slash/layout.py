@@ -1,8 +1,8 @@
-from slash.core import Children, Elem
+from slash.core import Elem, Children
 
 
 class Row(Elem):
-    def __init__(self, children: Children | None = None):
+    def __init__(self, children: Children = None):
         super().__init__(
             "div",
             children,
@@ -20,7 +20,7 @@ class Row(Elem):
 
 
 class Column(Elem):
-    def __init__(self, children: Children | None = None):
+    def __init__(self, children: Children = None):
         super().__init__(
             "div",
             children,

@@ -2,10 +2,10 @@ from __future__ import annotations
 import asyncio
 
 import numpy as np
-from slash.app import App
+from slash.core import Session, Elem
+from slash import App
 from slash import html, layout
-from slash.core import Elem, Session
-from slash.progress import Progress
+from slash.basic import Progress
 
 
 async def move_to_value(progress: Progress, value: float) -> None:

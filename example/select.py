@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-from slash.app import App
-import slash.core as e
-import slash.html as h
+from slash import App
+from slash.core import Elem
 from slash.layout import Column
 
-from slash.html import Select
+from slash.html import H1, Select, Span
 
 
-def update_span(span: h.Span, text: str) -> None:
+def update_span(span: Span, text: str) -> None:
     span.text = f"You selected: {text}"
 
 
-def home() -> e.Elem:
+def home() -> Elem:
     return Column(
         [
-            h.H1("Select demo"),
+            H1("Select demo"),
             select := Select(
                 [
                     "Woodpecker",
@@ -102,7 +101,7 @@ def home() -> e.Elem:
             ).onchange(
                 lambda _: update_span(span, select.value),
             ),
-            span := h.Span().style({"padding": "8px"}),
+            span := Span().style({"padding": "8px"}),
         ]
     ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from slash.app import App
+from slash import App
 import slash.html as e
 from slash.layout import Column
-from slash.table import Table
-from slash.utils import random_id
+from slash.basic.table import Table
+from slash._utils import random_id
 
 
 def update_table(table: Table) -> None:

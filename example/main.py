@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import random
-from slash.app import App
-from slash.core import ChangeEvent, ClickEvent, Elem, InputEvent, Session
+from slash.core import Elem, Session
+from slash import App
+from slash.events import ChangeEvent, ClickEvent, InputEvent
 import slash.html as h
 from slash.js import JSFunction
 from slash.layout import Column

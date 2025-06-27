@@ -1,15 +1,7 @@
-from slash.core import (
-    Attr,
-    ChangeEvent,
-    Children,
-    Elem,
-    Session,
-    SupportsOnChange,
-    SupportsOnClick,
-    SupportsOnInput,
-)
+from slash.core import Elem, Attr, Session, Children
+from slash.events import ChangeEvent, SupportsOnChange, SupportsOnClick, SupportsOnInput
 from slash.js import JSFunction
-from slash.message import Message
+from slash._message import Message
 
 
 class Div(Elem, SupportsOnClick):
@@ -99,9 +91,6 @@ class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         placeholder: str = "",
     ) -> None:
         super().__init__("input")
-        SupportsOnClick.__init__(self)
-        SupportsOnInput.__init__(self)
-        SupportsOnChange.__init__(self)
         self.type = type
         self.value = value
         self.placeholder = placeholder
@@ -121,9 +110,6 @@ class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         placeholder: str = "",
     ) -> None:
         super().__init__("textarea", [text])
-        SupportsOnClick.__init__(self)
-        SupportsOnInput.__init__(self)
-        SupportsOnChange.__init__(self)
         self.placeholder = placeholder
         self.text = text
         self.onchange(self._set_text)
@@ -145,7 +131,6 @@ class Img(Elem):
 class Select(Elem, SupportsOnChange):
     def __init__(self, options: list[str]):
         super().__init__("select", [Elem("option", option) for option in options])
-        SupportsOnChange.__init__(self)
         self._value = options[0]
         self.onchange(self._set_value)
 

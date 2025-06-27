@@ -1,5 +1,6 @@
-from slash.core import ChangeEvent, Elem, SupportsOnChange
-from slash import html
+from slash.core import Elem
+from slash.events import ChangeEvent, SupportsOnChange
+from slash.html import Div
 
 
 class Tabs(Elem, SupportsOnChange):
@@ -7,7 +8,7 @@ class Tabs(Elem, SupportsOnChange):
         super().__init__(
             "div",
             [
-                html.Div(label).onclick(lambda event: self._onclick_tab(event.target))
+                Div(label).onclick(lambda event: self._onclick_tab(event.target))
                 for label in labels
             ],
         )
