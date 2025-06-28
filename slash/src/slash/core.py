@@ -19,7 +19,9 @@ from slash.js import JSFunction
 
 T = TypeVar("T")
 
-Handler = Callable[[T], Awaitable[None] | None]
+Handler: TypeAlias = (
+    Callable[[T], Awaitable[None] | None] | Callable[[], Awaitable[None] | None]
+)
 
 # Session
 
@@ -145,7 +147,14 @@ class Session:
 
     def call_handler(self, handler: Handler[T], event: T) -> None:
         """Call event handler in the context of the session."""
-        result = handler(event)
+        num_params = len(inspect.signature(handler).parameters)
+        if num_params == 0:
+            result = handler()  # type: ignore[call-arg]
+        elif num_params == 1:
+            result = handler(event)  # type: ignore[call-arg]
+        else:
+            raise RuntimeError("Handler must have 0 or 1 parameters.")
+
         if inspect.isawaitable(result):
             self.create_task(result)
 
@@ -346,7 +355,7 @@ class Elem:
 
         # Call mount event handlers
         for handler in self._onmount_handlers:
-            handler(MountEvent())
+            session.call_handler(handler, MountEvent())
 
     def unmount(self) -> None:
         """Unmount element."""

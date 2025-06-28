@@ -2,16 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
-from typing import Self, TypeVar
+from typing import Self
 
-from slash.core import Elem, MountEvent, Session, UnmountEvent
+from slash.core import Elem, Handler, MountEvent, Session, UnmountEvent
 
-MountEvent
-UnmountEvent
-
-T = TypeVar("T")
-Handler = Callable[[T], Awaitable[None] | None]
+MountEvent  # so that `MountEvent` can be imported from `slash.events`
+UnmountEvent  # so that `UnmountEvent` can be imported from `slash.events`
 
 
 class ClickEvent:

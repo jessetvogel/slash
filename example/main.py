@@ -67,12 +67,12 @@ def test_counter() -> Elem:
                     Row(
                         [
                             Button("+1").onclick(
-                                lambda _: set_counter(state["count"] + 1)
+                                lambda: set_counter(state["count"] + 1)
                             ),
                             Button("-1").onclick(
-                                lambda _: set_counter(state["count"] - 1)
+                                lambda: set_counter(state["count"] - 1)
                             ),
-                            Button("Reset").onclick(lambda _: set_counter(0)),
+                            Button("Reset").onclick(lambda: set_counter(0)),
                         ]
                     ),
                 ]
@@ -169,7 +169,7 @@ def test_select() -> Elem:
                     "Condor",
                 ]
             ).onchange(
-                lambda _: span.set_text(f"You selected '{select.value}'"),
+                lambda: span.set_text(f"You selected '{select.value}'"),
             ),
             span := Span().style({"padding": "8px"}),
         ]
@@ -181,16 +181,16 @@ def test_log() -> Elem:
         [
             H2("Logging test"),
             Button("Trigger info").onclick(
-                lambda _: Session.require().log("info", "Example info message")
+                lambda: Session.require().log("info", "Example info message")
             ),
             Button("Trigger debug").onclick(
-                lambda _: Session.require().log("debug", "Example debug message")
+                lambda: Session.require().log("debug", "Example debug message")
             ),
             Button("Trigger warning").onclick(
-                lambda _: Session.require().log("warning", "Example warning message")
+                lambda: Session.require().log("warning", "Example warning message")
             ),
             Button("Trigger error").onclick(
-                lambda _: Session.require().log("error", "Example error message")
+                lambda: Session.require().log("error", "Example error message")
             ),
         ]
     )
@@ -219,7 +219,7 @@ def test_js() -> Elem:
             Column(
                 [
                     textarea := Textarea(placeholder="Write some JS here.."),
-                    Button("Execute").onclick(lambda _: execute()),
+                    Button("Execute").onclick(execute),
                 ]
             ),
         ]
@@ -243,7 +243,7 @@ def test_tabs() -> Elem:
             ).onchange(lambda event: set_tab(event.value)),
             content := Div()
             .style({"padding": "8px"})
-            .onmount(lambda _: set_tab(tabs.value)),
+            .onmount(lambda: set_tab(tabs.value)),
         ]
     )
 
@@ -254,15 +254,13 @@ def test_dialog() -> Elem:
             H2("Dialog test"),
             Div(
                 [
-                    Button("Dialog.show()").onclick(lambda _: dialog.show()),
-                    Button("Dialog.show_modal()").onclick(
-                        lambda _: dialog.show_modal()
-                    ),
+                    Button("Dialog.show()").onclick(lambda: dialog.show()),
+                    Button("Dialog.show_modal()").onclick(lambda: dialog.show_modal()),
                     dialog := Dialog(
                         Column(
                             [
                                 Span("This is a dialog element!"),
-                                Button("Close").onclick(lambda _: dialog.close()),
+                                Button("Close").onclick(lambda: dialog.close()),
                             ],
                         ).style({"gap": "16px"})
                     ),

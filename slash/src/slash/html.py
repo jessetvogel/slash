@@ -95,6 +95,10 @@ class A(Elem, SupportsOnClick):
         SupportsOnClick.__init__(self)
         self.href = href
 
+    def set_href(self, href: str) -> Self:
+        self.href = href
+        return self
+
 
 class Button(Elem, SupportsOnClick):
     """HTML <button> element."""
@@ -122,13 +126,17 @@ class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         self.type = type
         self.value = value
         self.placeholder = placeholder
-        self.onchange(self._update_value)
+        self.onchange(self._handle_change)
 
-    def _update_value(self, event: ChangeEvent) -> None:
+    def _handle_change(self, event: ChangeEvent) -> None:
         self._value = event.value
 
     def set_value(self, value: str) -> Self:
         self.value = value
+        return self
+
+    def set_placeholder(self, placeholder: str) -> Self:
+        self.placeholder = placeholder
         return self
 
 
@@ -155,9 +163,17 @@ class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
     def value(self) -> str:
         return self._value
 
+    @value.setter
+    def value(self, value: str) -> None:
+        self.set_value(value)
+
     def set_value(self, value: str) -> Self:
         self._value = value
         self.set_text(value)
+        return self
+
+    def set_placeholder(self, placeholder: str) -> Self:
+        self.placeholder = placeholder
         return self
 
 
@@ -171,6 +187,14 @@ class Img(Elem):
         super().__init__("img")
         self.src = src
         self.alt = alt
+
+    def set_src(self, src: str) -> Self:
+        self.src = src
+        return self
+
+    def set_alt(self, alt: str) -> Self:
+        self.alt = alt
+        return self
 
 
 class Select(Elem, SupportsOnChange):
@@ -236,6 +260,10 @@ class HTML(Elem):
     @property
     def html(self) -> str:
         return self._html
+
+    @html.setter
+    def html(self, html: str) -> None:
+        self.set_html(html)
 
     def set_html(self, html: str) -> Self:
         self._html = html
