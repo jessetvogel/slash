@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from slash import App
-from slash.core import Elem
 from slash.basic import Figure, Markdown, Tabs
+from slash.core import Elem
 from slash.events import MountEvent
-from slash.html import H2, P, Div
+from slash.html import H2, Div, P
 from slash.layout import Column
 
 

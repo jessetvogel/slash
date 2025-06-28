@@ -1,14 +1,14 @@
 from __future__ import annotations
-from pathlib import Path
-import random
 
+import random
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
 from slash import App
 from slash.core import Elem, Session
 from slash.html import H1, Button, Img
 from slash.layout import Column
-
-import matplotlib.pyplot as plt
-import numpy as np
 
 
 def update_image(img: Img) -> None:

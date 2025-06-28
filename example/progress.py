@@ -1,10 +1,11 @@
 from __future__ import annotations
+
 import asyncio
 
 import numpy as np
-from slash.core import Session, Elem
 from slash import App
 from slash.basic import Progress
+from slash.core import Elem, Session
 from slash.html import Button
 from slash.layout import Column, Row
 

@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from slash import App
 from slash.core import Elem
-from slash.layout import Column
-
 from slash.html import H1, Select, Span
+from slash.layout import Column
 
 
 def update_span(span: Span, text: str) -> None:

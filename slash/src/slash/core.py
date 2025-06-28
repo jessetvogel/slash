@@ -418,6 +418,11 @@ class Elem:
         self._children = [value]
         self._update_attrs({"text": value})
 
+    def set_text(self, text: str) -> Self:
+        self._children = [text]
+        self._update_attrs({"text": text})
+        return self
+
     def __repr__(self) -> str:
         s = ""
         s += f"<{self.tag}>\n"

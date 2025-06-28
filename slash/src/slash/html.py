@@ -1,5 +1,7 @@
 """Slash HTML elements."""
 
+from typing import Self
+
 from slash._message import Message
 from slash.core import Attr, Children, Elem, Session
 from slash.events import ChangeEvent, SupportsOnChange, SupportsOnClick, SupportsOnInput
@@ -120,10 +122,14 @@ class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         self.type = type
         self.value = value
         self.placeholder = placeholder
-        self.onchange(self._set_value)
+        self.onchange(self._update_value)
 
-    def _set_value(self, event: ChangeEvent) -> None:
+    def _update_value(self, event: ChangeEvent) -> None:
         self._value = event.value
+
+    def set_value(self, value: str) -> Self:
+        self.value = value
+        return self
 
 
 class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
@@ -133,17 +139,26 @@ class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
 
     def __init__(
         self,
-        text: str = "",
+        value: str = "",
         *,
         placeholder: str = "",
     ) -> None:
-        super().__init__("textarea", [text])
+        super().__init__("textarea", [value])
         self.placeholder = placeholder
-        self.text = text
-        self.onchange(self._set_text)
+        self._value = value
+        self.onchange(self._handle_change)
 
-    def _set_text(self, event: ChangeEvent) -> None:
-        self._text = event.value
+    def _handle_change(self, event: ChangeEvent) -> None:
+        self._value = event.value
+
+    @property
+    def value(self) -> str:
+        return self._value
+
+    def set_value(self, value: str) -> Self:
+        self._value = value
+        self.set_text(value)
+        return self
 
 
 class Img(Elem):
@@ -164,7 +179,7 @@ class Select(Elem, SupportsOnChange):
     def __init__(self, options: list[str]):
         super().__init__("select", [Elem("option", option) for option in options])
         self._value = options[0]
-        self.onchange(self._set_value)
+        self.onchange(self._handle_change)
 
     @property
     def value(self) -> str:
@@ -180,7 +195,7 @@ class Select(Elem, SupportsOnChange):
                 else:
                     child.remove_attr("selected")
 
-    def _set_value(self, event: ChangeEvent) -> None:
+    def _handle_change(self, event: ChangeEvent) -> None:
         self.value = event.value
 
 
@@ -212,8 +227,18 @@ class HTML(Elem):
 
     def __init__(self, html: str) -> None:
         super().__init__("div")
-        self.onmount(lambda _: self._set_html())
-        self._html = html
+        self.set_html(html)
+        self.onmount(lambda _: self._update_html())
 
-    def _set_html(self) -> None:
+    def _update_html(self) -> None:
         Session.require().send(Message.html(self.id, self._html))
+
+    @property
+    def html(self) -> str:
+        return self._html
+
+    def set_html(self, html: str) -> Self:
+        self._html = html
+        if self.is_mounted():
+            self._update_html()
+        return self

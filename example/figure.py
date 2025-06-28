@@ -1,10 +1,11 @@
 from __future__ import annotations
+
 import math
 import random
 
-from slash.core import Elem
 from slash import App
 from slash.basic import Figure
+from slash.core import Elem
 from slash.html import H1, Button, Input
 from slash.layout import Column, Row
 

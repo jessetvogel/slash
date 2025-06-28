@@ -5,7 +5,6 @@ from slash.core import Elem
 from slash.html import H2, Button, Input, Span
 from slash.layout import Column, Row
 
-
 input_text = ""
 
 BOX_STYLE = {
