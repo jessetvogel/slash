@@ -30,25 +30,21 @@ def set_figure_title(figure: Figure, title: str) -> None:
 
 def home() -> Elem:
     return Column(
-        [
-            H1("Figure demo"),
-            figure := Figure(
-                title="Some random figure",
-                xlabel="time (sec)",
-                ylabel="amplitude",
-                grid=True,
-            ),
-            Button("Click me!").onclick(lambda _: update_figure(figure)),
-            Row(
-                [
-                    Input(
-                        placeholder="Enter figure title",
-                    ).oninput(
-                        lambda event: set_figure_title(figure, event.value),
-                    )
-                ]
-            ),
-        ],
+        H1("Figure demo"),
+        figure := Figure(
+            title="Some random figure",
+            xlabel="time (sec)",
+            ylabel="amplitude",
+            grid=True,
+        ),
+        Button("Click me!").onclick(lambda _: update_figure(figure)),
+        Row(
+            Input(
+                placeholder="Enter figure title",
+            ).oninput(
+                lambda event: set_figure_title(figure, event.value),
+            )
+        ),
     ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 
 

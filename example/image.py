@@ -41,15 +41,13 @@ def generate_graph(image: Img) -> None:
 
 def home() -> Elem:
     return Column(
-        [
-            H1("Image demo"),
-            image := Img(
-                "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
-                alt="This is the alt text.",
-            ),
-            Button("Show an icon!").onclick(lambda _: update_image(image)),
-            Button("Show a graph!").onclick(lambda _: generate_graph(image)),
-        ]
+        H1("Image demo"),
+        image := Img(
+            "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
+            alt="This is the alt text.",
+        ),
+        Button("Show an icon!").onclick(lambda _: update_image(image)),
+        Button("Show a graph!").onclick(lambda _: generate_graph(image)),
     ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 
 

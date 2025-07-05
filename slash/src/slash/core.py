@@ -224,15 +224,18 @@ class Elem:
     def __init__(
         self,
         tag: str,
-        children: list[Elem | str] | Elem | str | None = None,
+        *children: Elem | str | list[Elem | str],
         **attrs: Any,
     ) -> None:
         self._tag = tag
-        if children is None:
-            children = []
-        if not isinstance(children, list):
-            children = [children]
-        self._children = children
+        self._children: list[Elem | str] = []
+        for child in children:
+            if isinstance(child, list):
+                self._children.extend(child)
+            elif isinstance(child, Elem) or isinstance(child, str):
+                self._children.append(child)
+            else:
+                raise TypeError(f"Invalid child type: {type(child)}")
         self._style: dict[str, str] = {}
         self._attrs = attrs
         self._classes: set[str] = set()
@@ -461,4 +464,4 @@ class Elem:
 
 # Types
 
-Children: TypeAlias = list[Elem | str] | Elem | str | None
+Children: TypeAlias = Elem | str

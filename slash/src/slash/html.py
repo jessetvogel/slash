@@ -11,72 +11,72 @@ from slash.js import JSFunction
 class Div(Elem, SupportsOnClick):
     """HTML <div> element."""
 
-    def __init__(self, children: Children = None) -> None:
-        super().__init__("div", children=children)
+    def __init__(self, *children: Children) -> None:
+        super().__init__("div", *children)
         SupportsOnClick.__init__(self)
 
 
 class P(Elem, SupportsOnClick):
     """HTML <p> element."""
 
-    def __init__(self, children: Children = None) -> None:
-        super().__init__("p", children=children)
+    def __init__(self, *children: Children) -> None:
+        super().__init__("p", *children)
         SupportsOnClick.__init__(self)
 
 
 class Span(Elem, SupportsOnClick):
     """HTML <span> element."""
 
-    def __init__(self, children: Children = None) -> None:
-        super().__init__("span", children=children)
+    def __init__(self, *children: Children) -> None:
+        super().__init__("span", *children)
         SupportsOnClick.__init__(self)
 
 
 class H1(Elem, SupportsOnClick):
     """HTML <h1> element."""
 
-    def __init__(self, children: Children = None) -> None:
-        super().__init__("h1", children=children)
+    def __init__(self, *children: Children) -> None:
+        super().__init__("h1", *children)
         SupportsOnClick.__init__(self)
 
 
 class H2(Elem, SupportsOnClick):
     """HTML <h2> element."""
 
-    def __init__(self, children: Children = None) -> None:
-        super().__init__("h2", children=children)
+    def __init__(self, *children: Children) -> None:
+        super().__init__("h2", *children)
         SupportsOnClick.__init__(self)
 
 
 class H3(Elem, SupportsOnClick):
     """HTML <h3> element."""
 
-    def __init__(self, children: Children = None) -> None:
-        super().__init__("h3", children=children)
+    def __init__(self, *children: Children) -> None:
+        super().__init__("h3", *children)
         SupportsOnClick.__init__(self)
 
 
 class H4(Elem, SupportsOnClick):
     """HTML <h4> element."""
 
-    def __init__(self, children: Children = None) -> None:
-        super().__init__("h4", children=children)
+    def __init__(self, *children: Children) -> None:
+        super().__init__("h4", *children)
         SupportsOnClick.__init__(self)
 
 
 class H5(Elem, SupportsOnClick):
     """HTML <h5> element."""
 
-    def __init__(self, children: Children = None) -> None:
-        super().__init__("h5", children=children)
+    def __init__(self, *children: Children) -> None:
+        super().__init__("h5", *children)
         SupportsOnClick.__init__(self)
 
 
 class H6(Elem, SupportsOnClick):
     """HTML <h6> element."""
 
-    def __init__(self, children: Children = None) -> None:
-        super().__init__("h6", children=children)
+    def __init__(self, *children: Children) -> None:
+        super().__init__("h6", *children)
         SupportsOnClick.__init__(self)
 
 
@@ -87,11 +87,10 @@ class A(Elem, SupportsOnClick):
 
     def __init__(
         self,
-        children: Children = None,
-        *,
+        *children: Children,
         href: str = "#",
     ) -> None:
-        super().__init__("a", children=children)
+        super().__init__("a", *children)
         SupportsOnClick.__init__(self)
         self.href = href
 
@@ -103,8 +102,8 @@ class A(Elem, SupportsOnClick):
 class Button(Elem, SupportsOnClick):
     """HTML <button> element."""
 
-    def __init__(self, children: Children = None) -> None:
-        super().__init__("button", children=children)
+    def __init__(self, *children: Children) -> None:
+        super().__init__("button", *children)
         SupportsOnClick.__init__(self)
 
 
@@ -151,7 +150,7 @@ class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         *,
         placeholder: str = "",
     ) -> None:
-        super().__init__("textarea", [value])
+        super().__init__("textarea", value)
         self.placeholder = placeholder
         self._value = value
         self.onchange(self._handle_change)
@@ -201,7 +200,7 @@ class Select(Elem, SupportsOnChange):
     """HTML <select> element."""
 
     def __init__(self, options: list[str]):
-        super().__init__("select", [Elem("option", option) for option in options])
+        super().__init__("select", *[Elem("option", option) for option in options])
         self._value = options[0]
         self.onchange(self._handle_change)
 
@@ -233,8 +232,8 @@ class Dialog(Elem):
     )
     JS_CLOSE = JSFunction(["id"], "document.getElementById(id).close()")
 
-    def __init__(self, children: Children | None = None):
-        super().__init__("dialog", children)
+    def __init__(self, *children: Children):
+        super().__init__("dialog", *children)
 
     def show(self) -> None:
         Session.require().execute(self.JS_SHOW, [self.id])

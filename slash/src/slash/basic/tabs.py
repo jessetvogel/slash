@@ -7,7 +7,7 @@ class Tabs(Elem, SupportsOnChange):
     def __init__(self, labels: list[str], *, value: str | None = None) -> None:
         super().__init__(
             "div",
-            [
+            *[
                 Div(label).onclick(lambda event: self._onclick_tab(event.target))
                 for label in labels
             ],

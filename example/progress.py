@@ -28,16 +28,12 @@ async def move_to_value(progress: Progress, value: float) -> None:
 
 def home() -> Elem:
     return Column(
-        [
-            progress := Progress(),
-            Row(
-                [
-                    Button("0%").onclick(lambda _: move_to_value(progress, 0.0)),
-                    Button("50%").onclick(lambda _: move_to_value(progress, 0.5)),
-                    Button("100%").onclick(lambda _: move_to_value(progress, 1.0)),
-                ]
-            ),
-        ]
+        progress := Progress(),
+        Row(
+            Button("0%").onclick(lambda _: move_to_value(progress, 0.0)),
+            Button("50%").onclick(lambda _: move_to_value(progress, 0.5)),
+            Button("100%").onclick(lambda _: move_to_value(progress, 1.0)),
+        ),
     )
 
 

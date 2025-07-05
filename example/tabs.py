@@ -10,12 +10,10 @@ from slash.layout import Column
 
 def tab_1() -> Elem:
     return Div(
-        [
-            H2("Lorem ipsum"),
-            P(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sem eros, fringilla et nisl sed, scelerisque finibus sem. Maecenas et imperdiet nisl, bibendum sodales sem. Vivamus diam ligula, interdum vitae quam auctor, porttitor euismod arcu. Nulla pretium ultricies dolor quis porttitor. Nullam vestibulum quam a feugiat egestas. Duis non vehicula justo, ut commodo orci. Praesent imperdiet elit a nibh rutrum scelerisque. Donec et ligula elementum neque euismod tempor. Donec lacinia, nulla quis egestas aliquam, lacus nisi blandit lectus, vel cursus eros turpis ut neque. In quam turpis, interdum eu velit a, lobortis suscipit ipsum. Morbi ullamcorper massa id est dignissim, vel auctor tellus aliquet. Cras vulputate finibus nisl, non lacinia tellus sagittis in. Aenean et accumsan dolor."
-            ),
-        ]
+        H2("Lorem ipsum"),
+        P(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sem eros, fringilla et nisl sed, scelerisque finibus sem. Maecenas et imperdiet nisl, bibendum sodales sem. Vivamus diam ligula, interdum vitae quam auctor, porttitor euismod arcu. Nulla pretium ultricies dolor quis porttitor. Nullam vestibulum quam a feugiat egestas. Duis non vehicula justo, ut commodo orci. Praesent imperdiet elit a nibh rutrum scelerisque. Donec et ligula elementum neque euismod tempor. Donec lacinia, nulla quis egestas aliquam, lacus nisi blandit lectus, vel cursus eros turpis ut neque. In quam turpis, interdum eu velit a, lobortis suscipit ipsum. Morbi ullamcorper massa id est dignissim, vel auctor tellus aliquet. Cras vulputate finibus nisl, non lacinia tellus sagittis in. Aenean et accumsan dolor."
+        ),
     )
 
 
@@ -92,12 +90,10 @@ def home() -> Elem:
             content.append(tab_3())
 
     return Column(
-        [
-            tabs := Tabs(
-                ["Latin", "Figure", "Markdown"],
-            ).onchange(lambda event: set_tab(event.value)),
-            content.onmount(lambda _: set_tab(tabs.value)),
-        ]
+        tabs := Tabs(
+            ["Latin", "Figure", "Markdown"],
+        ).onchange(lambda event: set_tab(event.value)),
+        content.onmount(lambda _: set_tab(tabs.value)),
     )
 
 

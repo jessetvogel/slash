@@ -143,6 +143,24 @@
 
 /* Core components */
 
+.slash-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.slash-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.slash-panel {
+    border: 1px solid #ccc;
+    background-color: #f8f7f6;
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
 .slash-figure {
     display: inline-block;
     background-color: var(--white);

@@ -8,25 +8,17 @@ from slash.layout import Column
 
 def home() -> Elem:
     return Column(
-        [
-            H2("Dialog demo"),
-            Div(
-                [
-                    Button("Dialog.show()").onclick(lambda _: dialog.show()),
-                    Button("Dialog.show_modal()").onclick(
-                        lambda _: dialog.show_modal()
-                    ),
-                    dialog := Dialog(
-                        Column(
-                            [
-                                Span("This is a dialog element!"),
-                                Button("Close").onclick(lambda _: dialog.close()),
-                            ],
-                        ).style({"gap": "16px"})
-                    ),
-                ]
+        H2("Dialog demo"),
+        Div(
+            Button("Dialog.show()").onclick(lambda _: dialog.show()),
+            Button("Dialog.show_modal()").onclick(lambda _: dialog.show_modal()),
+            dialog := Dialog(
+                Column(
+                    Span("This is a dialog element!"),
+                    Button("Close").onclick(lambda _: dialog.close()),
+                ).style({"gap": "16px"})
             ),
-        ],
+        ),
     ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 
 

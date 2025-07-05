@@ -16,11 +16,9 @@ def update_table(table: Table) -> None:
 
 def home() -> Elem:
     return Column(
-        [
-            H1("Table demo"),
-            table := Table(),
-            Button("Click me!").onclick(lambda _: update_table(table)),
-        ]
+        H1("Table demo"),
+        table := Table(),
+        Button("Click me!").onclick(lambda _: update_table(table)),
     ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 
 

@@ -25,13 +25,9 @@ def swap_column(new_task: Elem, tasks: Elem, finished: Elem) -> None:
 def add_task(tasks: Elem, finished: Elem) -> None:
     tasks.append(
         new_task := Row(
-            [
-                Span(input_text).style({"margin-right": "auto", "font-weight": "bold"}),
-                Button("move").onclick(
-                    lambda _: swap_column(new_task, tasks, finished)
-                ),
-                Button("delete").onclick(lambda _: new_task.unmount()),
-            ]
+            Span(input_text).style({"margin-right": "auto", "font-weight": "bold"}),
+            Button("move").onclick(lambda _: swap_column(new_task, tasks, finished)),
+            Button("delete").onclick(lambda _: new_task.unmount()),
         ).style(
             {"align-items": "center"},
         )
@@ -45,38 +41,28 @@ def set_text(value: str) -> None:
 
 def home() -> Elem:
     return Column(
-        [
-            Row(
-                [
-                    Input("text").onchange(lambda event: set_text(event.value)),
-                    Button("add task").onclick(lambda _: add_task(tasks, finished)),
-                ]
-            ),
-            Row(
-                [
-                    tasks := Column(
-                        [
-                            H2("Tasks 📝").style(
-                                {"text-align": "center", "color": "blue"},
-                            )
-                        ]
-                    ).style(
-                        {"width": "256px"},
-                    ),
-                    finished := Column(
-                        [
-                            H2("Finished 🎉").style(
-                                {"text-align": "center", "color": "green"},
-                            )
-                        ]
-                    ).style(
-                        {"width": "256px"},
-                    ),
-                ]
+        Row(
+            Input("text").onchange(lambda event: set_text(event.value)),
+            Button("add task").onclick(lambda _: add_task(tasks, finished)),
+        ),
+        Row(
+            tasks := Column(
+                H2("Tasks 📝").style(
+                    {"text-align": "center", "color": "blue"},
+                )
             ).style(
-                {"gap": "32px"},
+                {"width": "256px"},
             ),
-        ]
+            finished := Column(
+                H2("Finished 🎉").style(
+                    {"text-align": "center", "color": "green"},
+                )
+            ).style(
+                {"width": "256px"},
+            ),
+        ).style(
+            {"gap": "32px"},
+        ),
     ).style(
         {"width": "512px", "align-items": "center", "margin": "0px auto"},
     )

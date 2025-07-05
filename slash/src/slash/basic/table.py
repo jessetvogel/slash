@@ -32,4 +32,4 @@ class Table(Elem):
         self._table.clear()
         for i, row in enumerate(data):
             cell = "th" if self.has_headers and i == 0 else "td"
-            self._table.append(Elem("tr", [Elem(cell, str(entry)) for entry in row]))
+            self._table.append(Elem("tr", *[Elem(cell, str(entry)) for entry in row]))

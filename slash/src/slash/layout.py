@@ -6,17 +6,12 @@ from slash.core import Children, Elem
 class Row(Elem):
     """Row element."""
 
-    def __init__(self, children: Children = None):
+    def __init__(self, *children: Children):
         super().__init__(
             "div",
-            children,
+            *children,
         )
-        self.style(
-            {
-                "display": "flex",
-                "flex-direction": "row",
-            }
-        )
+        self.add_class("slash-row")
 
     @property
     def tag(self) -> str:
@@ -26,18 +21,24 @@ class Row(Elem):
 class Column(Elem):
     """Column element."""
 
-    def __init__(self, children: Children = None):
+    def __init__(self, *children: Children):
         super().__init__(
             "div",
-            children,
+            *children,
         )
-        self.style(
-            {
-                "display": "flex",
-                "flex-direction": "column",
-            }
-        )
+        self.add_class("slash-column")
 
     @property
     def tag(self) -> str:
         return "div"
+
+
+class Panel(Elem):
+    """Panel element."""
+
+    def __init__(self, *children: Children):
+        super().__init__(
+            "div",
+            *children,
+        )
+        self.add_class("slash-panel")
