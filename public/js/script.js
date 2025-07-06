@@ -18,7 +18,7 @@ class Client {
             console.log('Connection established!');
         };
         const loading = $("slash-loading");
-        this.socket.onmessage = function (event) {
+        this.socket.onmessage = async function (event) {
             loading === null || loading === void 0 ? void 0 : loading.remove();
             let message;
             try {
@@ -27,14 +27,14 @@ class Client {
             }
             catch (error) {
                 console.error(`Received invalid message from server\nmessage: ${event.data}`);
-                Slash.message('error', `<span>Received invalid message from server</span><pre>${event.data}</pre><span>${error}</span>`);
+                Slash.message('error', `<span>Received invalid message from server</span><pre><code>${event.data}</code></pre><span>${error}</span>`);
                 return;
             }
             try {
-                client.handle(message);
+                await client.handle(message);
             }
             catch (error) {
-                Slash.message('error', `<span>Failed to handle message from server</span><pre>${event.data}</pre><span>${error}</span>`);
+                Slash.message('error', `<span>Failed to handle message from server</span><pre><code>${event.data}</code></pre><span>${error}</span>`);
                 return;
             }
         };
@@ -50,11 +50,14 @@ class Client {
         const event = message.event;
         if (event == "create") {
             const tag = message.tag;
-            if (tag == "text") {
+            if (tag === undefined) {
                 $(message.parent).append(message.text);
                 return;
             }
-            const elem = create(tag, { id: message.id });
+            const elem = (message.ns !== undefined)
+                ? document.createElementNS(message.ns, tag)
+                : document.createElement(tag);
+            elem.id = message.id;
             this.update(elem, message);
             return;
         }
@@ -117,10 +120,13 @@ class Client {
     }
     update(elem, message) {
         for (const attr in message) {
-            if (attr == "event" || attr == "id" || attr == "tag")
+            if (attr == "event" || attr == "id" || attr == "tag" || attr == "ns")
                 continue;
             if (attr == "parent") {
-                $(message.parent).append(elem);
+                const parent = $(message.parent);
+                if (parent === null)
+                    throw new Error(`No element exists with id '${message.parent}'`);
+                parent.append(elem);
                 continue;
             }
             if (attr == "style") {

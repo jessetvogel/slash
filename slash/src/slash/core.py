@@ -308,16 +308,18 @@ class Elem:
 
         return attrs
 
-    def set_attr(self, name: str, value: str = "") -> None:
+    def set_attr(self, name: str, value: str | int = "") -> Self:
         """Set attribute."""
         self._attrs[name] = value
         self._update_attrs({name: value})
+        return self
 
-    def remove_attr(self, name: str) -> None:
+    def remove_attr(self, name: str) -> Self:
         """Remove attribute."""
         if name in self._attrs:
             del self._attrs[name]
             self._update_attrs({name: None})
+        return self
 
     def is_mounted(self) -> bool:
         """Check if element is mounted."""
@@ -350,7 +352,7 @@ class Elem:
                 child.mount()
             else:
                 session.send(
-                    Message(event="create", tag="text", parent=self.id, text=child),
+                    Message(event="create", parent=self.id, text=child),
                 )
 
         # Mark as mounted
@@ -389,9 +391,10 @@ class Elem:
 
     def clear(self) -> None:
         """Unmount all children."""
-        for child in self.children:
-            if isinstance(child, Elem):
-                child.unmount()
+        if self.is_mounted():
+            for child in self.children:
+                if isinstance(child, Elem):
+                    child.unmount()
         self._children = []
 
     def append(self, elem: Elem) -> Self:
@@ -403,7 +406,27 @@ class Elem:
         self._children.append(elem)
 
         # Set update
-        if (session := Session.current()) is not None:
+        if (session := Session.current()) is not None and self.is_mounted():
+            # If elem is not mounted yet, mount it
+            if not elem.is_mounted():
+                elem.mount()
+            else:
+                # Otherwise, send update message with new `parent` value
+                session.send(Message.update(elem.id, parent=self.id))
+        return self
+
+    def insert(self, position: int, elem: Elem) -> Self:
+        """Insert element to the children of this element at given position."""
+        # Set parent and children variables
+        if elem._parent is not None:
+            elem._parent._children.remove(elem)
+        elem._parent = self
+        self._children.insert(position, elem)
+
+        # TODO: Send correct position!
+
+        # Set update
+        if (session := Session.current()) is not None and self.is_mounted():
             # If elem is not mounted yet, mount it
             if not elem.is_mounted():
                 elem.mount()

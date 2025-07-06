@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 import traceback
 from collections.abc import Callable
 
@@ -44,7 +45,13 @@ class App:
                 root = self._endpoints["/"]()
                 root.mount()
             except Exception as err:
-                msg = "Server error: " + str(err)
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                tb = traceback.extract_tb(exc_tb)
+                frame = tb[-1]
+                msg = (
+                    "Server error: " + str(err) + "\n"
+                    f"(at line {frame.lineno} of {frame.filename})"
+                )
                 LOGGER.error(msg)
                 session.log("error", msg)
             await session.flush()

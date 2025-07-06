@@ -1,154 +1,447 @@
-import random
-from typing import Any, Self
+from __future__ import annotations
 
-from slash.core import Elem, Session
-from slash.js import JSFunction
+import math
+from abc import abstractmethod
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
+from typing import Self
 
-# class FigureOption:
-#   TODO
+from slash.basic.svg import SVG, SVGElem
 
 
-class Figure(Elem):
-    def __init__(
-        self, *, title: str = "", xlabel: str = "", ylabel: str = "", grid: bool = False
-    ):
-        self._canvas = Elem("canvas", width=512, height=384)
-        super().__init__("div", children=[self._canvas], **{"class": "slash-figure"})  # type: ignore[arg-type]
-        self._title = title
-        self._xlabel = xlabel
-        self._ylabel = ylabel
-        self._grid = grid
-        self._js_figure_id = self.id + "_js_figure"
-        self.onmount(lambda _: self._create_js_figure())
+@dataclass
+class View:
+    x_min: float
+    x_max: float
+    y_min: float
+    y_max: float
+    u_min: float
+    u_max: float
+    v_min: float
+    v_max: float
 
-    def _create_js_figure(self) -> None:
-        options = {
-            "title": self._title,
-            "xlabel": self._xlabel,
-            "ylabel": self._ylabel,
-            "grid": self._grid,
-        }
 
-        Session.require().execute(
-            FUNCTION_CREATE, [self._canvas.id, options], self._js_figure_id
+class Figure(SVG):
+    def __init__(self, *, width: int = 384, height: int = 256) -> None:
+        super().__init__()
+
+        self._width = width
+        self._height = height
+
+        self.style({"display": "block"})
+        self.set_attr("width", width)
+        self.set_attr("height", height)
+
+        self.title = None
+        self.xlabel = None
+        self.ylabel = None
+        self.legend = False
+        self.grid = False
+
+        self._view = View(
+            0.0, 1.0, 0.0, 1.0, 32, self._width - 16, self._height - 16, 16
         )
 
-    def _update_options(self, options: dict[str, Any]) -> None:
-        Session.require().execute(FUNCTION_SET, [self._js_figure_id, options])
+        self._plots: list[Plot] = []
 
     @property
-    def title(self) -> str:
+    def title(self) -> str | None:
         return self._title
 
     @title.setter
-    def title(self, value: str) -> None:
-        self._title = value
-        self._update_options({"title": value})
+    def title(self, title: str | None):
+        self._title = title
+
+    def set_title(self, title: str | None) -> Self:
+        self.title = title
+        return self
 
     @property
-    def xlabel(self) -> str:
+    def xlabel(self) -> str | None:
         return self._xlabel
 
     @xlabel.setter
-    def xlabel(self, value: str) -> None:
-        self._xlabel = value
-        self._update_options({"xlabel": value})
+    def xlabel(self, xlabel: str | None):
+        self._xlabel = xlabel
+
+    def set_xlabel(self, xlabel: str | None) -> Self:
+        self.xlabel = xlabel
+        return self
 
     @property
-    def ylabel(self) -> str:
+    def ylabel(self) -> str | None:
         return self._ylabel
 
     @ylabel.setter
-    def ylabel(self, value: str) -> None:
-        self._ylabel = value
-        self._update_options({"ylabel": value})
+    def ylabel(self, ylabel: str | None):
+        self._ylabel = ylabel
+
+    def set_ylabel(self, ylabel: str | None) -> Self:
+        self.ylabel = ylabel
+        return self
+
+    @property
+    def legend(self) -> bool:
+        return self._legend
+
+    @legend.setter
+    def legend(self, legend: bool):
+        self._legend = legend
+
+    def set_legend(self, legend: bool) -> Self:
+        self.legend = legend
+        return self
 
     @property
     def grid(self) -> bool:
         return self._grid
 
     @grid.setter
-    def grid(self, value: bool) -> None:
-        self._grid = value
-        self._update_options({"grid": value})
+    def grid(self, grid: bool):
+        self._grid = grid
 
-    def clear(self) -> None:
-        Session.require().execute(FUNCTION_CLEAR, [self._js_figure_id])
-
-    def draw(self) -> Self:
-        Session.require().execute(FUNCTION_DRAW, [self._js_figure_id])
+    def set_grid(self, grid: bool) -> Self:
+        self.grid = grid
         return self
 
-    def graph(
-        self,
-        xs: list[float],
-        ys: list[float],
-        *,
-        color: str | None = None,
-    ) -> Self:
-        options: dict[str, Any] = {"color": color or random_hex_color()}
-        Session.require().execute(
-            FUNCTION_GRAPH, [self._js_figure_id, list(zip(xs, ys)), options]
+    def add_plot(self, plot: Plot) -> Self:
+        if plot.color is None:
+            plot.color = self._next_color()
+
+        self._plots.append(plot)
+        return self
+
+    def remove_plot(self, plot: Plot) -> Self:
+        self._plots.remove(plot)
+        return self
+
+    def clear_plots(self) -> Self:
+        self._plots.clear()
+        return self
+
+    def render(self) -> Self:
+        self._update_view()
+        self._update_defs()
+        self._update_grid()
+        self._update_plots()
+        self._update_axes()
+        self._update_ticks()
+        self._update_labels()
+        self._update_legend()
+        return self
+
+    def _update_plots(self) -> None:
+        if not hasattr(self, "_svg_plots"):
+            self._svg_plots = SVGElem("g")
+            self.append(self._svg_plots)
+
+        self._svg_plots.set_attr("clip-path", f"url(#{self._clip_plots_id})")
+
+        self._svg_plots.clear()
+        for plot in self._plots:
+            plot.plot(self._svg_plots, self._xy_to_uv)
+
+    def _update_view(self) -> None:
+        self._view.v_max = 40 if self.title is not None else 16
+        self._view.v_min = (
+            self._height - 48 if self.xlabel is not None else self._height - 16
         )
-        return self
+        self._view.u_min = 48 if self.ylabel is not None else 16
 
-    def scatter(
-        self,
-        xs: list[float],
-        ys: list[float],
-        *,
-        color: str | None = None,
-    ) -> Self:
-        options: dict[str, Any] = {"color": color or random_hex_color()}
-        Session.require().execute(
-            FUNCTION_SCATTER,
-            [self._js_figure_id, list(zip(xs, ys)), options],
+    def _update_defs(self) -> None:
+        if not hasattr(self, "_svg_defs"):
+            self._svg_defs = SVGElem("defs")
+            self.append(self._svg_defs)
+
+        self._svg_defs.clear()
+        self._svg_defs.append(
+            clip := SVGElem(
+                "clipPath",
+                SVGElem(
+                    "rect",
+                    x=self._view.u_min,
+                    y=self._view.v_max,
+                    width=self._view.u_max - self._view.u_min,
+                    height=self._view.v_min - self._view.v_max,
+                ),
+            )
         )
-        return self
+        self._clip_plots_id: str = clip.id
+
+    def _update_axes(self) -> None:
+        if not hasattr(self, "_svg_axes"):
+            self._svg_axes = SVGElem(
+                "polyline",
+                fill="none",
+                **{"stroke": "black", "stroke-width": "1"},
+            )
+            self.append(self._svg_axes)
+
+        self._svg_axes.set_attr(
+            "points",
+            " ".join(
+                [
+                    f"{self._view.u_min},{self._view.v_max}",
+                    f"{self._view.u_min},{self._view.v_min}",
+                    f"{self._view.u_max},{self._view.v_min}",
+                ]
+            ),
+        )
+
+    def _update_legend(self) -> None:
+        if not hasattr(self, "_svg_legend"):
+            self._svg_legend = SVGElem("g", **{"font-size": "14px"})
+            self.append(self._svg_legend)
+
+        self._svg_legend.clear()
+
+        if not self.legend:
+            return
+
+        y_top = self._view.v_max + 8
+        x_left = self._view.u_max - 8 - 128
+        x_right = self._view.u_max - 8
+
+        self._svg_legend.append(
+            bg := SVGElem(
+                "rect",
+                x=x_left,
+                y=y_top,
+                rx=4,
+                ry=4,
+                width=x_right - x_left,
+                height=0,
+                fill="rgba(255, 255, 255, 0.5)",
+                stroke="#ccc",
+            )
+        )
+
+        y_current = y_top + 12
+
+        for plot in self._plots:
+            if plot.label is not None:
+                self._svg_legend.append(
+                    SVGElem(
+                        "circle", cx=x_left + 12, cy=y_current, r=4, fill=plot.color
+                    )
+                )
+                self._svg_legend.append(
+                    SVGElem(
+                        "text",
+                        plot.label,
+                        x=x_left + 12 + 12,
+                        y=y_current,
+                        **{"text-anchor": "start", "dominant-baseline": "middle"},
+                    )
+                )
+                y_current += 16
+
+        y_bottom = y_current - 16 + 12
+
+        bg.set_attr("height", int(y_bottom - y_top))
+
+    def _xy_to_uv(self, x: float, y: float) -> tuple[float, float]:
+        """Convert abstract xy-coordinates to SVG uv-coordinates."""
+        u = self._view.u_min + (self._view.u_max - self._view.u_min) * (
+            x - self._view.x_min
+        ) / (self._view.x_max - self._view.x_min)
+        v = self._view.v_min + (self._view.v_max - self._view.v_min) * (
+            y - self._view.y_min
+        ) / (self._view.y_max - self._view.y_min)
+        return u, v
+
+    def _update_ticks(self) -> None:
+        if not hasattr(self, "_svg_ticks"):
+            self._svg_ticks = SVGElem("g", **{"stroke": "black", "stroke-width": "1"})
+            self.append(self._svg_ticks)
+
+        self._svg_ticks.clear()
+
+        labels = SVGElem("g").style(
+            {
+                "font-size": "10px",
+                "stroke-width": "0",
+            }
+        )
+
+        for x in self.xticks():
+            u, v = self._xy_to_uv(x, self._view.y_min)
+            self._svg_ticks.append(SVGElem("line", x1=u, y1=v - 2, x2=u, y2=v + 2))
+            labels.append(
+                SVGElem(
+                    "text",
+                    f"{x:.1f}",
+                    x=u,
+                    y=v + 4,
+                    **{"text-anchor": "middle", "dominant-baseline": "hanging"},
+                )
+            )
+
+        for y in self.yticks():
+            u, v = self._xy_to_uv(self._view.x_min, y)
+            self._svg_ticks.append(SVGElem("line", x1=u - 2, y1=v, x2=u + 2, y2=v))
+            labels.append(
+                SVGElem(
+                    "text",
+                    f"{y:.1f}",
+                    x=u - 4,
+                    y=v,
+                    **{"text-anchor": "end", "dominant-baseline": "middle"},
+                )
+            )
+
+        self._svg_ticks.append(labels)
+        self._svg_ticks.append(labels)
+
+    def _update_grid(self) -> None:
+        if not hasattr(self, "_svg_grid"):
+            self._svg_grid = SVGElem("g", **{"stroke": "#ccc", "stroke-width": "1"})
+            self.append(self._svg_grid)
+
+        self._svg_grid.clear()
+        if not self.grid:
+            return
+
+        for x in self.xticks():
+            u, _ = self._xy_to_uv(x, 0)
+            self._svg_grid.append(
+                SVGElem("line", x1=u, y1=self._view.v_min, x2=u, y2=self._view.v_max)
+            )
+        for y in self.yticks():
+            _, v = self._xy_to_uv(0, y)
+            self._svg_grid.append(
+                SVGElem("line", x1=self._view.u_min, y1=v, x2=self._view.u_max, y2=v)
+            )
+
+    def _update_labels(self) -> None:
+        if not hasattr(self, "_svg_labels"):
+            self._svg_labels = SVGElem("g")
+            self.append(self._svg_labels)
+
+        self._svg_labels.clear()
+
+        if self.title:
+            self._svg_labels.append(
+                SVGElem(
+                    "text",
+                    self.title,
+                    **{
+                        "x": (self._view.u_min + self._view.u_max) / 2,
+                        "y": (self._view.v_max - 16),
+                        "text-anchor": "middle",
+                        "dominant-baseline": "auto",
+                        "font-size": "18px",
+                    },
+                )
+            )
+
+        if self.xlabel:
+            self._svg_labels.append(
+                SVGElem(
+                    "text",
+                    self.xlabel,
+                    **{
+                        "x": (self._view.u_min + self._view.u_max) / 2,
+                        "y": (self._view.v_min + 24),
+                        "text-anchor": "middle",
+                        "dominant-baseline": "hanging",
+                        "font-size": "14",
+                    },
+                )
+            )
+
+        if self.ylabel:
+            self._svg_labels.append(
+                SVGElem(
+                    "text",
+                    self.ylabel,
+                    **{
+                        "y": (self._view.u_min - 32),
+                        "x": -(self._view.v_min + self._view.v_max) / 2,
+                        "text-anchor": "middle",
+                        "dominant-baseline": "auto",
+                        "font-size": "14",
+                        "transform": "rotate(-90)",
+                    },
+                )
+            )
+
+    def xticks(self) -> list[float]:
+        interval = round_125((self._view.x_max - self._view.x_min) / 10)
+        x = math.ceil(self._view.x_min / interval) * interval
+        ticks = [x]
+        while x + interval <= self._view.x_max:
+            x += interval
+            ticks.append(x)
+        return ticks
+
+    def yticks(self) -> list[float]:
+        interval = round_125((self._view.y_max - self._view.y_min) / 10)
+        y = math.ceil(self._view.y_min / interval) * interval
+        ticks = [y]
+        while y + interval <= self._view.y_max:
+            y += interval
+            ticks.append(y)
+        return ticks
+
+    def _next_color(self) -> str:
+        if not hasattr(self, "_color_counter"):
+            self._color_counter = 0
+        else:
+            self._color_counter += 1
+        colors = ["var(--blue)", "var(--red)", "var(--yellow)", "var(--green)"]
+        return colors[self._color_counter % len(colors)]
 
 
-FUNCTION_CREATE = JSFunction(
-    ["id", "options"],
-    "return new Figure(document.getElementById(id), options)",
-)
-
-FUNCTION_SCATTER = JSFunction(
-    ["id", "pts", "options"],
-    """
-    const figure = Slash.value(id);
-    const scatter = new Scatter(pts, options);
-    figure.plot(scatter);
-    """,
-)
-
-FUNCTION_GRAPH = JSFunction(
-    ["id", "pts", "options"],
-    """
-    const figure = Slash.value(id);
-    const graph = new Graph(pts, options);
-    figure.plot(graph);
-    """,
-)
-
-FUNCTION_CLEAR = JSFunction(
-    ["id"],
-    "Slash.value(id).clear()",
-)
-
-FUNCTION_SET = JSFunction(
-    ["id", "options"],
-    """
-    const figure = Slash.value(id);
-    for (const key in options)
-        figure.options[key] = options[key];
-    """,
-)
-
-FUNCTION_DRAW = JSFunction(
-    ["id"],
-    "Slash.value(id).draw()",
-)
+def round_125(x: float) -> float:
+    if x == 0:
+        return 0
+    e = math.floor(math.log10(abs(x)))
+    b = abs(x) / 10**e
+    r = 1 if b < 1.5 else 2 if b < 3.5 else 5 if b < 7.5 else 1
+    e += b >= 7.5
+    return math.copysign(r * 10**e, x)
 
 
-def random_hex_color() -> str:
-    return "#{:06x}".format(random.randint(0, 0xFFFFFF))
+@dataclass
+class Plot:
+    xs: Sequence[float]
+    ys: Sequence[float]
+    color: str | None = None
+    label: str | None = None
+
+    @abstractmethod
+    def plot(
+        self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]
+    ) -> None:
+        pass
+
+
+@dataclass
+class Graph(Plot):
+    def plot(
+        self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]
+    ):
+        points = []
+        for x, y in zip(self.xs, self.ys):
+            u, v = xy_to_uv(x, y)
+            points.append(f"{u},{v}")
+        frame.append(
+            SVGElem(
+                "polyline",
+                points=" ".join(points),
+                **{"stroke": self.color, "stroke-width": "2", "fill": "none"},
+            )
+        )
+
+
+@dataclass
+class Scatter(Plot):
+    def plot(
+        self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]
+    ):
+        circles = SVGElem("g", **{"fill": self.color})
+        for x, y in zip(self.xs, self.ys):
+            u, v = xy_to_uv(x, y)
+            circles.append(SVGElem("circle", cx=u, cy=v, r=3))
+        frame.append(circles)
