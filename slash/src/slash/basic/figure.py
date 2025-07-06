@@ -11,14 +11,14 @@ from slash.basic.svg import SVG, SVGElem
 
 @dataclass
 class View:
-    x_min: float
-    x_max: float
-    y_min: float
-    y_max: float
-    u_min: float
-    u_max: float
-    v_min: float
-    v_max: float
+    x_min: float = 0.0
+    x_max: float = 1.0
+    y_min: float = 0.0
+    y_max: float = 1.0
+    u_min: float = 0.0
+    u_max: float = 1.0
+    v_min: float = 0.0
+    v_max: float = 1.0
 
 
 class Figure(SVG):
@@ -37,11 +37,10 @@ class Figure(SVG):
         self.ylabel = None
         self.legend = False
         self.grid = False
+        self.xlim = None, None
+        self.ylim = None, None
 
-        self._view = View(
-            0.0, 1.0, 0.0, 1.0, 32, self._width - 16, self._height - 16, 16
-        )
-
+        self._view = View()
         self._plots: list[Plot] = []
 
     @property
@@ -49,7 +48,7 @@ class Figure(SVG):
         return self._title
 
     @title.setter
-    def title(self, title: str | None):
+    def title(self, title: str | None) -> None:
         self._title = title
 
     def set_title(self, title: str | None) -> Self:
@@ -61,7 +60,7 @@ class Figure(SVG):
         return self._xlabel
 
     @xlabel.setter
-    def xlabel(self, xlabel: str | None):
+    def xlabel(self, xlabel: str | None) -> None:
         self._xlabel = xlabel
 
     def set_xlabel(self, xlabel: str | None) -> Self:
@@ -73,7 +72,7 @@ class Figure(SVG):
         return self._ylabel
 
     @ylabel.setter
-    def ylabel(self, ylabel: str | None):
+    def ylabel(self, ylabel: str | None) -> None:
         self._ylabel = ylabel
 
     def set_ylabel(self, ylabel: str | None) -> Self:
@@ -85,7 +84,7 @@ class Figure(SVG):
         return self._legend
 
     @legend.setter
-    def legend(self, legend: bool):
+    def legend(self, legend: bool) -> None:
         self._legend = legend
 
     def set_legend(self, legend: bool) -> Self:
@@ -97,11 +96,35 @@ class Figure(SVG):
         return self._grid
 
     @grid.setter
-    def grid(self, grid: bool):
+    def grid(self, grid: bool) -> None:
         self._grid = grid
 
     def set_grid(self, grid: bool) -> Self:
         self.grid = grid
+        return self
+
+    @property
+    def xlim(self) -> tuple[float | None, float | None]:
+        return self._xmin, self._xmax
+
+    @xlim.setter
+    def xlim(self, xlim: tuple[float | None, float | None]) -> None:
+        self._xmin, self._xmax = xlim
+
+    def set_xlim(self, xmin: float | None = None, xmax: float | None = None) -> Self:
+        self.xlim = xmin, xmax
+        return self
+
+    @property
+    def ylim(self) -> tuple[float | None, float | None]:
+        return self._ymin, self._ymax
+
+    @ylim.setter
+    def ylim(self, ylim: tuple[float | None, float | None]) -> None:
+        self._ymin, self._ymax = ylim
+
+    def set_ylim(self, ymin: float | None = None, ymax: float | None = None) -> Self:
+        self.ylim = ymin, ymax
         return self
 
     def add_plot(self, plot: Plot) -> Self:
@@ -147,6 +170,12 @@ class Figure(SVG):
             self._height - 48 if self.xlabel is not None else self._height - 16
         )
         self._view.u_min = 48 if self.ylabel is not None else 16
+        self._view.u_max = self._width - 16
+
+        self._view.x_min = self.xlim[0] or min(x for p in self._plots for x in p.xs)
+        self._view.x_max = self.xlim[1] or max(x for p in self._plots for x in p.xs)
+        self._view.y_min = self.ylim[0] or min(y for p in self._plots for y in p.ys)
+        self._view.y_max = self.ylim[1] or max(y for p in self._plots for y in p.ys)
 
     def _update_defs(self) -> None:
         if not hasattr(self, "_svg_defs"):
@@ -211,7 +240,7 @@ class Figure(SVG):
                 ry=4,
                 width=x_right - x_left,
                 height=0,
-                fill="rgba(255, 255, 255, 0.5)",
+                fill="rgba(255, 255, 255, 0.67)",
                 stroke="#ccc",
             )
         )

@@ -21,6 +21,9 @@ def update_figure(figure: Figure) -> None:
     figure.clear_plots()
     figure.add_plot(Graph(xs, ys, color="var(--secondary-color)", label="graph"))
     figure.add_plot(Scatter(xs, ys, color="var(--primary-color)", label="scatter"))
+
+    figure.set_ylim(-1.0, 1.0)
+
     figure.render()
 
 
@@ -33,7 +36,7 @@ def home() -> Elem:
     return Column(
         H1("Figure demo"),
         Panel(
-            figure := Figure()
+            figure := Figure(width=512, height=320)
             .set_title("Some random figure")
             .set_xlabel("time (sec)")
             .set_ylabel("amplitude")
