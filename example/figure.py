@@ -5,7 +5,7 @@ import random
 
 from slash import App
 from slash.basic import Figure
-from slash.basic.figure import Graph, Scatter
+from slash.basic.figure import Bar, Graph, Scatter
 from slash.core import Elem
 from slash.html import H1, Button, Input
 from slash.layout import Column, Panel, Row
@@ -16,12 +16,14 @@ def update_figure(figure: Figure) -> None:
     f = 1 + random.random()
     p = random.random() * 6.28
     xs = [n / 5 for n in range(n + 1)]
-    ys = [0.5 + 0.4 * math.sin(f * x + p) for x in xs]
+    ys = [0.2 + 0.4 * math.sin(f * x + p) for x in xs]
 
     figure.clear_plots()
+    figure.add_plot(Bar(xs, ys, color="var(--green)", label="bar"))
     figure.add_plot(Graph(xs, ys, color="var(--secondary-color)", label="graph"))
     figure.add_plot(Scatter(xs, ys, color="var(--primary-color)", label="scatter"))
 
+    figure.set_xlim(-1.0, 11.0)
     figure.set_ylim(-1.0, 1.0)
 
     figure.render()

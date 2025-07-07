@@ -474,3 +474,30 @@ class Scatter(Plot):
             u, v = xy_to_uv(x, y)
             circles.append(SVGElem("circle", cx=u, cy=v, r=3))
         frame.append(circles)
+
+
+@dataclass
+class Bar(Plot):
+    def plot(
+        self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]
+    ):
+        bars = SVGElem("g", **{"fill": self.color})
+
+        uvs = [xy_to_uv(x, y) for x, y in zip(self.xs, self.ys)]
+        _, z = xy_to_uv(0, 0)
+
+        width = 0.0
+        for uv1, uv2 in zip(uvs, uvs[1:]):
+            width = max(width, abs(uv2[0] - uv1[0]))
+
+        width *= 0.8
+
+        for x, y in zip(self.xs, self.ys):
+            u, v = xy_to_uv(x, y)
+            _, z = xy_to_uv(0, 0)
+            y, height = min(v, z), abs(z - v)
+            bars.append(
+                SVGElem("rect", x=u - width / 2, y=y, width=width, height=height)
+            )
+
+        frame.append(bars)
