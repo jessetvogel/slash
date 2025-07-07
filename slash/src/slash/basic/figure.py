@@ -489,7 +489,6 @@ class Bar(Plot):
         width = 0.0
         for uv1, uv2 in zip(uvs, uvs[1:]):
             width = max(width, abs(uv2[0] - uv1[0]))
-
         width *= 0.8
 
         for x, y in zip(self.xs, self.ys):

@@ -397,22 +397,30 @@ class Elem:
                     child.unmount()
         self._children = []
 
-    def append(self, elem: Elem) -> Self:
+    def append(self, elem: Elem | str) -> Self:
         """Append element to the children of this element."""
-        # Set parent and children variables
-        if elem._parent is not None:
-            elem._parent._children.remove(elem)
-        elem._parent = self
-        self._children.append(elem)
+        if isinstance(elem, Elem):
+            # Set parent and children variables
+            if elem._parent is not None:
+                elem._parent._children.remove(elem)
+            elem._parent = self
+            self._children.append(elem)
 
-        # Set update
-        if (session := Session.current()) is not None and self.is_mounted():
-            # If elem is not mounted yet, mount it
-            if not elem.is_mounted():
-                elem.mount()
-            else:
-                # Otherwise, send update message with new `parent` value
-                session.send(Message.update(elem.id, parent=self.id))
+            # Set update
+            if (session := Session.current()) is not None and self.is_mounted():
+                # If elem is not mounted yet, mount it
+                if not elem.is_mounted():
+                    elem.mount()
+                else:
+                    # Otherwise, send update message with new `parent` value
+                    session.send(Message.update(elem.id, parent=self.id))
+
+        if isinstance(elem, str):
+            self._children.append(elem)
+            # Append text
+            if (session := Session.current()) is not None and self.is_mounted():
+                session.send(Message("create", parent=self.id, text=elem))
+
         return self
 
     def insert(self, position: int, elem: Elem) -> Self:

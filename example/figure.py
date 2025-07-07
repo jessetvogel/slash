@@ -6,9 +6,10 @@ import random
 from slash import App
 from slash.basic import Figure
 from slash.basic.figure import Bar, Graph, Scatter
+from slash.basic.pie import Pie
 from slash.core import Elem
 from slash.html import H1, Button, Input
-from slash.layout import Column, Panel, Row
+from slash.layout import Column, Panel
 
 
 def update_figure(figure: Figure) -> None:
@@ -29,6 +30,26 @@ def update_figure(figure: Figure) -> None:
     figure.render()
 
 
+def update_pie(pie: Pie) -> None:
+    labels = [
+        "Apple",
+        "Banana",
+        "Mango",
+        "Strawberry",
+        "Orange",
+        "Pineapple",
+        "Grapes",
+        "Watermelon",
+        "Blueberry",
+        "Peach",
+    ]
+    values = [7, 3, 9, 1, 6, 8, 2, 10, 4, 5]
+
+    pie.set_title("My Flavourite Fruits").set_radius(112.0).set_gap(32.0).render(
+        labels, values
+    )
+
+
 def set_figure_title(figure: Figure, title: str) -> None:
     figure.title = title
     figure.render()
@@ -44,15 +65,19 @@ def home() -> Elem:
             .set_ylabel("amplitude")
             .set_grid(True)
             .set_legend(True)
+            .onmount(lambda _: update_figure(figure)),
         ),
         Button("Click me!").onclick(lambda _: update_figure(figure)),
-        Row(
-            Input(
-                placeholder="Enter figure title",
-            ).oninput(
-                lambda event: set_figure_title(figure, event.value),
-            )
+        Input(
+            placeholder="Enter figure title",
+        ).oninput(
+            lambda event: set_figure_title(figure, event.value),
         ),
+        H1("Pie chart demo"),
+        Panel(
+            pie := Pie(width=512, height=320).onmount(lambda _: update_pie(pie)),
+        ),
+        Button("Click me!").onclick(lambda _: update_pie(pie)),
     ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 
 
