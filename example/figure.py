@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 import random
 
+import numpy as np
 from slash import App
 from slash.basic import Figure
 from slash.basic.figure import Bar, Graph, Scatter
@@ -50,6 +51,24 @@ def update_pie(pie: Pie) -> None:
     )
 
 
+def update_bar(bar: Figure) -> None:
+    bar.clear_plots()
+    bar.set_xlim(0.0, 4.0)
+    bar.set_ylim(0.0)
+
+    xs = np.array([1, 2, 3])
+    labels = ["2023", "2024", "2025"]
+
+    bar.add_plot(Bar(xs - 0.25, [4, 5, 6], width=0.25, label="First"))
+    bar.add_plot(Bar(xs, [5, 6, 7], width=0.25, label="Second"))
+    bar.add_plot(Bar(xs + 0.25, [3, 5.5, 6.5], width=0.25, label="Third"))
+    bar.set_xticks(list(zip(xs, labels)))
+
+    bar.set_legend(True)
+
+    bar.render()
+
+
 def set_figure_title(figure: Figure, title: str) -> None:
     figure.title = title
     figure.render()
@@ -78,6 +97,11 @@ def home() -> Elem:
             pie := Pie(width=512, height=320).onmount(lambda _: update_pie(pie)),
         ),
         Button("Click me!").onclick(lambda _: update_pie(pie)),
+        H1("Bar chart demo"),
+        Panel(
+            bar := Figure(width=512, height=320).onmount(lambda _: update_bar(bar)),
+        ),
+        Button("Click me!").onclick(lambda _: update_bar(bar)),
     ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
 
 

@@ -39,6 +39,8 @@ class Figure(SVG):
         self.grid = False
         self.xlim = None, None
         self.ylim = None, None
+        self.set_xticks(None)
+        self.set_yticks(None)
 
         self._view = View()
         self._plots: list[Plot] = []
@@ -167,15 +169,31 @@ class Figure(SVG):
     def _update_view(self) -> None:
         self._view.v_max = 40 if self.title is not None else 16
         self._view.v_min = (
-            self._height - 48 if self.xlabel is not None else self._height - 16
+            self._height - 48 if self.xlabel is not None else self._height - 24
         )
-        self._view.u_min = 48 if self.ylabel is not None else 16
+        self._view.u_min = 48 if self.ylabel is not None else 24
         self._view.u_max = self._width - 16
 
-        self._view.x_min = self.xlim[0] or min(x for p in self._plots for x in p.xs)
-        self._view.x_max = self.xlim[1] or max(x for p in self._plots for x in p.xs)
-        self._view.y_min = self.ylim[0] or min(y for p in self._plots for y in p.ys)
-        self._view.y_max = self.ylim[1] or max(y for p in self._plots for y in p.ys)
+        self._view.x_min = (
+            self.xlim[0]
+            if self.xlim[0] is not None
+            else min(x for p in self._plots for x in p.xs)
+        )
+        self._view.x_max = (
+            self.xlim[1]
+            if self.xlim[1] is not None
+            else max(x for p in self._plots for x in p.xs)
+        )
+        self._view.y_min = (
+            self.ylim[0]
+            if self.ylim[0] is not None
+            else min(y for p in self._plots for y in p.ys)
+        )
+        self._view.y_max = (
+            self.ylim[1]
+            if self.ylim[1] is not None
+            else max(y for p in self._plots for y in p.ys)
+        )
 
     def _update_defs(self) -> None:
         if not hasattr(self, "_svg_defs"):
@@ -293,26 +311,26 @@ class Figure(SVG):
             }
         )
 
-        for x in self.xticks():
+        for x, label in self.xticks():
             u, v = self._xy_to_uv(x, self._view.y_min)
             self._svg_ticks.append(SVGElem("line", x1=u, y1=v - 2, x2=u, y2=v + 2))
             labels.append(
                 SVGElem(
                     "text",
-                    f"{x:.1f}",
+                    label,
                     x=u,
                     y=v + 4,
                     **{"text-anchor": "middle", "dominant-baseline": "hanging"},
                 )
             )
 
-        for y in self.yticks():
+        for y, label in self.yticks():
             u, v = self._xy_to_uv(self._view.x_min, y)
             self._svg_ticks.append(SVGElem("line", x1=u - 2, y1=v, x2=u + 2, y2=v))
             labels.append(
                 SVGElem(
                     "text",
-                    f"{y:.1f}",
+                    label,
                     x=u - 4,
                     y=v,
                     **{"text-anchor": "end", "dominant-baseline": "middle"},
@@ -331,12 +349,12 @@ class Figure(SVG):
         if not self.grid:
             return
 
-        for x in self.xticks():
+        for x, _ in self.xticks():
             u, _ = self._xy_to_uv(x, 0)
             self._svg_grid.append(
                 SVGElem("line", x1=u, y1=self._view.v_min, x2=u, y2=self._view.v_max)
             )
-        for y in self.yticks():
+        for y, _ in self.yticks():
             _, v = self._xy_to_uv(0, y)
             self._svg_grid.append(
                 SVGElem("line", x1=self._view.u_min, y1=v, x2=self._view.u_max, y2=v)
@@ -395,23 +413,43 @@ class Figure(SVG):
                 )
             )
 
-    def xticks(self) -> list[float]:
+    def xticks(self) -> Sequence[tuple[float, str]]:
+        if self._xticks is not None:
+            return self._xticks
         interval = round_125((self._view.x_max - self._view.x_min) / 10)
         x = math.ceil(self._view.x_min / interval) * interval
         ticks = [x]
         while x + interval <= self._view.x_max:
             x += interval
             ticks.append(x)
-        return ticks
+        return [(x, f"{x:.1f}") for x in ticks]
 
-    def yticks(self) -> list[float]:
+    def set_xticks(self, xticks: Sequence[float | tuple[float, str]] | None) -> Self:
+        self._xticks = (
+            [(x, f"{x:.1f}") if isinstance(x, float) else x for x in xticks]
+            if xticks is not None
+            else None
+        )
+        return self
+
+    def yticks(self) -> Sequence[tuple[float, str]]:
+        if self._yticks is not None:
+            return self._yticks
         interval = round_125((self._view.y_max - self._view.y_min) / 10)
         y = math.ceil(self._view.y_min / interval) * interval
         ticks = [y]
         while y + interval <= self._view.y_max:
             y += interval
             ticks.append(y)
-        return ticks
+        return [(y, f"{y:.1f}") for y in ticks]
+
+    def set_yticks(self, yticks: Sequence[float | tuple[float, str]] | None) -> Self:
+        self._yticks = (
+            [(y, f"{y:.1f}") if isinstance(y, float) else y for y in yticks]
+            if yticks is not None
+            else None
+        )
+        return self
 
     def _next_color(self) -> str:
         if not hasattr(self, "_color_counter"):
@@ -478,25 +516,21 @@ class Scatter(Plot):
 
 @dataclass
 class Bar(Plot):
+    width: float | None = None
+
     def plot(
         self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]
     ):
         bars = SVGElem("g", **{"fill": self.color})
 
-        uvs = [xy_to_uv(x, y) for x, y in zip(self.xs, self.ys)]
-        _, z = xy_to_uv(0, 0)
-
-        width = 0.0
-        for uv1, uv2 in zip(uvs, uvs[1:]):
-            width = max(width, abs(uv2[0] - uv1[0]))
-        width *= 0.8
+        width = self.width or 0.5 * max(
+            abs(x2 - x1) for x1, x2 in zip(self.xs, self.xs[1:])
+        )
 
         for x, y in zip(self.xs, self.ys):
-            u, v = xy_to_uv(x, y)
-            _, z = xy_to_uv(0, 0)
-            y, height = min(v, z), abs(z - v)
-            bars.append(
-                SVGElem("rect", x=u - width / 2, y=y, width=width, height=height)
-            )
+            u1, v1 = xy_to_uv(x - width / 2, 0)
+            u2, v2 = xy_to_uv(x + width / 2, y)
+            y, height = min(v1, v2), abs(v2 - v1)
+            bars.append(SVGElem("rect", x=u1, y=y, width=u2 - u1, height=height))
 
         frame.append(bars)
