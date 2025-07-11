@@ -2,13 +2,20 @@ body {
     /* Colors */
     --white: #ffffff;
     --black: #101010;
-    --green: #7faa6c;
-    --yellow: #e2a32d;
-    --blue: #1a7d8e;
-    --red: #ba5912;
 
-    --primary-color: #1a7d8e;
-    --secondary-color: #e2a32d;
+    --red: #c04016;
+    --orange: #e27b2d;
+    --yellow: #e2a32d;
+    --green: #589e3c;
+    --teal: #1a8e75;
+    --blue: #1a7d8e;
+    --indigo: #4058b0;
+    --purple: #6b50a2;
+    --pink: #ce5ca7;
+    --aubergine: #a23f61;
+
+    --primary-color: var(--blue);
+    --secondary-color: var(--orange);
 
     --main-bg-color: #f1efec;
     --main-text-color: var(--black);

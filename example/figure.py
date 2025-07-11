@@ -9,8 +9,8 @@ from slash.basic import Figure
 from slash.basic.figure import Bar, Graph, Scatter
 from slash.basic.pie import Pie
 from slash.core import Elem
-from slash.html import H1, Button, Input
-from slash.layout import Column, Panel
+from slash.html import H1, Button, Div, Input
+from slash.layout import Column, Panel, Row
 
 
 def update_figure(figure: Figure) -> None:
@@ -21,9 +21,9 @@ def update_figure(figure: Figure) -> None:
     ys = [0.2 + 0.4 * math.sin(f * x + p) for x in xs]
 
     figure.clear_plots()
-    figure.add_plot(Bar(xs, ys, color="var(--green)", label="bar"))
-    figure.add_plot(Graph(xs, ys, color="var(--secondary-color)", label="graph"))
-    figure.add_plot(Scatter(xs, ys, color="var(--primary-color)", label="scatter"))
+    figure.add_plot(Bar(xs, ys, label="bar"))
+    figure.add_plot(Graph(xs, ys, label="graph"))
+    figure.add_plot(Scatter(xs, ys, label="scatter"))
 
     figure.set_xlim(-1.0, 11.0)
     figure.set_ylim(-1.0, 1.0)
@@ -74,8 +74,37 @@ def set_figure_title(figure: Figure, title: str) -> None:
     figure.render()
 
 
+def circle(color: str) -> None:
+    return Div().style(
+        {
+            "background-color": color,
+            "border-radius": "32px",
+            "width": "32px",
+            "height": "32px",
+        }
+    )
+
+
 def home() -> Elem:
     return Column(
+        H1("Colors"),
+        Row(
+            [
+                circle(f"var(--{color})")
+                for color in [
+                    "red",
+                    "orange",
+                    "yellow",
+                    "green",
+                    "teal",
+                    "blue",
+                    "indigo",
+                    "purple",
+                    "pink",
+                    "aubergine",
+                ]
+            ]
+        ).style({"gap": "8px"}),
         H1("Figure demo"),
         Panel(
             figure := Figure(width=512, height=320)

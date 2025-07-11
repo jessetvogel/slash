@@ -6,6 +6,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Self
 
+from slash._utils import default_color
 from slash.basic.svg import SVG, SVGElem
 
 
@@ -44,6 +45,7 @@ class Figure(SVG):
 
         self._view = View()
         self._plots: list[Plot] = []
+        self._color_counter = 0
 
     @property
     def title(self) -> str | None:
@@ -142,6 +144,7 @@ class Figure(SVG):
 
     def clear_plots(self) -> Self:
         self._plots.clear()
+        self._color_counter = 0
         return self
 
     def render(self) -> Self:
@@ -452,12 +455,8 @@ class Figure(SVG):
         return self
 
     def _next_color(self) -> str:
-        if not hasattr(self, "_color_counter"):
-            self._color_counter = 0
-        else:
-            self._color_counter += 1
-        colors = ["var(--blue)", "var(--red)", "var(--yellow)", "var(--green)"]
-        return colors[self._color_counter % len(colors)]
+        self._color_counter += 1
+        return default_color(self._color_counter - 1)
 
 
 def round_125(x: float) -> float:

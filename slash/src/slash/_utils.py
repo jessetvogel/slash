@@ -29,3 +29,19 @@ def _int32_to_str(n: int) -> str:
         n, r = divmod(n, base)
         result.append(chars[r])
     return "".join(reversed(result))
+
+
+def default_color(index: int) -> str:
+    colors = [
+        "var(--blue)",
+        "var(--yellow)",
+        "var(--green)",
+        "var(--red)",
+        "var(--indigo)",
+        "var(--orange)",
+        "var(--purple)",
+        "var(--teal)",
+        "var(--pink)",
+        "var(--aubergine)",
+    ]
+    return colors[index % len(colors)]

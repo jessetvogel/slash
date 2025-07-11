@@ -4,6 +4,7 @@ import math
 from collections.abc import Sequence
 from typing import Self
 
+from slash._utils import default_color
 from slash.basic.svg import SVG, SVGElem
 from slash.core import Elem
 
@@ -23,6 +24,8 @@ class Pie(SVG):
         self.legend = True
         self.radius = 96.0
         self.gap = 0.0
+
+        self._color_counter = 0
 
     @property
     def title(self) -> str | None:
@@ -73,7 +76,9 @@ class Pie(SVG):
         return self
 
     def render(self, labels: Sequence[str], values: Sequence[float]) -> Self:
+        # Clear
         self.clear()
+        self._color_counter = 0
 
         total = sum(values)
 
@@ -169,9 +174,5 @@ class Pie(SVG):
         pass
 
     def _next_color(self) -> str:
-        if not hasattr(self, "_color_counter"):
-            self._color_counter = 0
-        else:
-            self._color_counter += 1
-        colors = ["var(--blue)", "var(--red)", "var(--yellow)", "var(--green)"]
-        return colors[self._color_counter % len(colors)]
+        self._color_counter += 1
+        return default_color(self._color_counter - 1)
