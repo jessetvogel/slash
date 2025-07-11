@@ -17,41 +17,90 @@ body {
     --primary-color: var(--blue);
     --secondary-color: var(--orange);
 
-    --main-bg-color: #f1efec;
-    --main-text-color: var(--black);
+    --bg-dark: #f1efec;
+    --bg: #f8f7f6;
+    --bg-light: #fff;
+
+    --fg: var(--black);
+
+    --border: #bbb;
+    --border-light: #bbb;
 
     --button-bg-color: var(--white);
     --button-bg-color-hover: #eee;
     --button-text-color: var(--black);
-    --button-border: 1px solid #bbb;
+    --button-border: 1px solid var(--border);
 
     --input-bg-color: var(--white);
     --input-text-color: var(--black);
-    --input-border: 1px solid #bbb;
+    --input-border: 1px solid var(--border);
 
     --table-bg-color: var(--white);
-    --table-border: 1px solid #bbb;
+    --table-border: 1px solid var(--border);
 
     --pre-bg-color: #eee;
     --pre-text-color: #444;
-    --pre-border: 1px solid #bbb;
+    --pre-border: 1px solid var(--border);
 
-    --dialog-bg-color: var(--white);
-    --dialog-border: 1px solid #bbb;
+    --dialog-bg-color: var(--bg);
+    --dialog-border: 1px solid var(--border);
     --dialog-backdrop-color: rgba(0, 0, 0, 0.075);
 
     --blockquote-bg-color: #eee;
     --blockquote-text-color: #444;
 
-    --error-text-color: #ba5912;
-    --info-text-color: #1a7d8e;
-    --warning-text-color: #e2a32d;
-    --debug-text-color: #7faa6c;
+    --error-text-color: var(--red);
+    --info-text-color: var(--blue);
+    --warning-text-color: var(--yellow);
+    --debug-text-color: var(--green);
 
     --shadow: 0px 0px 8px rgba(0, 0, 0, 0.075);
 
     /* Fonts */
     --main-font: 'DM Sans';
+}
+
+body.dark {
+    --bg-dark: #161515;
+    --bg: #252524;
+    --bg-light: #3d3c3a;
+    --bg-extra-light: #5b5a57;
+
+    --fg: #f9f9f9;
+    --fg-soft: #777;
+
+    --border-light: #777069;
+    --border: #44413f;
+
+    --button-bg-color: var(--bg-light);
+    --button-bg-color-hover: var(--bg-extra-light);
+    --button-text-color: var(--white);
+    --button-border: 1px solid var(--border-light);
+
+    --input-bg-color: var(--bg-light);
+    --input-text-color: var(--fg);
+    --input-border: 1px solid var(--border-light);
+
+    --table-bg-color: var(--white);
+    --table-border: 1px solid var(--border);
+
+    --pre-bg-color: #eee;
+    --pre-text-color: #444;
+    --pre-border: 1px solid var(--border);
+
+    --dialog-bg-color: var(--bg);
+    --dialog-border: 1px solid var(--border);
+    --dialog-backdrop-color: rgba(0, 0, 0, 0.67);
+
+    --blockquote-bg-color: #eee;
+    --blockquote-text-color: #444;
+
+    --error-text-color: var(--red);
+    --info-text-color: var(--blue);
+    --warning-text-color: var(--yellow);
+    --debug-text-color: var(--green);
+
+    --shadow: 0px 0px 8px rgba(0, 0, 0, 0.075);
 }
 
 html,
@@ -69,8 +118,8 @@ input {
 /* Default style */
 
 body {
-    background-color: var(--main-bg-color);
-    color: var(--main-text-color);
+    background-color: var(--bg-dark);
+    color: var(--fg);
 }
 
 button,
@@ -154,7 +203,7 @@ div.table {
         display: block;
 
         background-color: var(--table-bg-color);
-        color: var(--main-text-color);
+        color: var(--fg);
 
         border-radius: 8px;
         outline: var(--table-border);
@@ -185,6 +234,7 @@ div.table {
 
 dialog {
     background-color: var(--dialog-bg-color);
+    color: var(--fg);
     border: var(--dialog-border);
     border-radius: 8px;
     box-shadow: var(--shadow);
@@ -203,7 +253,7 @@ blockquote {
     /* padding: 0.01px; */
     padding-left: 12px;
     margin: 0px;
-    border-left: 8px solid #bbb;
+    border-left: 8px solid var(--border);
     font-style: italic;
 }
 
@@ -226,9 +276,13 @@ pre code {
 }
 
 hr {
-    border: 1px solid #bbb;
+    border: 1px solid var(--border);
 }
 
 p {
     line-height: 1.4;
+}
+
+a {
+    color: var(--blue);
 }

@@ -168,6 +168,12 @@ class Client {
                 elem.innerText = message.text;
                 continue;
             }
+            if (attr == "value") {
+                if ('value' in elem) {
+                    elem.value = message.value;
+                    continue;
+                }
+            }
             const value = message[attr];
             if (value === null)
                 elem.removeAttribute(attr);

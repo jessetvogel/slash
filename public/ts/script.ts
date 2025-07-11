@@ -215,6 +215,13 @@ class Client {
                 continue;
             }
 
+            if (attr == "value") {
+                if ('value' in elem) {
+                    elem.value = message.value;
+                    continue;
+                }
+            }
+
             const value = message[attr];
             if (value === null) // null means to remove the attribute
                 elem.removeAttribute(attr);

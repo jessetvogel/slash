@@ -223,7 +223,7 @@ class Figure(SVG):
             self._svg_axes = SVGElem(
                 "polyline",
                 fill="none",
-                **{"stroke": "black", "stroke-width": "1"},
+                **{"stroke": "var(--fg)", "stroke-width": "1"},
             )
             self.append(self._svg_axes)
 
@@ -261,8 +261,8 @@ class Figure(SVG):
                 ry=4,
                 width=x_right - x_left,
                 height=0,
-                fill="rgba(255, 255, 255, 0.67)",
-                stroke="#ccc",
+                fill="color-mix(in srgb, var(--bg-light) 67%, transparent)",
+                stroke="var(--border-light)",
             )
         )
 
@@ -281,7 +281,11 @@ class Figure(SVG):
                         plot.label,
                         x=x_left + 12 + 12,
                         y=y_current,
-                        **{"text-anchor": "start", "dominant-baseline": "middle"},
+                        **{
+                            "text-anchor": "start",
+                            "dominant-baseline": "middle",
+                            "fill": "var(--fg)",
+                        },
                     )
                 )
                 y_current += 16
@@ -302,7 +306,10 @@ class Figure(SVG):
 
     def _update_ticks(self) -> None:
         if not hasattr(self, "_svg_ticks"):
-            self._svg_ticks = SVGElem("g", **{"stroke": "black", "stroke-width": "1"})
+            self._svg_ticks = SVGElem(
+                "g",
+                **{"stroke": "var(--fg)", "stroke-width": "1"},
+            )
             self.append(self._svg_ticks)
 
         self._svg_ticks.clear()
@@ -311,6 +318,7 @@ class Figure(SVG):
             {
                 "font-size": "10px",
                 "stroke-width": "0",
+                "fill": "var(--fg)",
             }
         )
 
@@ -345,7 +353,9 @@ class Figure(SVG):
 
     def _update_grid(self) -> None:
         if not hasattr(self, "_svg_grid"):
-            self._svg_grid = SVGElem("g", **{"stroke": "#ccc", "stroke-width": "1"})
+            self._svg_grid = SVGElem(
+                "g", **{"stroke": "var(--fg)", "stroke-width": "1", "opacity": 0.2}
+            )
             self.append(self._svg_grid)
 
         self._svg_grid.clear()
@@ -365,7 +375,7 @@ class Figure(SVG):
 
     def _update_labels(self) -> None:
         if not hasattr(self, "_svg_labels"):
-            self._svg_labels = SVGElem("g")
+            self._svg_labels = SVGElem("g").style({"fill": "var(--fg)"})
             self.append(self._svg_labels)
 
         self._svg_labels.clear()
