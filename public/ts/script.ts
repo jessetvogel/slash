@@ -159,6 +159,13 @@ class Client {
             return;
         }
 
+        // theme
+        if (event == "theme") {
+            const theme = message.theme;
+            document.body.className = theme;
+            return;
+        }
+
         throw new Error(`Unknown event '${event}'`);
     }
 

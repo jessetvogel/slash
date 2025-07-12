@@ -35,8 +35,9 @@ body {
     --input-text-color: var(--black);
     --input-border: 1px solid var(--border);
 
-    --table-bg-color: var(--white);
-    --table-border: 1px solid var(--border);
+    --table-bg: var(--white);
+    --table-bg-odd: #ccc;
+    --table-border: 1px solid var(--border-light);
 
     --pre-bg-color: #eee;
     --pre-text-color: #444;
@@ -81,8 +82,9 @@ body.dark {
     --input-text-color: var(--fg);
     --input-border: 1px solid var(--border-light);
 
-    --table-bg-color: var(--white);
-    --table-border: 1px solid var(--border);
+    --table-bg: var(--bg);
+    --table-bg-odd: var(--bg-light);
+    --table-border: 1px solid var(--border-light);
 
     --pre-bg-color: #eee;
     --pre-text-color: #444;
@@ -195,40 +197,29 @@ input[type="range"] {
     accent-color: var(--primary-color);
 }
 
-div.table {
+table {
+    display: inline-block;
+    background-color: var(--table-bg);
+    color: var(--fg);
+    border-collapse: collapse;
     box-shadow: var(--shadow);
-    border-radius: 8px;
 
-    table {
-        display: block;
+    td,
+    th {
+        border: var(--table-border);
+        padding: 8px;
+        text-align: center;
+    }
 
-        background-color: var(--table-bg-color);
-        color: var(--fg);
+    th {
+        background-color: var(--primary-color);
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        color: var(--white);
+        font-weight: bold;
+    }
 
-        border-radius: 8px;
-        outline: var(--table-border);
-        outline-offset: -1px;
-        clip-path: xywh(0px 0px 100% 100% round 8px);
-
-        border-collapse: collapse;
-
-        td,
-        th {
-            border: var(--table-border);
-            padding: 8px;
-            text-align: center;
-        }
-
-        th {
-            background-color: var(--primary-color);
-            border: 1px solid rgba(0, 0, 0, 0.25);
-            color: var(--white);
-            font-weight: bold;
-        }
-
-        tr:nth-child(even) {
-            background-color: #eee;
-        }
+    tr:nth-child(odd) {
+        background-color: var(--table-bg-odd);
     }
 }
 

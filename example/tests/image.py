@@ -5,10 +5,9 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from slash import App
 from slash.core import Elem, Session
-from slash.html import H1, Button, Img
-from slash.layout import Column
+from slash.html import H2, Button, Div, Img
+from slash.layout import Column, Panel, Row
 
 
 def update_image(img: Img) -> None:
@@ -24,7 +23,7 @@ def update_image(img: Img) -> None:
 
 
 def generate_graph(image: Img) -> None:
-    path = Path("./tmp/graph.png")
+    path = Path("../tmp/graph.png")
 
     f = 1 + random.random() * 10.0
 
@@ -39,23 +38,19 @@ def generate_graph(image: Img) -> None:
     image.style({"height": "256px"})
 
 
-def home() -> Elem:
-    return Column(
-        H1("Image demo"),
-        image := Img(
-            "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
-            alt="This is the alt text.",
+def test_image() -> Elem:
+    return Div(
+        H2("Image"),
+        Panel(
+            Column(
+                image := Img(
+                    "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
+                    alt="This is the alt text.",
+                ),
+                Row(
+                    Button("Show an icon!").onclick(lambda _: update_image(image)),
+                    Button("Show a graph!").onclick(lambda _: generate_graph(image)),
+                ),
+            ).style({"align-items": "center"})
         ),
-        Button("Show an icon!").onclick(lambda _: update_image(image)),
-        Button("Show a graph!").onclick(lambda _: generate_graph(image)),
-    ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
-
-
-def main():
-    app = App()
-    app.add_endpoint("/", home)
-    app.run()
-
-
-if __name__ == "__main__":
-    main()
+    )

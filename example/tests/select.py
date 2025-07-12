@@ -1,18 +1,10 @@
-from __future__ import annotations
-
-from slash import App
 from slash.core import Elem
-from slash.html import H1, Select, Span
-from slash.layout import Column
+from slash.html import H2, Div, Select, Span
 
 
-def update_span(span: Span, text: str) -> None:
-    span.text = f"You selected: {text}"
-
-
-def home() -> Elem:
-    return Column(
-        H1("Select demo"),
+def test_select() -> Elem:
+    return Div(
+        H2("Select"),
         select := Select(
             [
                 "Woodpecker",
@@ -97,17 +89,7 @@ def home() -> Elem:
                 "Condor",
             ]
         ).onchange(
-            lambda _: update_span(span, select.value),
+            lambda: span.set_text(f"You selected '{select.value}'"),
         ),
         span := Span().style({"padding": "8px"}),
-    ).style({"width": "512px", "align-items": "center", "margin": "0px auto"})
-
-
-def main():
-    app = App()
-    app.add_endpoint("/", home)
-    app.run()
-
-
-if __name__ == "__main__":
-    main()
+    )

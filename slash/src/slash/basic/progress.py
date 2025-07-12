@@ -1,9 +1,10 @@
 from slash.core import Elem
+from slash.html import Span
 
 
 class Progress(Elem):
     def __init__(self, text: str | None = None):
-        super().__init__("div")
+        super().__init__("div", Span())
         self.add_class("slash-progress")
         self._value = 0.0
         self._text = text
@@ -21,5 +22,5 @@ class Progress(Elem):
     def _update(self):
         percentage = int(self._value * 100)
         self.style({"--value": f"{percentage}%"})
-        self.text = self._text or f"{percentage}%"
+        self.children[0].text = self._text or f"{percentage}%"
         (self.add_class if self._value == 1.0 else self.remove_class)("completed")

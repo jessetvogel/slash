@@ -116,6 +116,11 @@ class Client {
             Slash.message(type, text);
             return;
         }
+        if (event == "theme") {
+            const theme = message.theme;
+            document.body.className = theme;
+            return;
+        }
         throw new Error(`Unknown event '${event}'`);
     }
     update(elem, message) {

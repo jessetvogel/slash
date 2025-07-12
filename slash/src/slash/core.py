@@ -7,7 +7,7 @@ import inspect
 from collections.abc import Awaitable, Callable
 from contextvars import ContextVar
 from pathlib import Path
-from typing import Any, Self, TypeAlias, TypeVar
+from typing import Any, Literal, Self, TypeAlias, TypeVar
 
 from slash._logging import LOGGER
 from slash._message import Message
@@ -179,6 +179,9 @@ class Session:
         traceback: object | None,
     ) -> None:
         Session._current.reset(self._token)
+
+    def set_theme(self, theme: Literal["light", "dark"]) -> None:
+        self.send(Message("theme", theme=theme))
 
 
 # Attributes
