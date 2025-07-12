@@ -40,7 +40,7 @@ body {
     --table-border: 1px solid var(--border-light);
 
     --pre-bg-color: #eee;
-    --pre-text-color: #444;
+    --pre-text-color: #574f43;
     --pre-border: 1px solid var(--border);
 
     --dialog-bg-color: var(--bg);
@@ -86,9 +86,9 @@ body.dark {
     --table-bg-odd: var(--bg-light);
     --table-border: 1px solid var(--border-light);
 
-    --pre-bg-color: #eee;
-    --pre-text-color: #444;
-    --pre-border: 1px solid var(--border);
+    --pre-bg-color: var(--bg-light);
+    --pre-text-color: #b0aa9d;
+    --pre-border: 1px solid var(--border-light);
 
     --dialog-bg-color: var(--bg);
     --dialog-border: 1px solid var(--border);

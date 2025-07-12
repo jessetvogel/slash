@@ -7,6 +7,7 @@ from slash.html import (
     Div,
 )
 
+from tests.pre import test_pre
 from tests.table import test_table
 from tests.svg import test_svg
 from tests.image import test_image
@@ -40,6 +41,7 @@ def home() -> Elem:
         test_progress(),
         test_tabs(),
         test_table(),
+        test_pre(),
     ).style({"max-width": "640px", "margin": "0px auto"})
 
 
