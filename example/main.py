@@ -22,12 +22,14 @@ from tests.js import test_js
 from tests.input import test_input
 from tests.log import test_log
 from tests.markdown import test_markdown
+from tests.form import test_form
 
 
 def home() -> Elem:
     return Div(
         H1("Slash tests").style({"text-align": "center"}),
         test_colors(),
+        test_form(),
         test_figure(),
         test_image(),
         test_svg(),

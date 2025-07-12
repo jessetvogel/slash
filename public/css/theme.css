@@ -36,7 +36,7 @@ body {
     --input-border: 1px solid var(--border);
 
     --table-bg: var(--white);
-    --table-bg-odd: #ccc;
+    --table-bg-odd: #eeedec;
     --table-border: 1px solid var(--border-light);
 
     --pre-bg-color: #eee;
@@ -56,6 +56,7 @@ body {
     --debug-text-color: var(--green);
 
     --shadow: 0px 0px 8px rgba(0, 0, 0, 0.075);
+    --invert-filter: invert(0);
 
     /* Fonts */
     --main-font: 'DM Sans';
@@ -103,6 +104,7 @@ body.dark {
     --debug-text-color: var(--green);
 
     --shadow: 0px 0px 8px rgba(0, 0, 0, 0.075);
+    --invert-filter: invert(1);
 }
 
 html,
@@ -198,7 +200,6 @@ input[type="range"] {
 }
 
 table {
-    display: inline-block;
     background-color: var(--table-bg);
     color: var(--fg);
     border-collapse: collapse;

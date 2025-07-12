@@ -81,7 +81,7 @@ def update_pie(pie: Pie) -> None:
         "Blueberry",
         "Peach",
     ]
-    values = [7, 3, 9, 1, 6, 8, 2, 10, 4, 5]
+    values = [random.randint(1, 10) for _ in labels]
 
     pie.set_title("My Flavourite Fruits").set_radius(112.0).set_gap(32.0).render(
         labels, values
@@ -96,9 +96,15 @@ def update_bar(bar: Figure) -> None:
     xs = np.array([1, 2, 3])
     labels = ["2023", "2024", "2025"]
 
-    bar.add_plot(Bar(xs - 0.25, [4, 5, 6], width=0.25, label="First"))
-    bar.add_plot(Bar(xs, [5, 6, 7], width=0.25, label="Second"))
-    bar.add_plot(Bar(xs + 0.25, [3, 5.5, 6.5], width=0.25, label="Third"))
+    a, b, c = (
+        [random.randint(5, 10), random.randint(5, 10), random.randint(5, 10)],
+        [random.randint(5, 10), random.randint(5, 10), random.randint(5, 10)],
+        [random.randint(5, 10), random.randint(5, 10), random.randint(5, 10)],
+    )
+
+    bar.add_plot(Bar(xs - 0.25, a, width=0.25, label="First"))
+    bar.add_plot(Bar(xs, b, width=0.25, label="Second"))
+    bar.add_plot(Bar(xs + 0.25, c, width=0.25, label="Third"))
     bar.set_xticks(list(zip(xs, labels)))
 
     bar.set_legend(True)

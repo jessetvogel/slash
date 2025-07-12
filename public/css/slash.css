@@ -151,6 +151,7 @@
 .slash-row {
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .slash-panel {
@@ -253,6 +254,72 @@
     }
 }
 
+.slash-checkbox {
+    position: relative;
+    display: block;
+    min-width: 20px;
+    width: 20px;
+    height: 20px;
+    margin: 6px;
+    border-radius: 2px;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow);
+    background-color: var(--bg-light);
+    cursor: pointer;
+
+
+    &.checked {
+        background-color: var(--bg-extra-light);
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 20px;
+            height: 20px;
+            background-image: url("../img/check.png");
+            background-size: 67%;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: var(--invert-filter);
+        }
+    }
+}
+
+.slash-radio {
+    position: relative;
+    display: block;
+    min-width: 20px;
+    width: 20px;
+    height: 20px;
+    margin: 6px;
+    border-radius: 100%;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow);
+    background-color: var(--bg-light);
+    cursor: pointer;
+
+
+    &.checked {
+        background-color: var(--bg-extra-light);
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 7px;
+            left: 7px;
+            width: 6px;
+            height: 6px;
+            background-color: var(--fg);
+            border-radius: 100%;
+        }
+    }
+}
+
+/* Animations */
+
+
 @keyframes slash-progress {
     from {
         background-position: 0px 0px;
@@ -262,8 +329,6 @@
         background-position: 96px 0px;
     }
 }
-
-/* Animations */
 
 @keyframes slide-in-right {
     from {
