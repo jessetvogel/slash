@@ -24,20 +24,16 @@ body {
     --fg: var(--black);
 
     --border: #bbb;
-    --border-light: #bbb;
+    --border-light: #ccc;
 
     --button-bg: var(--white);
     --button-bg-hover: #eee;
     --button-text-color: var(--black);
-    --button-border: 1px solid var(--border);
+    --button-border: 1px solid var(--border-light);
 
     --input-bg-color: var(--white);
     --input-text-color: var(--black);
-    --input-border: 1px solid var(--border);
-
-    --table-bg: var(--white);
-    --table-bg-odd: #eeedec;
-    --table-border: 1px solid var(--border-light);
+    --input-border: 1px solid var(--border-light);
 
     --pre-bg-color: #eee;
     --pre-text-color: #574f43;
@@ -82,10 +78,6 @@ body.dark {
     --input-bg-color: var(--bg-light);
     --input-text-color: var(--fg);
     --input-border: 1px solid var(--border-light);
-
-    --table-bg: var(--bg);
-    --table-bg-odd: var(--bg-light);
-    --table-border: 1px solid var(--border-light);
 
     --pre-bg-color: var(--bg-light);
     --pre-text-color: #b0aa9d;
@@ -206,32 +198,6 @@ select {
 
 input[type="range"] {
     accent-color: var(--primary-color);
-}
-
-table {
-    background-color: var(--table-bg);
-    color: var(--fg);
-    border-collapse: collapse;
-    box-shadow: var(--shadow);
-
-    td,
-    th {
-        border: var(--table-border);
-        padding: 8px;
-        text-align: center;
-    }
-
-    th {
-        background-color: var(--primary-color);
-        border: 1px solid rgba(0, 0, 0, 0.25);
-        color: var(--white);
-        font-weight: bold;
-
-    }
-
-    tr:nth-child(odd) {
-        background-color: var(--table-bg-odd);
-    }
 }
 
 dialog {

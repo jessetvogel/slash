@@ -40,6 +40,14 @@ class Label(Elem, SupportsOnClick):
         SupportsOnClick.__init__(self)
 
 
+class Table(Elem, SupportsOnClick):
+    """HTML <table> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("table", *children)
+        SupportsOnClick.__init__(self)
+
+
 class Tr(Elem, SupportsOnClick):
     """HTML <tr> element."""
 

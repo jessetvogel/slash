@@ -6,10 +6,10 @@ from slash.html import Button, Div, Label, Span, Td, Th, Tr
 Datum = Mapping[str, Any]
 
 
-class Data(Elem):
+class DataTable(Elem):
     def __init__(self, keys: Sequence[str], *, max_rows: int = 10) -> None:
         super().__init__("div")
-        self.add_class("slash-table")
+        self.add_class("slash-data-table")
         self._keys = list(keys)
         self._max_rows = max_rows
 

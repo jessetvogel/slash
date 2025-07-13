@@ -8,7 +8,6 @@ from slash.html import (
 )
 
 from tests.pre import test_pre
-from tests.table import test_table
 from tests.svg import test_svg
 from tests.image import test_image
 from tests.colors import test_colors
@@ -23,7 +22,7 @@ from tests.input import test_input
 from tests.log import test_log
 from tests.markdown import test_markdown
 from tests.form import test_form
-from tests.data import test_data
+from tests.data_table import test_data
 
 
 def home() -> Elem:
@@ -44,7 +43,6 @@ def home() -> Elem:
         test_js(),
         test_progress(),
         test_tabs(),
-        test_table(),
         test_pre(),
     ).style({"max-width": "640px", "margin": "0px auto"})
 

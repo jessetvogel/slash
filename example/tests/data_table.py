@@ -1,7 +1,7 @@
 from __future__ import annotations
 import random
 
-from slash.basic.data import Data
+from slash.basic.data_table import DataTable
 from slash.core import Elem
 from slash.html import H2
 from slash.layout import Column
@@ -61,4 +61,4 @@ def test_data() -> Elem:
         for n in range(95)
     ]
 
-    return Column(H2("Data"), Data(keys).set_data(data))
+    return Column(H2("Data table"), DataTable(keys).set_data(data))

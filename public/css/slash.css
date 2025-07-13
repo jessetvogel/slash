@@ -267,7 +267,6 @@
     background-color: var(--bg-light);
     cursor: pointer;
 
-
     &.checked {
         background-color: var(--bg-extra-light);
 
@@ -317,7 +316,32 @@
     }
 }
 
-.slash-table {
+.slash-data-table {
+    table {
+        background-color: var(--bg-light);
+        color: var(--fg);
+        border-collapse: collapse;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-light);
+    }
+
+    td,
+    th {
+        padding: 8px;
+        text-align: center;
+    }
+
+    th {
+        background-color: var(--primary-color);
+        color: var(--white);
+        font-weight: bold;
+
+    }
+
+    tr:nth-child(odd) {
+        background-color: var(--bg);
+    }
+
     th {
         cursor: pointer;
         user-select: none;
