@@ -79,7 +79,8 @@ class Client {
 
             // text
             if (tag === undefined) {
-                $(message.parent)!.append(message.text);
+                const parent = this.getElementById(message.parent);
+                parent.append(message.text);
                 return;
             }
 
@@ -94,32 +95,28 @@ class Client {
 
         // update
         if (event == "update") {
-            const elem = $(message.id);
-            if (elem == null) throw new Error(`No element exists with id '${message.id}'`);
+            const elem = this.getElementById(message.id);
             this.update(elem, message);
             return;
         }
 
         // remove
         if (event == "remove") {
-            const elem = $(message.id);
-            if (elem == null) throw new Error(`No element exists with id '${message.id}'`);
+            const elem = this.getElementById(message.id);
             elem.remove();
             return;
         }
 
         // clear
         if (event == "clear") {
-            const elem = $(message.id);
-            if (elem == null) throw new Error(`No element exists with id '${message.id}'`);
+            const elem = this.getElementById(message.id);
             elem.innerHTML = "";
             return;
         }
 
         // html
         if (event == "html") {
-            const elem = $(message.id);
-            if (elem == null) throw new Error(`No element exists with id '${message.id}'`);
+            const elem = this.getElementById(message.id);
             elem.innerHTML = message.html;
             return;
         }
@@ -161,8 +158,13 @@ class Client {
 
         // theme
         if (event == "theme") {
-            const theme = message.theme;
-            document.body.className = theme;
+            document.body.className = message.theme;
+            return;
+        }
+
+        // title
+        if (event == "title") {
+            document.title = message.title;
             return;
         }
 
@@ -175,8 +177,7 @@ class Client {
                 continue;
 
             if (attr == "parent") {
-                const parent = $(message.parent);
-                if (parent === null) throw new Error(`No element exists with id '${message.parent}'`);
+                const parent = this.getElementById(message.parent);
                 parent.append(elem);
                 continue;
             }
@@ -272,6 +273,13 @@ class Client {
 
     send(message: Message) {
         this.socket?.send(JSON.stringify(message));
+    }
+
+    getElementById(id: string): HTMLElement {
+        const elem = $(id);
+        if (elem == null)
+            throw new Error(`No element exists with id '${id}'`);
+        return elem;
     }
 };
 

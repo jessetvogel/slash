@@ -51,7 +51,8 @@ class Client {
         if (event == "create") {
             const tag = message.tag;
             if (tag === undefined) {
-                $(message.parent).append(message.text);
+                const parent = this.getElementById(message.parent);
+                parent.append(message.text);
                 return;
             }
             const elem = (message.ns !== undefined)
@@ -62,30 +63,22 @@ class Client {
             return;
         }
         if (event == "update") {
-            const elem = $(message.id);
-            if (elem == null)
-                throw new Error(`No element exists with id '${message.id}'`);
+            const elem = this.getElementById(message.id);
             this.update(elem, message);
             return;
         }
         if (event == "remove") {
-            const elem = $(message.id);
-            if (elem == null)
-                throw new Error(`No element exists with id '${message.id}'`);
+            const elem = this.getElementById(message.id);
             elem.remove();
             return;
         }
         if (event == "clear") {
-            const elem = $(message.id);
-            if (elem == null)
-                throw new Error(`No element exists with id '${message.id}'`);
+            const elem = this.getElementById(message.id);
             elem.innerHTML = "";
             return;
         }
         if (event == "html") {
-            const elem = $(message.id);
-            if (elem == null)
-                throw new Error(`No element exists with id '${message.id}'`);
+            const elem = this.getElementById(message.id);
             elem.innerHTML = message.html;
             return;
         }
@@ -117,8 +110,11 @@ class Client {
             return;
         }
         if (event == "theme") {
-            const theme = message.theme;
-            document.body.className = theme;
+            document.body.className = message.theme;
+            return;
+        }
+        if (event == "title") {
+            document.title = message.title;
             return;
         }
         throw new Error(`Unknown event '${event}'`);
@@ -128,9 +124,7 @@ class Client {
             if (attr == "event" || attr == "id" || attr == "tag" || attr == "ns")
                 continue;
             if (attr == "parent") {
-                const parent = $(message.parent);
-                if (parent === null)
-                    throw new Error(`No element exists with id '${message.parent}'`);
+                const parent = this.getElementById(message.parent);
                 parent.append(elem);
                 continue;
             }
@@ -219,6 +213,12 @@ class Client {
     send(message) {
         var _a;
         (_a = this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify(message));
+    }
+    getElementById(id) {
+        const elem = $(id);
+        if (elem == null)
+            throw new Error(`No element exists with id '${id}'`);
+        return elem;
     }
 }
 ;

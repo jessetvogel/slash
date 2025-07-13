@@ -183,6 +183,10 @@ class Session:
     def set_theme(self, theme: Literal["light", "dark"]) -> None:
         self.send(Message("theme", theme=theme))
 
+    def set_title(self, title: str) -> None:
+        """Set document title."""
+        self.send(Message("title", title=title))
+
 
 # Attributes
 
