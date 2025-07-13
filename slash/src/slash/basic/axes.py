@@ -24,7 +24,7 @@ class View:
     v_max: float = 1.0
 
 
-class Figure(SVG):
+class Axes(SVG):
     JS_POSITION_LEGEND = JSFunction(
         ["legend_id", "rect_id", "right"],
         """
@@ -311,7 +311,7 @@ r.setAttribute("width", w + 16);
         bg.set_attr("height", int(y_bottom - y_top))
 
         Session.require().execute(
-            Figure.JS_POSITION_LEGEND,
+            Axes.JS_POSITION_LEGEND,
             [self._svg_legend.id, bg.id, self._view.u_max - 24],
         )
 

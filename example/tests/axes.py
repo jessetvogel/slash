@@ -4,8 +4,8 @@ import math
 import random
 
 import numpy as np
-from slash.basic import Figure
-from slash.basic.figure import Bar, Graph, Scatter
+from slash.basic import Axes
+from slash.basic.axes import Bar, Graph, Scatter
 from slash.basic.pie import Pie
 from slash.core import Elem
 from slash.html import H2, Button, Div, Input
@@ -19,23 +19,23 @@ CENTERED_PANEL = {
 }
 
 
-def test_figure() -> Elem:
+def test_axes() -> Elem:
     return Div(
-        H2("Figure"),
+        H2("Axes"),
         Panel(
-            figure := Figure(width=512, height=320)
-            .set_title("Some random figure")
+            axes := Axes(width=512, height=320)
+            .set_title("Some random axes figure")
             .set_xlabel("time (sec)")
             .set_ylabel("amplitude")
             .set_grid(True)
             .set_legend(True)
-            .onmount(lambda _: update_figure(figure)),
+            .onmount(lambda _: update_axes(axes)),
             Row(
-                Button("Update graph").onclick(lambda _: update_figure(figure)),
+                Button("Update graph").onclick(lambda _: update_axes(axes)),
                 Input(
-                    placeholder="Enter figure title",
+                    placeholder="Enter axes title",
                 ).oninput(
-                    lambda event: set_figure_title(figure, event.value),
+                    lambda event: set_axes_title(axes, event.value),
                 ),
             ),
         ).style(CENTERED_PANEL),
@@ -44,28 +44,28 @@ def test_figure() -> Elem:
             Button("Update pie chart").onclick(lambda _: update_pie(pie)),
         ).style(CENTERED_PANEL),
         Panel(
-            bar := Figure(width=512, height=320).onmount(lambda _: update_bar(bar)),
+            bar := Axes(width=512, height=320).onmount(lambda _: update_bar(bar)),
             Button("Update bar chart").onclick(lambda _: update_bar(bar)),
         ).style(CENTERED_PANEL),
     )
 
 
-def update_figure(figure: Figure) -> None:
+def update_axes(axes: Axes) -> None:
     n = 50
     f = 1 + random.random()
     p = random.random() * 6.28
     xs = [n / 5 for n in range(n + 1)]
     ys = [0.2 + 0.4 * math.sin(f * x + p) for x in xs]
 
-    figure.clear_plots()
-    figure.add_plot(Bar(xs, ys, label="bar"))
-    figure.add_plot(Graph(xs, ys, label="graph"))
-    figure.add_plot(Scatter(xs, ys, label="scatter"))
+    axes.clear_plots()
+    axes.add_plot(Bar(xs, ys, label="bar"))
+    axes.add_plot(Graph(xs, ys, label="graph"))
+    axes.add_plot(Scatter(xs, ys, label="scatter"))
 
-    figure.set_xlim(-1.0, 11.0)
-    figure.set_ylim(-1.0, 1.0)
+    axes.set_xlim(-1.0, 11.0)
+    axes.set_ylim(-1.0, 1.0)
 
-    figure.render()
+    axes.render()
 
 
 def update_pie(pie: Pie) -> None:
@@ -88,7 +88,7 @@ def update_pie(pie: Pie) -> None:
     )
 
 
-def update_bar(bar: Figure) -> None:
+def update_bar(bar: Axes) -> None:
     bar.clear_plots()
     bar.set_xlim(0.0, 4.0)
     bar.set_ylim(0.0)
@@ -112,6 +112,6 @@ def update_bar(bar: Figure) -> None:
     bar.render()
 
 
-def set_figure_title(figure: Figure, title: str) -> None:
-    figure.title = title
-    figure.render()
+def set_axes_title(axes: Axes, title: str) -> None:
+    axes.title = title
+    axes.render()

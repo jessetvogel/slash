@@ -11,7 +11,7 @@ from tests.pre import test_pre
 from tests.svg import test_svg
 from tests.image import test_image
 from tests.colors import test_colors
-from tests.figure import test_figure
+from tests.axes import test_axes
 from tests.dom import test_dom
 from tests.progress import test_progress
 from tests.select import test_select
@@ -31,7 +31,7 @@ def home() -> Elem:
         test_colors(),
         test_data(),
         test_form(),
-        test_figure(),
+        test_axes(),
         test_image(),
         test_svg(),
         test_markdown(),

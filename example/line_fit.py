@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from slash import App
-from slash.basic.figure import Figure
+from slash.basic.axes import Axes
 from slash.basic.progress import Progress
 from slash.core import Elem
 from slash.html import (
@@ -14,7 +14,7 @@ from slash.layout import Column
 import numpy as np
 
 
-async def fit(figure: Figure, progress: Progress) -> None:
+async def fit(axes: Axes, progress: Progress) -> None:
     # Generate some random points
     a = np.random.uniform(0.0, +0.1)
     b = np.random.uniform(+0.1, +1.0)
@@ -33,10 +33,10 @@ async def fit(figure: Figure, progress: Progress) -> None:
     def callback(ab):
         a, b = ab
 
-        figure.clear()
-        figure.graph(x, a * x + b)
-        figure.scatter(x, y)
-        figure.draw()
+        axes.clear()
+        axes.graph(x, a * x + b)
+        axes.scatter(x, y)
+        axes.draw()
 
         progress_data["value"] += 0.01
         progress.set_value(progress_data["value"])
@@ -54,12 +54,12 @@ async def fit(figure: Figure, progress: Progress) -> None:
 
 def home() -> Elem:
     async def async_fit() -> None:
-        await fit(figure, progress)
+        await fit(axes, progress)
 
     return Div(
         H1("Fit a line").style({"text-align": "center"}),
         Column(
-            figure := Figure(),
+            axes := Axes(),
             Button("Fit!").onclick(async_fit),
             progress := Progress(),
         ),

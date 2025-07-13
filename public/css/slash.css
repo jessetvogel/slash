@@ -162,18 +162,6 @@
     box-shadow: var(--shadow);
 }
 
-.slash-figure {
-    display: inline-block;
-    background-color: var(--white);
-    border: var(--button-border);
-    border-radius: 8px;
-    box-shadow: var(--shadow);
-
-    canvas {
-        display: block;
-    }
-}
-
 .slash-tabs {
     display: flex;
     flex-direction: row;
