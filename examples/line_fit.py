@@ -1,4 +1,7 @@
+# type: ignore
 from __future__ import annotations
+
+import numpy as np
 
 from slash import App
 from slash.basic.axes import Axes
@@ -10,8 +13,6 @@ from slash.html import (
     Div,
 )
 from slash.layout import Column
-
-import numpy as np
 
 
 async def fit(axes: Axes, progress: Progress) -> None:

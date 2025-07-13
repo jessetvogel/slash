@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import random
 
 from slash.basic.data_table import DataTable

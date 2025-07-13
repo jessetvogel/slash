@@ -1,28 +1,25 @@
 from __future__ import annotations
 
-from slash import App
-from slash.core import Elem
-from slash.html import (
-    H1,
-    Div,
-)
-
-from tests.pre import test_pre
-from tests.svg import test_svg
-from tests.image import test_image
-from tests.colors import test_colors
 from tests.axes import test_axes
-from tests.dom import test_dom
-from tests.progress import test_progress
-from tests.select import test_select
-from tests.tabs import test_tabs
+from tests.colors import test_colors
+from tests.data_table import test_data
 from tests.dialog import test_dialog
-from tests.js import test_js
+from tests.dom import test_dom
+from tests.form import test_form
+from tests.image import test_image
 from tests.input import test_input
+from tests.js import test_js
 from tests.log import test_log
 from tests.markdown import test_markdown
-from tests.form import test_form
-from tests.data_table import test_data
+from tests.pre import test_pre
+from tests.progress import test_progress
+from tests.select import test_select
+from tests.svg import test_svg
+from tests.tabs import test_tabs
+
+from slash import App
+from slash.core import Elem
+from slash.html import H1, Div
 
 
 def home() -> Elem:

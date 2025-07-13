@@ -4,8 +4,8 @@ import math
 import random
 
 import numpy as np
-from slash.basic import Axes
-from slash.basic.axes import Bar, Graph, Scatter
+
+from slash.basic.axes import Axes, Bar, Graph, Scatter
 from slash.basic.pie import Pie
 from slash.core import Elem
 from slash.html import H2, Button, Div, Input

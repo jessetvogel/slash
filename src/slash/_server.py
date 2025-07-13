@@ -8,10 +8,11 @@ from typing import Callable
 
 from aiohttp import WSCloseCode, WSMsgType, web
 
+import slash
 from slash._logging import LOGGER
 from slash._utils import random_id
 
-PATH_PUBLIC = Path("../public")
+PATH_PUBLIC = Path(slash.__file__).resolve().parent / "public"
 
 ALLOWED_MIME_TYPES = {
     ".html": "text/html",

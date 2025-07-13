@@ -5,6 +5,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 from slash.core import Elem, Session
 from slash.html import H2, Button, Div, Img
 from slash.layout import Column, Panel, Row

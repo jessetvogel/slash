@@ -1,5 +1,5 @@
 from slash.core import Elem
-from slash.html import H2, P, Div, Input
+from slash.html import H2, Div, Input, P
 from slash.layout import Panel
 
 
@@ -8,7 +8,8 @@ def test_input() -> Elem:
         H2("Input"),
         Panel(
             P(
-                "The text written in the left input element should appear backwards in the right input element."
+                "The text written in the left input element should "
+                "appear backwards in the right input element."
             ),
             Input(placeholder="Write here!").oninput(
                 lambda event: out.set_value("".join(reversed(event.value)))
