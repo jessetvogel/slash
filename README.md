@@ -22,14 +22,15 @@ dependencies = [
 
 ### Example
 
-The following script will create a page with the text 'Hello world'. Run the script and go to [http://localhost:8080](http://localhost:8080) to see the result.
+The following script will create a page with the text 'Hello world'. Run the
+script and go to [http://localhost:8080](http://localhost:8080) to see the
+result.
 
 ```python
 from slash import App
-from slash.core import Elem
 from slash.html import Span
 
-def home() -> Elem:
+def home():
     return Span("Hello world").style({"color": "red"})
 
 def main():
