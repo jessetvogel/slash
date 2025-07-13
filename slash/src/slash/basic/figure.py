@@ -8,6 +8,8 @@ from typing import Self
 
 from slash._utils import default_color
 from slash.basic.svg import SVG, SVGElem
+from slash.core import Session
+from slash.js import JSFunction
 
 
 @dataclass
@@ -23,6 +25,17 @@ class View:
 
 
 class Figure(SVG):
+    JS_POSITION_LEGEND = JSFunction(
+        ["legend_id", "rect_id", "right"],
+        """
+const l = document.getElementById(legend_id);
+const r = document.getElementById(rect_id);
+const w = l.getBBox().width;
+l.style.transform = `translateX(${right - w}px)`;
+r.setAttribute("width", w + 16);
+""",
+    )
+
     def __init__(self, *, width: int = 384, height: int = 256) -> None:
         super().__init__()
 
@@ -240,7 +253,11 @@ class Figure(SVG):
 
     def _update_legend(self) -> None:
         if not hasattr(self, "_svg_legend"):
-            self._svg_legend = SVGElem("g", **{"font-size": "14px"})
+            self._svg_legend = (
+                SVGElem("g")
+                .set_attr("font-size", "14px")
+                .style({"transform": f"translateX({self._width}px)"})
+            )
             self.append(self._svg_legend)
 
         self._svg_legend.clear()
@@ -249,8 +266,7 @@ class Figure(SVG):
             return
 
         y_top = self._view.v_max + 8
-        x_left = self._view.u_max - 8 - 128
-        x_right = self._view.u_max - 8
+        x_left = 0
 
         self._svg_legend.append(
             bg := SVGElem(
@@ -259,7 +275,7 @@ class Figure(SVG):
                 y=y_top,
                 rx=4,
                 ry=4,
-                width=x_right - x_left,
+                width=0,
                 height=0,
                 fill="color-mix(in srgb, var(--bg-light) 67%, transparent)",
                 stroke="var(--border-light)",
@@ -293,6 +309,11 @@ class Figure(SVG):
         y_bottom = y_current - 16 + 12
 
         bg.set_attr("height", int(y_bottom - y_top))
+
+        Session.require().execute(
+            Figure.JS_POSITION_LEGEND,
+            [self._svg_legend.id, bg.id, self._view.u_max - 24],
+        )
 
     def _xy_to_uv(self, x: float, y: float) -> tuple[float, float]:
         """Convert abstract xy-coordinates to SVG uv-coordinates."""
