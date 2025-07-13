@@ -43,7 +43,7 @@ class Client {
         };
         this.socket.onclose = function (event) {
             console.log('Connection closed.');
-            Slash.message('warning', 'Connection lost');
+            Slash.message('warning', 'Connection lost! Try reloading the page to reconnect to the server.', null);
         };
     }
     async handle(message) {
@@ -229,14 +229,15 @@ class Slash {
     static value(name) {
         return Slash.values[name];
     }
-    static message(type, message) {
+    static message(type, message, timeout = 10000) {
         const div = create("div", { class: "message " + type }, [
             create("span", { class: "icon" }),
             message
         ]);
-        const timeout = 10000;
-        setTimeout(() => div.classList.add("remove"), timeout);
-        setTimeout(() => div.remove(), timeout + 500);
+        if (timeout !== null) {
+            setTimeout(() => div.classList.add("remove"), timeout);
+            setTimeout(() => div.remove(), timeout + 500);
+        }
         $("slash-messages").prepend(div);
     }
 }
@@ -245,6 +246,7 @@ Slash.values = {};
 let client;
 function init() {
     window.Slash = Slash;
+    Slash.message("warning", "", -499);
     client = new Client();
     client.connect();
 }
