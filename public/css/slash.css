@@ -317,6 +317,100 @@
     }
 }
 
+.slash-table {
+    th {
+        cursor: pointer;
+        user-select: none;
+
+        label.sort {
+            position: relative;
+            margin-right: 16px;
+
+            &::before {
+                position: absolute;
+                left: 0px;
+                top: 4px;
+                content: '';
+                border-bottom: 5px solid currentColor;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                opacity: 0.5;
+            }
+
+            &::after {
+                position: absolute;
+                left: 0px;
+                bottom: 4px;
+                content: '';
+                border-top: 5px solid currentColor;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                opacity: 0.5;
+            }
+
+            &.asc::before {
+                opacity: 1.0;
+            }
+
+            &.desc::after {
+                opacity: 1.0;
+            }
+        }
+    }
+
+    .controls {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        margin-top: 4px;
+
+        button {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            padding: 0px;
+
+            &::before {
+                content: '';
+                position: absolute;
+                left: -1px;
+                /* due to border ? */
+                top: -1px;
+                width: 24px;
+                height: 24px;
+                background-size: 14px;
+                background-position: center;
+                background-repeat: no-repeat;
+                filter: var(--invert-filter);
+            }
+
+
+            &.first::before {
+                background-image: url("../img/first.png");
+            }
+
+            &.prev::before {
+                background-image: url("../img/prev.png");
+            }
+
+            &.next::before {
+                background-image: url("../img/next.png");
+            }
+
+            &.last::before {
+                background-image: url("../img/last.png");
+            }
+        }
+
+        span {
+            font-size: 14px;
+            margin: 0px 8px;
+        }
+    }
+}
+
 /* Animations */
 
 

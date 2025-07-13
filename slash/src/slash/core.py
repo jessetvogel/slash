@@ -239,7 +239,7 @@ class Elem:
                 self._children.append(child)
             else:
                 raise TypeError(f"Invalid child type: {type(child)}")
-        self._style: dict[str, str] = {}
+        self._style: dict[str, str | None] = {}
         self._attrs = attrs
         self._classes: set[str] = set()
 
@@ -274,7 +274,7 @@ class Elem:
         """Element parent."""
         return self._parent
 
-    def style(self, style: dict[str, str]) -> Self:
+    def style(self, style: dict[str, str | None]) -> Self:
         """Update style."""
         self._style.update(style)
         self._update_attrs({"style": style})
@@ -398,6 +398,8 @@ class Elem:
             for child in self.children:
                 if isinstance(child, Elem):
                     child.unmount()
+            if (session := Session.current()) is not None:
+                session.send(Message.clear(self.id))
         self._children = []
 
     def append(self, elem: Elem | str) -> Self:
@@ -498,4 +500,4 @@ class Elem:
 
 # Types
 
-Children: TypeAlias = Elem | str
+Children: TypeAlias = Elem | str | list[Elem | str]

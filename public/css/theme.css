@@ -26,8 +26,8 @@ body {
     --border: #bbb;
     --border-light: #bbb;
 
-    --button-bg-color: var(--white);
-    --button-bg-color-hover: #eee;
+    --button-bg: var(--white);
+    --button-bg-hover: #eee;
     --button-text-color: var(--black);
     --button-border: 1px solid var(--border);
 
@@ -74,8 +74,8 @@ body.dark {
     --border-light: #777069;
     --border: #44413f;
 
-    --button-bg-color: var(--bg-light);
-    --button-bg-color-hover: var(--bg-extra-light);
+    --button-bg: var(--bg-light);
+    --button-bg-hover: var(--bg-extra-light);
     --button-text-color: var(--white);
     --button-border: 1px solid var(--border-light);
 
@@ -130,7 +130,7 @@ button,
 input[type~="button"],
 input[type~="reset"],
 input[type~="submit"] {
-    background-color: var(--button-bg-color);
+    background-color: var(--button-bg);
     color: var(--button-text-color);
     border: var(--button-border);
     border-radius: 4px;
@@ -145,12 +145,21 @@ input[type~="submit"] {
     transition: background-color 0.2s;
 
     &:hover {
-        background-color: var(--button-bg-color-hover);
+        background-color: var(--button-bg-hover);
+    }
+
+    &.disabled {
+        opacity: 0.5;
+        cursor: default;
+
+        &:hover {
+            background-color: var(--button-bg);
+        }
     }
 }
 
 input[type~="color"] {
-    background-color: var(--button-bg-color);
+    background-color: var(--button-bg);
     color: var(--button-text-color);
     border: var(--button-border);
     border-radius: 4px;
@@ -165,7 +174,7 @@ input[type~="color"] {
     transition: background-color 0.2s;
 
     &:hover {
-        background-color: var(--button-bg-color-hover);
+        background-color: var(--button-bg-hover);
     }
 }
 
@@ -217,6 +226,7 @@ table {
         border: 1px solid rgba(0, 0, 0, 0.25);
         color: var(--white);
         font-weight: bold;
+
     }
 
     tr:nth-child(odd) {

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Self
 
 from slash.core import Elem
 
@@ -27,8 +27,9 @@ class Table(Elem):
         self._has_headers = value
         # TODO: Update table? (Can just replace td with th or vice versa)
 
-    def data(self, data: list[list[Any]]) -> None:
+    def set_data(self, data: list[list[Any]]) -> Self:
         self.clear()
         for i, row in enumerate(data):
             cell = "th" if self.has_headers and i == 0 else "td"
             self.append(Elem("tr", *[Elem(cell, str(entry)) for entry in row]))
+        return self

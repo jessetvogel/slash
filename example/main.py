@@ -23,12 +23,14 @@ from tests.input import test_input
 from tests.log import test_log
 from tests.markdown import test_markdown
 from tests.form import test_form
+from tests.data import test_data
 
 
 def home() -> Elem:
     return Div(
         H1("Slash tests").style({"text-align": "center"}),
         test_colors(),
+        test_data(),
         test_form(),
         test_figure(),
         test_image(),

@@ -32,6 +32,38 @@ class Span(Elem, SupportsOnClick):
         SupportsOnClick.__init__(self)
 
 
+class Label(Elem, SupportsOnClick):
+    """HTML <label> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("label", *children)
+        SupportsOnClick.__init__(self)
+
+
+class Tr(Elem, SupportsOnClick):
+    """HTML <tr> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("tr", *children)
+        SupportsOnClick.__init__(self)
+
+
+class Th(Elem, SupportsOnClick):
+    """HTML <th> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("th", *children)
+        SupportsOnClick.__init__(self)
+
+
+class Td(Elem, SupportsOnClick):
+    """HTML <td> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("td", *children)
+        SupportsOnClick.__init__(self)
+
+
 class H1(Elem, SupportsOnClick):
     """HTML <h1> element."""
 

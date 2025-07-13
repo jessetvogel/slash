@@ -8,7 +8,7 @@ from slash.layout import Column
 
 
 def update_table(table: Table) -> None:
-    table.data(
+    table.set_data(
         [[random_id(), random_id(), random_id(), random_id()] for _ in range(10)]
     )
 

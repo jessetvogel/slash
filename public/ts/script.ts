@@ -183,7 +183,7 @@ class Client {
 
             if (attr == "style") {
                 for (const [key, value] of Object.entries(message.style)) {
-                    if (typeof value !== 'string')
+                    if (value !== null && typeof value !== 'string')
                         throw new Error(`Invalid value for style property ${key}`);
                     elem.style.setProperty(key, value);
                 }
