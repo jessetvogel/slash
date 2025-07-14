@@ -11,7 +11,7 @@ from typing import Any, Literal, Self, TypeAlias, TypeVar
 
 from slash._logging import LOGGER
 from slash._message import Message
-from slash._server import Client, Server
+from slash._server import Client, Server, UploadEvent
 from slash._utils import random_id
 from slash.js import JSFunction
 
@@ -43,6 +43,9 @@ class Session:
 
         self._queue_messages: list[str] = []
         self._queue_files: list[tuple[str, Path]] = []
+        self._queue_upload_callbacks: list[
+            tuple[str, Callable[[UploadEvent], None]]
+        ] = []
 
         self._mounted_elems: dict[str, Elem] = {}  # elements that client already has
         self._functions: set[str] = set()  # functions that client already has
@@ -103,7 +106,9 @@ class Session:
         except TypeError as err:
             LOGGER.error(f"Failed to serialize message: {err}")
 
-    def log(self, type: str, message: str) -> None:
+    def log(
+        self, type: Literal["info", "debug", "warning", "error"], message: str
+    ) -> None:
         """Send logging message to the client.
 
         Args:
@@ -127,8 +132,13 @@ class Session:
         """Send all queued messages."""
         # Host files
         for url, path in self._queue_files:
-            self._server.host(url, path)
+            self._server.add_file(url, path)
         self._queue_files = []
+
+        # Set upload callbacks
+        for url, callback in self._queue_upload_callbacks:
+            self._server.add_upload_callback(url, callback)
+        self._queue_upload_callbacks = []
 
         # Send all messages
         for data in self._queue_messages:
@@ -145,16 +155,39 @@ class Session:
         self._queue_files.append((url, path))
         return url
 
+    def create_upload_gate(self, handler: Handler[UploadEvent]) -> str:
+        """Add callback for file upload.
+
+        Returns:
+            URL to which the files must be uploaded.
+        """
+        url = f"/upload/{random_id()}"
+
+        async def async_callback(event: UploadEvent) -> None:
+            self.call_handler(handler, event)
+            await self.flush()
+
+        def callback(event: UploadEvent) -> None:
+            self.create_task(async_callback(event))
+
+        self._queue_upload_callbacks.append((url, callback))
+        return url
+
     def call_handler(self, handler: Handler[T], event: T) -> None:
         """Call event handler in the context of the session."""
         num_params = len(inspect.signature(handler).parameters)
-        if num_params == 0:
-            result = handler()  # type: ignore[call-arg]
-        elif num_params == 1:
-            result = handler(event)  # type: ignore[call-arg]
-        else:
-            raise RuntimeError("Handler must have 0 or 1 parameters.")
 
+        if num_params != 0 and num_params != 1:
+            raise RuntimeError("Handler must haves 0 or 1 parameters")
+
+        # Call handler with session context
+        token = Session._current.set(self)
+        try:
+            result = handler(*[event][:num_params])  # type: ignore[call-arg]
+        finally:
+            Session._current.reset(token)
+
+        # If handler is async, create task
         if inspect.isawaitable(result):
             self.create_task(result)
 

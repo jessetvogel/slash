@@ -151,6 +151,7 @@ class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
     """HTML <input> element."""
 
     type = Attr("type")
+    name = Attr("name")
     value = Attr("value")
     placeholder = Attr("placeholder")
 
@@ -158,17 +159,23 @@ class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
         self,
         type: str = "text",
         *,
+        name: str | None = None,
         value: str = "",
         placeholder: str = "",
     ) -> None:
         super().__init__("input")
         self.type = type
+        self.name = name
         self.value = value
         self.placeholder = placeholder
         self.onchange(self._handle_change)
 
     def _handle_change(self, event: ChangeEvent) -> None:
         self._value = event.value
+
+    def set_name(self, name: str | None) -> Self:
+        self.name = name
+        return self
 
     def set_value(self, value: str) -> Self:
         self.value = value

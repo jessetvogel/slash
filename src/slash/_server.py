@@ -1,18 +1,21 @@
 """Slash server."""
 
+import shutil
 import urllib.parse
 import weakref
 from collections.abc import Awaitable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
-from aiohttp import WSCloseCode, WSMsgType, web
+from aiohttp import BodyPartReader, WSCloseCode, WSMsgType, web
 
 import slash
 from slash._logging import LOGGER
 from slash._utils import random_id
 
 PATH_PUBLIC = Path(slash.__file__).resolve().parent / "public"
+PATH_TMP = Path("./__slash_tmp__")
 
 ALLOWED_MIME_TYPES = {
     ".html": "text/html",
@@ -21,6 +24,18 @@ ALLOWED_MIME_TYPES = {
     ".png": "image/png",
     ".ttf": "font/ttf",
 }
+
+
+@dataclass
+class UploadedFile:
+    name: str
+    path: Path
+    size: int
+
+
+@dataclass
+class UploadEvent:
+    files: list[UploadedFile]
 
 
 class Client:
@@ -48,6 +63,7 @@ class Server:
         self._callback_ws_disconnect: Callable[[Client], Awaitable[None]] | None = None
 
         self._files: dict[str, Path] = {}
+        self._upload_callbacks: dict[str, Callable[[UploadEvent], None]] = {}
 
     def on_ws_connect(self, callback: Callable[[Client], Awaitable[None]]) -> None:
         self._callback_ws_connect = callback
@@ -66,7 +82,8 @@ class Server:
         # Create web.Application
         self.app = web.Application()
         self.app.router.add_get("/ws", self._on_ws_request)
-        self.app.router.add_route("*", "/{tail:.*}", self._on_http_request)
+        self.app.router.add_route("POST", "/{tail:.*}", self._on_http_post_request)
+        self.app.router.add_route("GET", "/{tail:.*}", self._on_http_get_request)
 
         # Keep track of websocket connections (to close on shutdown)
         self._websockets: weakref.WeakSet[web.WebSocketResponse] = weakref.WeakSet()
@@ -74,42 +91,6 @@ class Server:
 
         # Run web app
         web.run_app(self.app, host=self._host, port=self._port, print=None)
-
-    async def _on_shutdown(self, _: web.Application) -> None:
-        LOGGER.info("Server shutdown")
-        for ws in set(self._websockets):
-            await ws.close(code=WSCloseCode.GOING_AWAY, message=b"server shutdown")
-
-    async def _on_http_request(self, request: web.Request) -> web.Response:
-        path = request.path
-        method = request.method
-
-        # Method must be GET
-        if method != "GET":
-            return self._response_405_method_not_allowed()
-
-        # Parse URL
-        result = urllib.parse.urlparse(path)
-
-        # Validate path
-        path = result.path
-        if ".." in path:
-            return self._response_400_bad_request()
-
-        # `/` -> `/index.html`
-        if path == "/":
-            path = "/index.html"
-
-        # Check if path in `self._files`
-        if path in self._files:
-            return self._response_file(self._files[path])
-
-        # Remove initial `/`
-        while path.startswith("/"):
-            path = path[1:]
-
-        # Respond with file
-        return self._response_file(PATH_PUBLIC / path)
 
     async def _on_ws_request(self, request: web.Request) -> web.StreamResponse:
         # Construct websocket response
@@ -148,8 +129,102 @@ class Server:
 
         return ws
 
-    def _response_400_bad_request(self) -> web.Response:
-        return web.Response(status=400, text="400 Bad Request")
+    async def _on_http_get_request(self, request: web.Request) -> web.Response:
+        path = request.path
+        method = request.method
+
+        # Method must be GET
+        if method != "GET":
+            return self._response_405_method_not_allowed()
+
+        # Parse URL
+        result = urllib.parse.urlparse(path)
+
+        # Validate path
+        path = result.path
+        if ".." in path:
+            return self._response_400_bad_request()
+
+        # `/` -> `/index.html`
+        if path == "/":
+            path = "/index.html"
+
+        # Check if path in `self._files`
+        if path in self._files:
+            return self._response_file(self._files[path])
+
+        # Remove initial `/`
+        while path.startswith("/"):
+            path = path[1:]
+
+        # Respond with file
+        return self._response_file(PATH_PUBLIC / path)
+
+    async def _on_http_post_request(self, request: web.Request) -> web.Response:
+        path = request.path
+        method = request.method
+
+        # Method must be POST
+        if method != "POST":
+            return self._response_405_method_not_allowed()
+
+        # Check if path corresponds to an upload callback
+        if path in self._upload_callbacks:
+            callback = self._upload_callbacks[path]
+
+            # Expect 'Content-Type: multipart/form-data'
+            if not request.content_type.startswith("multipart/form-data"):
+                self._response_400_bad_request(
+                    "expected content type multipart/form-data"
+                )
+
+            # Create temporary directory if non-existent
+            PATH_TMP.mkdir(exist_ok=True)
+
+            # Write files to temporary directory
+            reader = await request.multipart()
+            files: list[UploadedFile] = []
+            while (field := await reader.next()) is not None:
+                if isinstance(field, BodyPartReader) and field.filename:
+                    name = field.filename
+                    size = 0
+                    # Use random filename for safety and to not overwrite any files
+                    filepath = PATH_TMP / random_id()
+                    with filepath.open("wb") as file:
+                        while chunk := await field.read_chunk():
+                            file.write(chunk)
+                            size += len(chunk)
+                    files.append(UploadedFile(name, filepath, size))
+
+            # If no files were uploaded, respond with bad request
+            if not files:
+                return self._response_400_bad_request("no files were uploaded")
+
+            # Call callback
+            try:
+                callback(UploadEvent(files))
+            except Exception as err:
+                LOGGER.error(f"Error occurred during handling upload event: {err}")
+
+            return web.Response(status=200, text=f"{len(files)} files uploaded")
+
+        LOGGER.warning(f"Unexpected POST request to '{path}'")
+        return self._response_404_not_found()
+
+    async def _on_shutdown(self, _: web.Application) -> None:
+        LOGGER.info("Server shutdown")
+        # Close all open websocket connections
+        for ws in set(self._websockets):
+            await ws.close(code=WSCloseCode.GOING_AWAY, message=b"server shutdown")
+        # Remove temporary directory (if exists)
+        if PATH_TMP.exists() and PATH_TMP.is_dir():
+            shutil.rmtree(PATH_TMP)
+
+    def _response_400_bad_request(self, msg: str | None = None) -> web.Response:
+        text = "400 Bad Request"
+        if msg:
+            text += f" ({msg})"
+        return web.Response(status=400, text=text)
 
     def _response_403_forbidden(self) -> web.Response:
         return web.Response(status=403, text="403 Forbidden")
@@ -176,5 +251,10 @@ class Server:
         with path.open("rb") as file:
             return web.Response(status=200, content_type=mime_type, body=file.read())
 
-    def host(self, url: str, path: Path) -> None:
+    def add_file(self, url: str, path: Path) -> None:
         self._files[url] = path
+
+    def add_upload_callback(
+        self, url: str, callback: Callable[[UploadEvent], None]
+    ) -> None:
+        self._upload_callbacks[url] = callback

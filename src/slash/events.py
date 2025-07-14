@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from typing import Self
 
+from slash._server import UploadEvent
 from slash.core import Elem, Handler, MountEvent, Session, UnmountEvent
 
+UploadEvent  # so that `UploadEvent` can be imported from `slash.events`
 MountEvent  # so that `MountEvent` can be imported from `slash.events`
 UnmountEvent  # so that `UnmountEvent` can be imported from `slash.events`
 

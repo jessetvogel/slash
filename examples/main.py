@@ -16,6 +16,7 @@ from tests.progress import test_progress
 from tests.select import test_select
 from tests.svg import test_svg
 from tests.tabs import test_tabs
+from tests.upload import test_upload
 
 from slash import App
 from slash.core import Elem
@@ -28,6 +29,7 @@ def home() -> Elem:
         test_colors(),
         test_data(),
         test_form(),
+        test_upload(),
         test_axes(),
         test_image(),
         test_svg(),
