@@ -242,23 +242,32 @@
     }
 }
 
-.slash-checkbox {
+.slash-checkbox,
+.slash-radio {
     position: relative;
-    display: block;
-    min-width: 20px;
-    width: 20px;
-    height: 20px;
-    margin: 6px;
-    border-radius: 2px;
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow);
-    background-color: var(--bg-light);
     cursor: pointer;
+    padding-left: 26px;
+    margin: 6px;
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        display: block;
+        width: 20px;
+        height: 20px;
+        border-radius: 2px;
+        border: 1px solid var(--border-light);
+        box-shadow: var(--shadow);
+        background-color: var(--bg-light);
+        box-sizing: border-box;
+    }
 
     &.checked {
         background-color: var(--bg-extra-light);
 
-        &::before {
+        &::after {
             content: "";
             position: absolute;
             top: 0px;
@@ -274,34 +283,12 @@
     }
 }
 
-.slash-radio {
-    position: relative;
-    display: block;
-    min-width: 20px;
-    width: 20px;
-    height: 20px;
-    margin: 6px;
-    border-radius: 100%;
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow);
-    background-color: var(--bg-light);
-    cursor: pointer;
+.slash-radio::before {
+    border-radius: 20px;
+}
 
-
-    &.checked {
-        background-color: var(--bg-extra-light);
-
-        &::before {
-            content: "";
-            position: absolute;
-            top: 7px;
-            left: 7px;
-            width: 6px;
-            height: 6px;
-            background-color: var(--fg);
-            border-radius: 100%;
-        }
-    }
+.slash-radio.checked::after {
+    background-image: url("../img/dot.png");
 }
 
 .slash-data-table {

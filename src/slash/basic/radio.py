@@ -7,12 +7,25 @@ from slash.events import ClickEvent, SupportsOnClick
 
 
 class Radio(Elem, SupportsOnClick):
-    def __init__(self, *, checked: bool = False) -> None:
-        super().__init__("label")
+    def __init__(self, label: str = "", *, checked: bool = False) -> None:
+        super().__init__("label", label)
+        self._label = label
         self._checked = checked
         self._connections: list[Radio] = []
         self.add_class("slash-radio")
         self.onclick(self._handle_click)
+
+    @property
+    def label(self) -> str:
+        return self._label
+
+    @label.setter
+    def label(self, label: str) -> None:
+        self.set_text(label)
+
+    def set_label(self, label: str) -> Self:
+        self.label = label
+        return self
 
     @property
     def checked(self) -> bool:

@@ -10,14 +10,14 @@ def test_form() -> Elem:
         H2("Checkbox"),
         Row(
             Column(
-                Row(Checkbox(), "Monday"),
-                Row(Checkbox(), "Tuesday"),
-                Row(Checkbox(), "Wednesday"),
+                Checkbox("Monday"),
+                Checkbox("Tuesday"),
+                Checkbox("Wednesday"),
             ),
             Column(
-                Row(radio := Radio(), "13:00"),
-                Row(Radio().connect(radio), "14:00"),
-                Row(Radio().connect(radio), "15:00"),
+                radio := Radio("13:00"),
+                Radio("14:00").connect(radio),
+                Radio("15:00").connect(radio),
             ),
         ).style({"gap": "32px"}),
     )
