@@ -6,6 +6,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
+from slash._server import PATH_PUBLIC
 from slash.core import Elem, Session
 from slash.html import H2, Button, Div, Img
 from slash.layout import Column, Panel, Row
@@ -13,10 +14,10 @@ from slash.layout import Column, Panel, Row
 
 def update_image(img: Img) -> None:
     path = [
-        Path("/Users/jessetvogel/Projects/slash/public/img/debug.png"),
-        Path("/Users/jessetvogel/Projects/slash/public/img/info.png"),
-        Path("/Users/jessetvogel/Projects/slash/public/img/warning.png"),
-        Path("/Users/jessetvogel/Projects/slash/public/img/error.png"),
+        Path(PATH_PUBLIC / "img/debug.png"),
+        Path(PATH_PUBLIC / "img/info.png"),
+        Path(PATH_PUBLIC / "img/warning.png"),
+        Path(PATH_PUBLIC / "img/error.png"),
     ][int(4 * random.random())]
 
     img.src = Session.require().host(path)

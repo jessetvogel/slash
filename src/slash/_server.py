@@ -187,9 +187,10 @@ class Server:
             while (field := await reader.next()) is not None:
                 if isinstance(field, BodyPartReader) and field.filename:
                     name = field.filename
+                    extension = Path(name).suffix.lower()
                     size = 0
                     # Use random filename for safety and to not overwrite any files
-                    filepath = PATH_TMP / random_id()
+                    filepath = PATH_TMP / (random_id() + extension)
                     with filepath.open("wb") as file:
                         while chunk := await field.read_chunk():
                             file.write(chunk)
