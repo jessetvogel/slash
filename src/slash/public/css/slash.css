@@ -439,6 +439,43 @@
     }
 }
 
+.slash-download {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    background-color: var(--button-bg);
+    color: var(--button-text-color);
+    border: var(--button-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    padding: 8px 16px 8px 32px;
+    margin: 4px;
+    line-height: 22px;
+    min-width: 64px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    box-sizing: border-box;
+
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: var(--button-bg-hover);
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 40px;
+        height: 40px;
+        background-image: url("../img/download.png");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 50%;
+    }
+}
+
 /* Animations */
 
 

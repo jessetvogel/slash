@@ -67,6 +67,25 @@ class Session:
         except LookupError as err:
             raise RuntimeError("Session required, but no session was set") from err
 
+    @property
+    def id(self) -> str:
+        """Get the id of the current session."""
+        if not hasattr(self, "_id"):
+            # Try to get session id from cookies
+            id = self._client.cookies.get("SLASH_SESSION", None)
+            if (
+                id is None  # if `id` is not set in cookie
+                or not id.startswith("_")  # or `id` has invalid format
+                or not id[1:].isalnum()
+                or len(id) != 7
+            ):
+                id = random_id()
+                self.send(
+                    Message(event="cookie", name="SLASH_SESSION", value=id, days=1)
+                )
+            self._id = id
+        return self._id
+
     def add_elem(self, elem: Elem) -> None:
         """Mark element as mounted.
 

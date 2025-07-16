@@ -3,9 +3,10 @@
 import shutil
 import urllib.parse
 import weakref
-from collections.abc import Awaitable
+from collections.abc import Awaitable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from types import MappingProxyType
 from typing import Callable
 
 from aiohttp import BodyPartReader, WSCloseCode, WSMsgType, web
@@ -23,6 +24,7 @@ ALLOWED_MIME_TYPES = {
     ".js": "text/javascript",
     ".png": "image/png",
     ".ttf": "font/ttf",
+    ".txt": "plain/txt",
 }
 
 
@@ -39,13 +41,23 @@ class UploadEvent:
 
 
 class Client:
-    def __init__(self, send: Callable[[str], Awaitable[None]]):
+    def __init__(
+        self,
+        send: Callable[[str], Awaitable[None]],
+        *,
+        cookies: Mapping[str, str] | None = None,
+    ):
         self._id = random_id()
         self._send = send
+        self._cookies = dict(cookies or {})
 
     @property
     def id(self) -> str:
         return self._id
+
+    @property
+    def cookies(self) -> Mapping[str, str]:
+        return MappingProxyType(self._cookies)
 
     async def send(self, data: str) -> None:
         await self._send(data)
@@ -100,7 +112,7 @@ class Server:
         LOGGER.debug("WebSocket connect")
 
         # Create client instance to keep track of connection details
-        client = Client(ws.send_str)
+        client = Client(ws.send_str, cookies=request.cookies)
 
         # Keep track of websocket connection
         self._websockets.add(ws)
@@ -152,6 +164,10 @@ class Server:
         # Check if path in `self._files`
         if path in self._files:
             return self._response_file(self._files[path])
+
+        if path.startswith("/tmp"):
+            print("FOLLOWING FILES ARE AVAILBLE:")
+            print(self._files)
 
         # Remove initial `/`
         while path.startswith("/"):

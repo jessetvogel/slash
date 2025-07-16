@@ -5,6 +5,7 @@ from tests.colors import test_colors
 from tests.data_table import test_data
 from tests.dialog import test_dialog
 from tests.dom import test_dom
+from tests.download import test_download
 from tests.form import test_form
 from tests.image import test_image
 from tests.input import test_input
@@ -14,6 +15,7 @@ from tests.markdown import test_markdown
 from tests.pre import test_pre
 from tests.progress import test_progress
 from tests.select import test_select
+from tests.storage import test_storage
 from tests.svg import test_svg
 from tests.tabs import test_tabs
 from tests.upload import test_upload
@@ -30,6 +32,8 @@ def home() -> Elem:
         test_data(),
         test_form(),
         test_upload(),
+        test_download(),
+        test_storage(),
         test_axes(),
         test_image(),
         test_svg(),
