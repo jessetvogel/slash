@@ -245,6 +245,7 @@ pre code {
 
 hr {
     border: 1px solid var(--border);
+    border-bottom: 0px;
 }
 
 p {
@@ -253,4 +254,8 @@ p {
 
 a {
     color: var(--blue);
+}
+
+details summary {
+    cursor: pointer;
 }

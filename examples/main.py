@@ -3,6 +3,7 @@ from __future__ import annotations
 from tests.axes import test_axes
 from tests.colors import test_colors
 from tests.data_table import test_data
+from tests.details import test_details
 from tests.dialog import test_dialog
 from tests.dom import test_dom
 from tests.download import test_download
@@ -38,6 +39,7 @@ def home() -> Elem:
         test_image(),
         test_svg(),
         test_markdown(),
+        test_details(),
         test_dom(),
         test_select(),
         test_dialog(),

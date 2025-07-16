@@ -13,7 +13,6 @@ class Div(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("div", *children)
-        SupportsOnClick.__init__(self)
 
 
 class P(Elem, SupportsOnClick):
@@ -21,7 +20,6 @@ class P(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("p", *children)
-        SupportsOnClick.__init__(self)
 
 
 class Span(Elem, SupportsOnClick):
@@ -29,7 +27,20 @@ class Span(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("span", *children)
-        SupportsOnClick.__init__(self)
+
+
+class Details(Elem, SupportsOnClick):
+    """HTML <details> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("details", *children)
+
+
+class Summary(Elem, SupportsOnClick):
+    """HTML <summary> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("summary", *children)
 
 
 class Label(Elem, SupportsOnClick):
@@ -37,7 +48,6 @@ class Label(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("label", *children)
-        SupportsOnClick.__init__(self)
 
 
 class Table(Elem, SupportsOnClick):
@@ -45,7 +55,6 @@ class Table(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("table", *children)
-        SupportsOnClick.__init__(self)
 
 
 class Tr(Elem, SupportsOnClick):
@@ -53,7 +62,6 @@ class Tr(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("tr", *children)
-        SupportsOnClick.__init__(self)
 
 
 class Th(Elem, SupportsOnClick):
@@ -61,7 +69,6 @@ class Th(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("th", *children)
-        SupportsOnClick.__init__(self)
 
 
 class Td(Elem, SupportsOnClick):
@@ -69,7 +76,6 @@ class Td(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("td", *children)
-        SupportsOnClick.__init__(self)
 
 
 class H1(Elem, SupportsOnClick):
@@ -77,7 +83,6 @@ class H1(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h1", *children)
-        SupportsOnClick.__init__(self)
 
 
 class H2(Elem, SupportsOnClick):
@@ -85,7 +90,6 @@ class H2(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h2", *children)
-        SupportsOnClick.__init__(self)
 
 
 class H3(Elem, SupportsOnClick):
@@ -93,7 +97,6 @@ class H3(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h3", *children)
-        SupportsOnClick.__init__(self)
 
 
 class H4(Elem, SupportsOnClick):
@@ -101,7 +104,6 @@ class H4(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h4", *children)
-        SupportsOnClick.__init__(self)
 
 
 class H5(Elem, SupportsOnClick):
@@ -109,7 +111,6 @@ class H5(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h5", *children)
-        SupportsOnClick.__init__(self)
 
 
 class H6(Elem, SupportsOnClick):
@@ -117,7 +118,6 @@ class H6(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h6", *children)
-        SupportsOnClick.__init__(self)
 
 
 class A(Elem, SupportsOnClick):
@@ -131,7 +131,7 @@ class A(Elem, SupportsOnClick):
         href: str = "#",
     ) -> None:
         super().__init__("a", *children)
-        SupportsOnClick.__init__(self)
+
         self.href = href
 
     def set_href(self, href: str) -> Self:
@@ -144,7 +144,6 @@ class Button(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("button", *children)
-        SupportsOnClick.__init__(self)
 
 
 class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):

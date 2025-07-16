@@ -247,12 +247,13 @@ class Server:
         return web.Response(status=403, text="403 Forbidden")
 
     def _response_404_not_found(self) -> web.Response:
-        return web.Response(status=404, text="404 Not Found")
+        return self._response_file(PATH_PUBLIC / "404.html", status=404)
+        # return web.Response(status=404, text="404 Not Found")
 
     def _response_405_method_not_allowed(self) -> web.Response:
         return web.Response(status=405, text="404 Method Not Allowed")
 
-    def _response_file(self, path: Path) -> web.Response:
+    def _response_file(self, path: Path, *, status: int = 200) -> web.Response:
         # Check file existence
         if not path.is_file():
             LOGGER.warning(f"Requested file '{path}' not found")
@@ -266,7 +267,7 @@ class Server:
 
         # Send file
         with path.open("rb") as file:
-            return web.Response(status=200, content_type=mime_type, body=file.read())
+            return web.Response(status=status, content_type=mime_type, body=file.read())
 
     def add_file(self, url: str, path: Path) -> None:
         self._files[url] = path
