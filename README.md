@@ -2,7 +2,7 @@
 
 Slash is a Python framework for creating web apps.
 
-### Installation
+## 📦 Installation
 
 Slash can be installed directly using `pip`.
 
@@ -20,7 +20,7 @@ dependencies = [
 ]
 ```
 
-### Example
+## 📘 Example
 
 The following script will create a page with the text 'Hello world'. Run the
 script and go to [http://localhost:8080](http://localhost:8080) to see the
