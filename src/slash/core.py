@@ -458,8 +458,19 @@ class Elem:
                 session.send(Message.clear(self.id))
         self._children = []
 
-    def append(self, elem: Elem | str) -> Self:
-        """Append element to the children of this element."""
+    def append(self, *children: Children) -> Self:
+        """Append to the children of this element."""
+        for child in children:
+            if isinstance(child, list):
+                self.append(*child)
+            elif isinstance(child, Elem) or isinstance(child, str):
+                self._append_elem(child)
+            else:
+                raise TypeError(f"Object of type {type(child)} cannot be appended")
+        return self
+
+    def _append_elem(self, elem: Elem | str) -> None:
+        """Append element or string to the children of this element."""
         if isinstance(elem, Elem):
             # Set parent and children variables
             if elem._parent is not None:
@@ -481,8 +492,6 @@ class Elem:
             # Append text
             if (session := Session.current()) is not None and self.is_mounted():
                 session.send(Message("create", parent=self.id, text=elem))
-
-        return self
 
     def insert(self, position: int, elem: Elem) -> Self:
         """Insert element to the children of this element at given position."""

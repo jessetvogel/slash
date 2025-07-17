@@ -2,6 +2,9 @@ body {
     /* Colors */
     --white: #ffffff;
     --black: #101010;
+    --gray: #777;
+    --light-gray: #ccc;
+    --dark-gray: #333;
 
     --red: #c04016;
     --orange: #e27b2d;
@@ -101,8 +104,9 @@ body.dark {
 
 html,
 body {
-    /* margin: 0px; */
-    /* padding: 0px; */
+    margin: 0px;
+    padding: 0px;
+    height: 100dvh;
 }
 
 body,

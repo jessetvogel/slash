@@ -1,9 +1,10 @@
 """Slash layout components."""
 
 from slash.core import Children, Elem
+from slash.events import SupportsOnClick
 
 
-class Row(Elem):
+class Row(Elem, SupportsOnClick):
     """Row element."""
 
     def __init__(self, *children: Children):
@@ -18,7 +19,7 @@ class Row(Elem):
         return "div"
 
 
-class Column(Elem):
+class Column(Elem, SupportsOnClick):
     """Column element."""
 
     def __init__(self, *children: Children):

@@ -491,6 +491,7 @@ r.setAttribute("width", w + 16);
 
 
 def round_125(x: float) -> float:
+    """Round to the nearest 1, 2 or 5 times a power of 10."""
     if x == 0:
         return 0
     e = math.floor(math.log10(abs(x)))

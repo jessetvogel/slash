@@ -5,10 +5,12 @@ from __future__ import annotations
 import sys
 import traceback
 from collections.abc import Callable
+from pathlib import Path
 
 from slash._logging import LOGGER
 from slash._message import Message
 from slash._server import Client, Server
+from slash._utils import random_id
 from slash.core import Elem, Session
 from slash.events import (
     ChangeEvent,
@@ -25,9 +27,15 @@ class App:
         self._server = Server("127.0.0.1", 8080)
         self._endpoints: dict[str, Callable[[], Elem]] = {}
         self._sessions: dict[str, Session] = {}
+        self._stylesheets: list[str] = []
 
     def add_endpoint(self, endpoint: str, root: Callable[[], Elem]) -> None:
         self._endpoints[endpoint] = root
+
+    def add_stylesheet(self, path: Path) -> None:
+        url = f"/style/{random_id()}.css"
+        self._server.add_file(url, path)
+        self._stylesheets.append(url)
 
     def run(self) -> None:
         self._server.on_ws_connect(self._handle_ws_connect)
@@ -41,6 +49,19 @@ class App:
 
         with session:
             try:
+                # Add stylesheets
+                for url in self._stylesheets:
+                    session.send(
+                        Message.create(
+                            tag="link",
+                            id=random_id(),
+                            parent="head",
+                            rel="stylesheet",
+                            type="text/css",
+                            href=url,
+                        )
+                    )
+
                 # Create and mount root element
                 root = self._endpoints["/"]()
                 root.mount()
