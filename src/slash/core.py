@@ -501,16 +501,14 @@ class Elem:
         elem._parent = self
         self._children.insert(position, elem)
 
-        # TODO: Send correct position!
-
         # Set update
         if (session := Session.current()) is not None and self.is_mounted():
             # If elem is not mounted yet, mount it
             if not elem.is_mounted():
                 elem.mount()
-            else:
-                # Otherwise, send update message with new `parent` value
-                session.send(Message.update(elem.id, parent=self.id))
+
+            # Send position
+            session.send(Message.update(elem.id, parent=self.id, position=position))
         return self
 
     def contains(self, elem: Elem) -> bool:

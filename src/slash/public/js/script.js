@@ -126,16 +126,30 @@ class Client {
             const expires = "expires=" + date.toUTCString();
             document.cookie = name + "=" + value + ";" + expires + ";path=/";
             ;
+            return;
         }
         throw new Error(`Unknown event '${event}'`);
     }
     update(elem, message) {
         for (const attr in message) {
-            if (attr == "event" || attr == "id" || attr == "tag" || attr == "ns")
+            if (attr == "event" || attr == "id" || attr == "tag" || attr == "ns" || attr == "position")
                 continue;
             if (attr == "parent") {
                 const parent = this.getElementById(message.parent);
-                parent.append(elem);
+                if ("position" in message) {
+                    if (Object.values(parent.children).includes(elem))
+                        parent.removeChild(elem);
+                    const position = message.position;
+                    if (position >= parent.children.length) {
+                        parent.append(elem);
+                    }
+                    else {
+                        parent.insertBefore(elem, parent.children[position]);
+                    }
+                }
+                else {
+                    parent.append(elem);
+                }
                 continue;
             }
             if (attr == "style") {

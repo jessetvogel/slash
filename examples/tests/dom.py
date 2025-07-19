@@ -1,5 +1,5 @@
 from slash.core import Elem
-from slash.html import H2, Button, Div, Span
+from slash.html import H2, H3, Button, Div, Span
 from slash.layout import Panel, Row
 
 
@@ -23,4 +23,34 @@ def test_dom() -> Elem:
                 Button("Reset").onclick(lambda: set_counter(0)),
             ),
         ),
+        Panel(
+            H3("Move the black dot"),
+            row := Row(
+                black := circle("var(--black)"),
+                circle("var(--red)"),
+                circle("var(--yellow)"),
+                circle("var(--green)"),
+                circle("var(--blue)"),
+                circle("var(--purple)"),
+            ).style({"gap": "8px"}),
+            Row(
+                Button("<").onclick(
+                    lambda: row.insert(max(0, row.children.index(black) - 1), black)
+                ),
+                Button(">").onclick(
+                    lambda: row.insert(row.children.index(black) + 1, black)
+                ),
+            ),
+        ),
+    )
+
+
+def circle(color: str) -> None:
+    return Div().style(
+        {
+            "background-color": color,
+            "border-radius": "32px",
+            "width": "32px",
+            "height": "32px",
+        }
     )

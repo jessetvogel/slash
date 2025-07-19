@@ -13,11 +13,14 @@ def storage_path() -> Path:
 def set_data(key: str, value: str) -> None:
     path = storage_path()
     path.parent.mkdir(exist_ok=True)
-    with path.open("r") as file:
-        try:
-            data = json.load(file)
-        except Exception:
-            data = {}
+    if not path.exists():
+        data = {}
+    else:
+        with path.open("r") as file:
+            try:
+                data = json.load(file)
+            except Exception:
+                data = {}
     data[key] = value
     with path.open("w") as file:
         json.dump(data, file)

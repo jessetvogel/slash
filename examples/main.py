@@ -49,7 +49,7 @@ def home() -> Elem:
         test_progress(),
         test_tabs(),
         test_pre(),
-    ).style({"max-width": "640px", "margin": "0px auto"})
+    ).style({"max-width": "640px", "margin": "0px auto", "padding": "8px"})
 
 
 def main():

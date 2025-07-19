@@ -7,6 +7,7 @@ import traceback
 from collections.abc import Callable
 from pathlib import Path
 
+from slash._config import Config
 from slash._logging import LOGGER
 from slash._message import Message
 from slash._server import Client, Server
@@ -28,6 +29,11 @@ class App:
         self._endpoints: dict[str, Callable[[], Elem]] = {}
         self._sessions: dict[str, Session] = {}
         self._stylesheets: list[str] = []
+        self._config = Config()
+
+    @property
+    def config(self) -> Config:
+        return self._config
 
     def add_endpoint(self, endpoint: str, root: Callable[[], Elem]) -> None:
         self._endpoints[endpoint] = root

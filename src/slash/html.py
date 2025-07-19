@@ -22,6 +22,13 @@ class P(Elem, SupportsOnClick):
         super().__init__("p", *children)
 
 
+class Br(Elem):
+    """HTML <br> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("br", *children)
+
+
 class Span(Elem, SupportsOnClick):
     """HTML <span> element."""
 
