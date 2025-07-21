@@ -1,4 +1,4 @@
-"""Slash is a dashboard framework."""
+"""Slash is a framework for web applications."""
 
 from slash._app import App
 

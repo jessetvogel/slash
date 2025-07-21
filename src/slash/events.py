@@ -25,6 +25,8 @@ class ClickEvent:
 
 
 class SupportsOnClick:
+    """Mixin class for onclick support."""
+
     @property
     def onclick_handlers(self) -> list[Handler[ClickEvent]]:
         if not hasattr(self, "_onclick_handlers"):
@@ -68,6 +70,8 @@ class InputEvent:
 
 
 class SupportsOnInput:
+    """Mixin class for oninput support."""
+
     @property
     def oninput_handlers(self) -> list[Handler[InputEvent]]:
         if not hasattr(self, "_oninput_handlers"):
@@ -111,6 +115,8 @@ class ChangeEvent:
 
 
 class SupportsOnChange:
+    """Mixin class for onchange support."""
+
     @property
     def onchange_handlers(self) -> list[Handler[ChangeEvent]]:
         if not hasattr(self, "_onchange_handlers"):

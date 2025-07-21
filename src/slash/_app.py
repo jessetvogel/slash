@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 import traceback
 from collections.abc import Callable
@@ -21,33 +22,67 @@ from slash.events import (
     SupportsOnClick,
     SupportsOnInput,
 )
+from slash.html import H1, Div
 
 
 class App:
+    """Main class for a Slash web application."""
+
     def __init__(self) -> None:
         self._server = Server("127.0.0.1", 8080)
-        self._endpoints: dict[str, Callable[[], Elem]] = {}
+        self._endpoints: dict[str | re.Pattern, Callable[..., Elem]] = {}
         self._sessions: dict[str, Session] = {}
         self._stylesheets: list[str] = []
         self._config = Config()
 
     @property
     def config(self) -> Config:
+        """Configuration object of application."""
         return self._config
 
-    def add_endpoint(self, endpoint: str, root: Callable[[], Elem]) -> None:
-        self._endpoints[endpoint] = root
+    def add_endpoint(self, pattern: str, root: Callable[..., Elem]) -> None:
+        """Add endpoint.
+
+        Args:
+            endpoint: URL of endpoint. Either string or regex pattern.
+            root: Function that returns a root element of the page.
+                If pattern is a `re.Pattern`, the matched groups will
+                be provided to the function as arguments.
+        """
+        is_regex = any(c in pattern for c in ".^$*+?{}[]\\|()")
+        self._endpoints[re.compile(f"^{pattern}$") if is_regex else pattern] = root
 
     def add_stylesheet(self, path: Path) -> None:
+        """Add stylesheet.
+
+        Args:
+            path: Path to stylesheet.
+        """
         url = f"/style/{random_id()}.css"
         self._server.add_file(url, path)
         self._stylesheets.append(url)
 
     def run(self) -> None:
+        """Start application."""
         self._server.on_ws_connect(self._handle_ws_connect)
         self._server.on_ws_message(self._handle_ws_message)
         self._server.on_ws_disconnect(self._handle_ws_disconnect)
         self._server.serve()
+
+    def _create_root(self, path: str) -> Elem:
+        for pattern, root in self._endpoints.items():
+            if isinstance(pattern, str) and pattern == path:
+                return root()
+            if isinstance(pattern, re.Pattern):
+                if (m := pattern.match(path)) is not None:
+                    return root(*m.groups())
+
+        return self._404()
+
+    def _404(self) -> Elem:
+        return Div(
+            H1("Page not found!"), Div("Oops, this page does not exist..")
+        ).style({"margin": "auto", "max-width": "512px", "text-align": "center"})
 
     async def _handle_ws_connect(self, client: Client) -> None:
         # Create new session
@@ -67,10 +102,6 @@ class App:
                             href=url,
                         )
                     )
-
-                # Create and mount root element
-                root = self._endpoints["/"]()
-                root.mount()
             except Exception as err:
                 exc_type, exc_value, exc_tb = sys.exc_info()
                 tb = traceback.extract_tb(exc_tb)
@@ -93,6 +124,12 @@ class App:
         with session:
             try:
                 message = Message.from_json(data)
+
+                # load
+                if message.event == "load":
+                    client.path = message.data["path"]
+                    client.query = message.data["query"]
+                    session.set_root(self._create_root(client.path))
 
                 # click
                 if message.event == "click":
@@ -128,19 +165,6 @@ class App:
 
     async def _handle_ws_disconnect(self, client: Client) -> None:
         self._sessions.pop(client.id)
-
-    # def _respond_client(self, client: Client) -> list[str]:
-    #     try:
-    #         # Host files
-    #         for url, path in client.flush_files().items():
-    #             self._server.host(url, path)
-
-    #         # Serialize messages
-    #         messages = [message.to_json() for message in client.flush()]
-    #     except Exception:
-    #         return [self._message_server_error(traceback.format_exc()).to_json()]
-
-    #     return messages
 
     def _message_server_error(self, error: str) -> Message:
         return Message.log(

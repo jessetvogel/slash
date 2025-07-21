@@ -138,7 +138,6 @@ class A(Elem, SupportsOnClick):
         href: str = "#",
     ) -> None:
         super().__init__("a", *children)
-
         self.href = href
 
     def set_href(self, href: str) -> Self:

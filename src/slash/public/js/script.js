@@ -14,8 +14,13 @@ class Client {
         this.socket = new WebSocket(`ws://${hostname}:${port}/ws`);
         console.log("Connecting to server ..");
         const client = this;
-        this.socket.onopen = function (event) {
+        this.socket.onopen = function () {
             console.log('Connection established!');
+            client.send({
+                event: "load",
+                path: window.location.pathname,
+                query: window.location.search,
+            });
         };
         const loading = $("slash-loading");
         this.socket.onmessage = async function (event) {

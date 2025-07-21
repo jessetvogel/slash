@@ -50,10 +50,28 @@ class Client:
         self._id = random_id()
         self._send = send
         self._cookies = dict(cookies or {})
+        self.path = ""
+        self.query = {}
 
     @property
     def id(self) -> str:
         return self._id
+
+    @property
+    def path(self) -> str:
+        return self._path
+
+    @path.setter
+    def path(self, path: str) -> None:
+        self._path = path
+
+    @property
+    def query(self) -> Mapping[str, str]:
+        return MappingProxyType(self._query)
+
+    @query.setter
+    def query(self, query: dict[str, str]) -> None:
+        self._query = query
 
     @property
     def cookies(self) -> Mapping[str, str]:
@@ -93,7 +111,7 @@ class Server:
 
         # Create web.Application
         self.app = web.Application()
-        self.app.router.add_get("/ws", self._on_ws_request)
+        self.app.router.add_route("GET", "/ws", self._on_ws_request)
         self.app.router.add_route("POST", "/{tail:.*}", self._on_http_post_request)
         self.app.router.add_route("GET", "/{tail:.*}", self._on_http_get_request)
 
@@ -157,24 +175,21 @@ class Server:
         if ".." in path:
             return self._response_400_bad_request()
 
-        # `/` -> `/index.html`
-        if path == "/":
-            path = "/index.html"
-
         # Check if path in `self._files`
         if path in self._files:
             return self._response_file(self._files[path])
 
-        if path.startswith("/tmp"):
-            print("FOLLOWING FILES ARE AVAILBLE:")
-            print(self._files)
+        # Asset files
+        if (
+            path.startswith("/css/")
+            or path.startswith("/fonts/")
+            or path.startswith("/img/")
+            or path.startswith("/js/")
+        ):
+            return self._response_file(PATH_PUBLIC / path[1:])
 
-        # Remove initial `/`
-        while path.startswith("/"):
-            path = path[1:]
-
-        # Respond with file
-        return self._response_file(PATH_PUBLIC / path)
+        # Otherwise, return `index.html`
+        return self._response_file(PATH_PUBLIC / "index.html")
 
     async def _on_http_post_request(self, request: web.Request) -> web.Response:
         path = request.path
@@ -247,8 +262,7 @@ class Server:
         return web.Response(status=403, text="403 Forbidden")
 
     def _response_404_not_found(self) -> web.Response:
-        return self._response_file(PATH_PUBLIC / "404.html", status=404)
-        # return web.Response(status=404, text="404 Not Found")
+        return web.Response(status=404, text="404 Not Found")
 
     def _response_405_method_not_allowed(self) -> web.Response:
         return web.Response(status=405, text="404 Method Not Allowed")

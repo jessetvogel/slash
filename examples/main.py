@@ -16,6 +16,7 @@ from tests.markdown import test_markdown
 from tests.pre import test_pre
 from tests.progress import test_progress
 from tests.select import test_select
+from tests.session import test_session
 from tests.storage import test_storage
 from tests.svg import test_svg
 from tests.tabs import test_tabs
@@ -30,6 +31,7 @@ def home() -> Elem:
     return Div(
         H1("Slash tests").style({"text-align": "center"}),
         test_colors(),
+        test_session(),
         test_data(),
         test_form(),
         test_upload(),

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import inspect
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Mapping
 from contextvars import ContextVar
 from pathlib import Path
 from typing import Any, Literal, Self, TypeAlias, TypeVar
@@ -49,6 +49,7 @@ class Session:
 
         self._mounted_elems: dict[str, Elem] = {}  # elements that client already has
         self._functions: set[str] = set()  # functions that client already has
+        self._root: Elem | None = None
 
     @staticmethod
     def current() -> Session | None:
@@ -85,6 +86,20 @@ class Session:
                 )
             self._id = id
         return self._id
+
+    @property
+    def path(self) -> str:
+        return self._client.path
+
+    @property
+    def query(self) -> Mapping[str, str]:
+        return self._client.query
+
+    def set_root(self, root: Elem) -> None:
+        if self._root is not None:
+            self._root.unmount()
+        self._root = root
+        root.mount()
 
     def add_elem(self, elem: Elem) -> None:
         """Mark element as mounted.
