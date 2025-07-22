@@ -63,8 +63,8 @@ class Message:
             return Message(event="execute", name=name, args=args)
 
     @staticmethod
-    def log(type: str, message: str) -> Message:
-        return Message(event="log", type=type, message=message)
+    def log(type: str, message: str, format: str) -> Message:
+        return Message(event="log", type=type, message=message, format=format)
 
     def __repr__(self) -> str:
         return str(self.__dict__)

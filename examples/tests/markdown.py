@@ -10,9 +10,7 @@ def test_markdown() -> Elem:
     return Div(
         H2("Markdown"),
         Panel(
-            Textarea(placeholder="Write some markdown..").oninput(
-                lambda event: output.set_markdown(event.value)
-            ),
+            Textarea(placeholder="Write some markdown..").oninput(lambda event: output.set_markdown(event.value)),
             output,
         ),
     )

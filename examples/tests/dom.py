@@ -34,12 +34,8 @@ def test_dom() -> Elem:
                 circle("var(--purple)"),
             ).style({"gap": "8px"}),
             Row(
-                Button("<").onclick(
-                    lambda: row.insert(max(0, row.children.index(black) - 1), black)
-                ),
-                Button(">").onclick(
-                    lambda: row.insert(row.children.index(black) + 1, black)
-                ),
+                Button("<").onclick(lambda: row.insert(max(0, row.children.index(black) - 1), black)),
+                Button(">").onclick(lambda: row.insert(row.children.index(black) + 1, black)),
             ),
         ),
     )

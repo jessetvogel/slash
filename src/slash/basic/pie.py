@@ -126,10 +126,7 @@ class Pie(SVG):
                 )
             )
 
-            style.append(
-                f"#{path.id}:hover {{ opacity: 0.8; }}"
-                f"#{path.id} {{ transition: opacity 0.2s; }}"
-            )
+            style.append(f"#{path.id}:hover {{ opacity: 0.8; }}#{path.id} {{ transition: opacity 0.2s; }}")
 
             text_anchor = "start" if math.cos(theta + d_theta / 2.0) < 0.0 else "end"
 

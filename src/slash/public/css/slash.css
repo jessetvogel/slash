@@ -138,6 +138,10 @@
                 background-color: var(--error-text-color);
             }
         }
+
+        p {
+            margin: 8px 0px;
+        }
     }
 }
 
@@ -472,6 +476,7 @@
         background-position: center;
         background-repeat: no-repeat;
         background-size: 50%;
+        filter: var(--invert-filter);
     }
 }
 

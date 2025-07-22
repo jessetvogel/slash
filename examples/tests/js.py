@@ -12,9 +12,7 @@ def test_js() -> Elem:
     return Div(
         H2("JavaScript"),
         Column(
-            textarea := Textarea(
-                "alert('Test successful!');", placeholder="Write some JS here.."
-            ),
+            textarea := Textarea("alert('Test successful!');", placeholder="Write some JS here.."),
             Button("Execute").onclick(execute),
         ),
     )

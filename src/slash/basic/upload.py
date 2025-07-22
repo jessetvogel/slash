@@ -51,17 +51,11 @@ class Upload(Elem):
         ),
     )
 
-    def __init__(
-        self, *, text: str = "Drop files or click to upload", multiple: bool = False
-    ) -> None:
+    def __init__(self, *, text: str = "Drop files or click to upload", multiple: bool = False) -> None:
         super().__init__("form", method="POST")
         self.add_class("slash-upload")
         self.onmount(self._setup_form)
-        self.append(
-            label := Label(
-                text, input := Input("file", name="file").set_attr("required", "")
-            )
-        )
+        self.append(label := Label(text, input := Input("file", name="file").set_attr("required", "")))
         if multiple:
             input.set_attr("multiple", "")
 

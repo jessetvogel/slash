@@ -7,10 +7,7 @@ class Tabs(Elem, SupportsOnChange):
     def __init__(self, labels: list[str], *, value: str | None = None) -> None:
         super().__init__(
             "div",
-            *[
-                Div(label).onclick(lambda event: self._onclick_tab(event.target))
-                for label in labels
-            ],
+            *[Div(label).onclick(lambda event: self._onclick_tab(event.target)) for label in labels],
         )
         SupportsOnChange.__init__(self)
         self.add_class("slash-tabs")

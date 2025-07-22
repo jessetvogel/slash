@@ -7,9 +7,7 @@ def test_session() -> Elem:
     return Div(
         H2("Session"),
         Table(
-            Tr(
-                Td("Session.path").style({"font-family": "monospace"}), Td(session.path)
-            ),
+            Tr(Td("Session.path").style({"font-family": "monospace"}), Td(session.path)),
             *[
                 Tr(
                     Td(f"Session.query['{name}']").style({"font-family": "monospace"}),

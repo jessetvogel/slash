@@ -32,9 +32,9 @@ def date(day: str, month: str, year: str) -> Elem:
 
 def main():
     app = App()
-    app.add_endpoint("/", home)
-    app.add_endpoint(r"/animal/(\w+)", animal)
-    app.add_endpoint(r"/date/(\d+)/(\d+)/(\d+)", date)
+    app.add_route("/", home)
+    app.add_route(r"/animal/(\w+)", animal)
+    app.add_route(r"/date/(\d+)/(\d+)/(\d+)", date)
     app.run()
 
 

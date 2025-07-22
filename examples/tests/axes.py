@@ -83,9 +83,7 @@ def update_pie(pie: Pie) -> None:
     ]
     values = [random.randint(1, 10) for _ in labels]
 
-    pie.set_title("My Flavourite Fruits").set_radius(112.0).set_gap(32.0).render(
-        labels, values
-    )
+    pie.set_title("My Flavourite Fruits").set_radius(112.0).set_gap(32.0).render(labels, values)
 
 
 def update_bar(bar: Axes) -> None:

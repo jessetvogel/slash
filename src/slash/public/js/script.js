@@ -19,7 +19,7 @@ class Client {
             client.send({
                 event: "load",
                 path: window.location.pathname,
-                query: window.location.search,
+                query: Object.fromEntries(new URLSearchParams(window.location.search)),
             });
         };
         const loading = $("slash-loading");
@@ -32,23 +32,23 @@ class Client {
             }
             catch (error) {
                 console.error(`Received invalid message from server\nmessage: ${event.data}`);
-                Slash.message('error', `<span>Received invalid message from server</span><pre><code>${event.data}</code></pre><span>${error}</span>`);
+                Slash.message('error', `<b>Received invalid message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`);
                 return;
             }
             try {
                 await client.handle(message);
             }
             catch (error) {
-                Slash.message('error', `<span>Failed to handle message from server</span><pre><code>${event.data}</code></pre><span>${error}</span>`);
+                Slash.message('error', `<b>Failed to handle message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`);
                 return;
             }
         };
         this.socket.onerror = function (error) {
             console.log('WebSocket error:', error);
         };
-        this.socket.onclose = function (event) {
+        this.socket.onclose = function () {
             console.log('Connection closed.');
-            Slash.message('warning', 'Connection lost! Try reloading the page to reconnect to the server.', null);
+            Slash.message('warning', 'Connection lost! Try reloading the page to reconnect to the server.', { permanent: true });
         };
     }
     async handle(message) {
@@ -110,8 +110,9 @@ class Client {
         if (event == "log") {
             const type = message.type;
             const text = message.message;
+            const format = message.format || "text";
             console.log(`[${type}] %c${text}`, 'color:rgb(216, 198, 162);');
-            Slash.message(type, text);
+            Slash.message(type, text, { format: format });
             return;
         }
         if (event == "theme") {
@@ -257,12 +258,14 @@ class Slash {
     static value(name) {
         return Slash.values[name];
     }
-    static message(type, message, timeout = 10000) {
-        const div = create("div", { class: "message " + type }, [
-            create("span", { class: "icon" }),
-            message
-        ]);
-        if (timeout !== null) {
+    static message(type, message, options = {}) {
+        const div = create("div", { class: "message " + type }, create("span", { class: "icon" }));
+        if (options.format == "html")
+            div.insertAdjacentHTML('beforeend', message);
+        else
+            div.append(message);
+        if (options.permanent !== true) {
+            const timeout = options.timeout || 10000;
             setTimeout(() => div.classList.add("remove"), timeout);
             setTimeout(() => div.remove(), timeout + 500);
         }
@@ -273,7 +276,7 @@ Slash.values = {};
 let client;
 function init() {
     window.Slash = Slash;
-    Slash.message("warning", "", -499);
+    Slash.message("warning", "", { timeout: -499 });
     client = new Client();
     client.connect();
 }

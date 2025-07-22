@@ -23,9 +23,7 @@ def test_colors() -> Elem:
                 ]
             ]
             + [
-                Button("dark")
-                .style({"margin-left": "auto"})
-                .onclick(lambda: Session.require().set_theme("dark")),
+                Button("dark").style({"margin-left": "auto"}).onclick(lambda: Session.require().set_theme("dark")),
                 Button("light").onclick(lambda: Session.require().set_theme("light")),
             ]
         ).style({"gap": "8px", "align-items": "center"}),

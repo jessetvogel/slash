@@ -19,12 +19,7 @@ class Formatter(logging.Formatter):
     FORMATS = {
         logging.INFO: fmt_prefix + " " + WHITE + "INFO" + RESET + ": %(message)s",
         logging.DEBUG: fmt_prefix + " " + BLUE + "DEBUG" + RESET + ": %(message)s",
-        logging.WARNING: fmt_prefix
-        + " "
-        + YELLOW
-        + "WARNING"
-        + RESET
-        + ": %(message)s",
+        logging.WARNING: fmt_prefix + " " + YELLOW + "WARNING" + RESET + ": %(message)s",
         logging.ERROR: fmt_prefix + " " + RED + "ERROR" + RESET + ": %(message)s",
         logging.CRITICAL: fmt_prefix + " " + RED + "CRITICAL" + RESET + ": %(message)s",
     }

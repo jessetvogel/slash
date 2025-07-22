@@ -56,7 +56,7 @@ def home() -> Elem:
 
 def main():
     app = App()
-    app.add_endpoint("/", home)
+    app.add_route("/", home)
     app.run()
 
 

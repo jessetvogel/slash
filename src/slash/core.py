@@ -19,9 +19,7 @@ from slash.js import JSFunction
 
 T = TypeVar("T")
 
-Handler: TypeAlias = (
-    Callable[[T], Awaitable[None] | None] | Callable[[], Awaitable[None] | None]
-)
+Handler: TypeAlias = Callable[[T], Awaitable[None] | None] | Callable[[], Awaitable[None] | None]
 
 # Session
 
@@ -43,9 +41,7 @@ class Session:
 
         self._queue_messages: list[str] = []
         self._queue_files: list[tuple[str, Path]] = []
-        self._queue_upload_callbacks: list[
-            tuple[str, Callable[[UploadEvent], None]]
-        ] = []
+        self._queue_upload_callbacks: list[tuple[str, Callable[[UploadEvent], None]]] = []
 
         self._mounted_elems: dict[str, Elem] = {}  # elements that client already has
         self._functions: set[str] = set()  # functions that client already has
@@ -81,9 +77,7 @@ class Session:
                 or len(id) != 7
             ):
                 id = random_id()
-                self.send(
-                    Message(event="cookie", name="SLASH_SESSION", value=id, days=1)
-                )
+                self.send(Message(event="cookie", name="SLASH_SESSION", value=id, days=1))
             self._id = id
         return self._id
 
@@ -141,7 +135,11 @@ class Session:
             LOGGER.error(f"Failed to serialize message: {err}")
 
     def log(
-        self, type: Literal["info", "debug", "warning", "error"], message: str
+        self,
+        type: Literal["info", "debug", "warning", "error"],
+        message: str,
+        *,
+        format: Literal["text", "html"] = "text",
     ) -> None:
         """Send logging message to the client.
 
@@ -149,11 +147,9 @@ class Session:
             type: Type of logging message. Can be 'info', 'debug', 'warning' or 'error'.
             message: Contents of the message.
         """
-        self.send(Message.log(type, message))
+        self.send(Message.log(type, message, format))
 
-    def execute(
-        self, jsfunction: JSFunction, args: list[Any], store: str | None = None
-    ) -> None:
+    def execute(self, jsfunction: JSFunction, args: list[Any], store: str | None = None) -> None:
         """Execute a JS function."""
         # Define function if not defined yet
         if jsfunction.id not in self._functions:
@@ -528,16 +524,12 @@ class Elem:
 
     def contains(self, elem: Elem) -> bool:
         """Check if element is contained by this element."""
-        return elem._parent is self or (
-            elem._parent is not None and self.contains(elem._parent)
-        )
+        return elem._parent is self or (elem._parent is not None and self.contains(elem._parent))
 
     @property
     def text(self) -> str:
         """Element text contents."""
-        return "".join(
-            child if isinstance(child, str) else child.text for child in self._children
-        )
+        return "".join(child if isinstance(child, str) else child.text for child in self._children)
 
     @text.setter
     def text(self, value: str) -> None:

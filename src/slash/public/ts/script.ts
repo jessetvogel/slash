@@ -36,7 +36,7 @@ class Client {
             client.send({
                 event: "load",
                 path: window.location.pathname,
-                query: window.location.search,
+                query: Object.fromEntries(new URLSearchParams(window.location.search)),
             });
         };
 
@@ -52,7 +52,7 @@ class Client {
             }
             catch (error) {
                 console.error(`Received invalid message from server\nmessage: ${event.data}`);
-                Slash.message('error', `<span>Received invalid message from server</span><pre><code>${event.data}</code></pre><span>${error}</span>`);
+                Slash.message('error', `<b>Received invalid message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`);
                 return;
             }
 
@@ -60,7 +60,7 @@ class Client {
                 await client.handle(message);
             }
             catch (error) {
-                Slash.message('error', `<span>Failed to handle message from server</span><pre><code>${event.data}</code></pre><span>${error}</span>`);
+                Slash.message('error', `<b>Failed to handle message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`);
                 return;
             }
         };
@@ -69,9 +69,9 @@ class Client {
             console.log('WebSocket error:', error);
         };
 
-        this.socket.onclose = function (event) {
+        this.socket.onclose = function () {
             console.log('Connection closed.');
-            Slash.message('warning', 'Connection lost! Try reloading the page to reconnect to the server.', null);
+            Slash.message('warning', 'Connection lost! Try reloading the page to reconnect to the server.', { permanent: true });
         };
     }
 
@@ -156,8 +156,9 @@ class Client {
         if (event == "log") {
             const type = message.type;
             const text = message.message;
+            const format = message.format || "text";
             console.log(`[${type}] %c${text}`, 'color:rgb(216, 198, 162);');
-            Slash.message(type, text);
+            Slash.message(type, text, { format: format });
             return;
         }
 
@@ -325,12 +326,16 @@ class Slash {
         return Slash.values[name];
     }
 
-    static message(type: string, message: string, timeout: number | null = 10000): void {
-        const div = create("div", { class: "message " + type }, [
-            create("span", { class: "icon" }),
-            message
-        ]);
-        if (timeout !== null) {
+    static message(type: string, message: string, options: { timeout?: number, format?: string, permanent?: boolean } = {}): void {
+        const div = create("div", { class: "message " + type }, create("span", { class: "icon" }));
+
+        if (options.format == "html")
+            div.insertAdjacentHTML('beforeend', message);
+        else
+            div.append(message);
+
+        if (options.permanent !== true) {
+            const timeout = options.timeout || 10_000; // 10 sec
             setTimeout(() => div.classList.add("remove"), timeout);
             setTimeout(() => div.remove(), timeout + 500);
         }
@@ -344,7 +349,7 @@ let client: Client;
 function init() {
     (window as any).Slash = Slash;
 
-    Slash.message("warning", "", -499); // preload the warning icon
+    Slash.message("warning", "", { timeout: -499 }); // preload the warning icon
 
     client = new Client();
     client.connect();

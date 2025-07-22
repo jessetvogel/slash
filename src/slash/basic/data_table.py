@@ -15,9 +15,7 @@ class DataTable(Elem):
 
         self._table = Elem("table").style({"width": "100%"})
         self._controls = Div(
-            first := Button()
-            .add_class("first")
-            .onclick(lambda: self._goto_page("first")),
+            first := Button().add_class("first").onclick(lambda: self._goto_page("first")),
             prev := Button().add_class("prev").onclick(lambda: self._goto_page("prev")),
             span := Span(),
             next := Button().add_class("next").onclick(lambda: self._goto_page("next")),
@@ -72,11 +70,7 @@ class DataTable(Elem):
                 self._update_data()
 
     def _set_sort_key(self, key: str | None) -> None:
-        if (
-            not hasattr(self, "_sort_key")
-            or self._sort_key is None
-            or self._sort_key != key
-        ):
+        if not hasattr(self, "_sort_key") or self._sort_key is None or self._sort_key != key:
             self._sort_key = key
             self._sort_asc = True
             self._update_sort_indices()
@@ -95,9 +89,7 @@ class DataTable(Elem):
             self._sort_indices = None
         else:
             sort_key = self._sort_key
-            self._sort_indices = sorted(
-                range(len(self._data)), key=lambda i: self._data[i].get(sort_key, None)
-            )
+            self._sort_indices = sorted(range(len(self._data)), key=lambda i: self._data[i].get(sort_key, None))
 
     def _update_sort(self) -> None:
         """Update sort labels in table header."""
@@ -140,19 +132,11 @@ class DataTable(Elem):
             tr.style({"display": None})
             index = self._index + i
             if self._sort_indices is not None:
-                index = (
-                    self._sort_indices[index]
-                    if self._sort_asc
-                    else self._sort_indices[len(self._data) - 1 - index]
-                )
+                index = self._sort_indices[index] if self._sort_asc else self._sort_indices[len(self._data) - 1 - index]
             datum = self._data[index]
             for key, td in zip(self._keys, tr.children):
                 assert isinstance(td, Td)
-                cell = (
-                    str(datum[key])
-                    if key in datum
-                    else Span("empty").style({"opacity": "0.5"})
-                )
+                cell = str(datum[key]) if key in datum else Span("empty").style({"opacity": "0.5"})
                 td.clear()
                 td.append(cell)
 
@@ -163,9 +147,7 @@ class DataTable(Elem):
         # Table header
         self._table_header = Tr(
             [
-                Th(Label().add_class("sort"), key).onclick(
-                    lambda event: self._set_sort_key(event.target.children[1])
-                )
+                Th(Label().add_class("sort"), key).onclick(lambda event: self._set_sort_key(event.target.children[1]))
                 for key in self._keys
             ]
         )

@@ -184,32 +184,14 @@ r.setAttribute("width", w + 16);
 
     def _update_view(self) -> None:
         self._view.v_max = 40 if self.title is not None else 16
-        self._view.v_min = (
-            self._height - 48 if self.xlabel is not None else self._height - 24
-        )
+        self._view.v_min = self._height - 48 if self.xlabel is not None else self._height - 24
         self._view.u_min = 48 if self.ylabel is not None else 24
         self._view.u_max = self._width - 16
 
-        self._view.x_min = (
-            self.xlim[0]
-            if self.xlim[0] is not None
-            else min(x for p in self._plots for x in p.xs)
-        )
-        self._view.x_max = (
-            self.xlim[1]
-            if self.xlim[1] is not None
-            else max(x for p in self._plots for x in p.xs)
-        )
-        self._view.y_min = (
-            self.ylim[0]
-            if self.ylim[0] is not None
-            else min(y for p in self._plots for y in p.ys)
-        )
-        self._view.y_max = (
-            self.ylim[1]
-            if self.ylim[1] is not None
-            else max(y for p in self._plots for y in p.ys)
-        )
+        self._view.x_min = self.xlim[0] if self.xlim[0] is not None else min(x for p in self._plots for x in p.xs)
+        self._view.x_max = self.xlim[1] if self.xlim[1] is not None else max(x for p in self._plots for x in p.xs)
+        self._view.y_min = self.ylim[0] if self.ylim[0] is not None else min(y for p in self._plots for y in p.ys)
+        self._view.y_max = self.ylim[1] if self.ylim[1] is not None else max(y for p in self._plots for y in p.ys)
 
     def _update_defs(self) -> None:
         if not hasattr(self, "_svg_defs"):
@@ -254,9 +236,7 @@ r.setAttribute("width", w + 16);
     def _update_legend(self) -> None:
         if not hasattr(self, "_svg_legend"):
             self._svg_legend = (
-                SVGElem("g")
-                .set_attr("font-size", "14px")
-                .style({"transform": f"translateX({self._width}px)"})
+                SVGElem("g").set_attr("font-size", "14px").style({"transform": f"translateX({self._width}px)"})
             )
             self.append(self._svg_legend)
 
@@ -286,11 +266,7 @@ r.setAttribute("width", w + 16);
 
         for plot in self._plots:
             if plot.label is not None:
-                self._svg_legend.append(
-                    SVGElem(
-                        "circle", cx=x_left + 12, cy=y_current, r=4, fill=plot.color
-                    )
-                )
+                self._svg_legend.append(SVGElem("circle", cx=x_left + 12, cy=y_current, r=4, fill=plot.color))
                 self._svg_legend.append(
                     SVGElem(
                         "text",
@@ -317,12 +293,12 @@ r.setAttribute("width", w + 16);
 
     def _xy_to_uv(self, x: float, y: float) -> tuple[float, float]:
         """Convert abstract xy-coordinates to SVG uv-coordinates."""
-        u = self._view.u_min + (self._view.u_max - self._view.u_min) * (
-            x - self._view.x_min
-        ) / (self._view.x_max - self._view.x_min)
-        v = self._view.v_min + (self._view.v_max - self._view.v_min) * (
-            y - self._view.y_min
-        ) / (self._view.y_max - self._view.y_min)
+        u = self._view.u_min + (self._view.u_max - self._view.u_min) * (x - self._view.x_min) / (
+            self._view.x_max - self._view.x_min
+        )
+        v = self._view.v_min + (self._view.v_max - self._view.v_min) * (y - self._view.y_min) / (
+            self._view.y_max - self._view.y_min
+        )
         return u, v
 
     def _update_ticks(self) -> None:
@@ -374,9 +350,7 @@ r.setAttribute("width", w + 16);
 
     def _update_grid(self) -> None:
         if not hasattr(self, "_svg_grid"):
-            self._svg_grid = SVGElem(
-                "g", **{"stroke": "var(--fg)", "stroke-width": "1", "opacity": 0.2}
-            )
+            self._svg_grid = SVGElem("g", **{"stroke": "var(--fg)", "stroke-width": "1", "opacity": 0.2})
             self.append(self._svg_grid)
 
         self._svg_grid.clear()
@@ -385,14 +359,10 @@ r.setAttribute("width", w + 16);
 
         for x, _ in self.xticks():
             u, _ = self._xy_to_uv(x, 0)
-            self._svg_grid.append(
-                SVGElem("line", x1=u, y1=self._view.v_min, x2=u, y2=self._view.v_max)
-            )
+            self._svg_grid.append(SVGElem("line", x1=u, y1=self._view.v_min, x2=u, y2=self._view.v_max))
         for y, _ in self.yticks():
             _, v = self._xy_to_uv(0, y)
-            self._svg_grid.append(
-                SVGElem("line", x1=self._view.u_min, y1=v, x2=self._view.u_max, y2=v)
-            )
+            self._svg_grid.append(SVGElem("line", x1=self._view.u_min, y1=v, x2=self._view.u_max, y2=v))
 
     def _update_labels(self) -> None:
         if not hasattr(self, "_svg_labels"):
@@ -459,11 +429,7 @@ r.setAttribute("width", w + 16);
         return [(x, f"{x:.1f}") for x in ticks]
 
     def set_xticks(self, xticks: Sequence[float | tuple[float, str]] | None) -> Self:
-        self._xticks = (
-            [(x, f"{x:.1f}") if isinstance(x, float) else x for x in xticks]
-            if xticks is not None
-            else None
-        )
+        self._xticks = [(x, f"{x:.1f}") if isinstance(x, float) else x for x in xticks] if xticks is not None else None
         return self
 
     def yticks(self) -> Sequence[tuple[float, str]]:
@@ -478,11 +444,7 @@ r.setAttribute("width", w + 16);
         return [(y, f"{y:.1f}") for y in ticks]
 
     def set_yticks(self, yticks: Sequence[float | tuple[float, str]] | None) -> Self:
-        self._yticks = (
-            [(y, f"{y:.1f}") if isinstance(y, float) else y for y in yticks]
-            if yticks is not None
-            else None
-        )
+        self._yticks = [(y, f"{y:.1f}") if isinstance(y, float) else y for y in yticks] if yticks is not None else None
         return self
 
     def _next_color(self) -> str:
@@ -509,17 +471,13 @@ class Plot:
     label: str | None = None
 
     @abstractmethod
-    def plot(
-        self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]
-    ) -> None:
+    def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]) -> None:
         pass
 
 
 @dataclass
 class Graph(Plot):
-    def plot(
-        self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]
-    ):
+    def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]):
         points = []
         for x, y in zip(self.xs, self.ys):
             u, v = xy_to_uv(x, y)
@@ -535,9 +493,7 @@ class Graph(Plot):
 
 @dataclass
 class Scatter(Plot):
-    def plot(
-        self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]
-    ):
+    def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]):
         circles = SVGElem("g", **{"fill": self.color})
         for x, y in zip(self.xs, self.ys):
             u, v = xy_to_uv(x, y)
@@ -549,14 +505,10 @@ class Scatter(Plot):
 class Bar(Plot):
     width: float | None = None
 
-    def plot(
-        self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]
-    ):
+    def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]):
         bars = SVGElem("g", **{"fill": self.color})
 
-        width = self.width or 0.5 * max(
-            abs(x2 - x1) for x1, x2 in zip(self.xs, self.xs[1:])
-        )
+        width = self.width or 0.5 * max(abs(x2 - x1) for x1, x2 in zip(self.xs, self.xs[1:]))
 
         for x, y in zip(self.xs, self.ys):
             u1, v1 = xy_to_uv(x - width / 2, 0)

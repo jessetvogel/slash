@@ -7,13 +7,8 @@ def test_input() -> Elem:
     return Div(
         H2("Input"),
         Panel(
-            P(
-                "The text written in the left input element should "
-                "appear backwards in the right input element."
-            ),
-            Input(placeholder="Write here!").oninput(
-                lambda event: out.set_value("".join(reversed(event.value)))
-            ),
+            P("The text written in the left input element should appear backwards in the right input element."),
+            Input(placeholder="Write here!").oninput(lambda event: out.set_value("".join(reversed(event.value)))),
             out := Input(),
         ).style({"margin": "8px 0px"}),
         Panel(

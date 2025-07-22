@@ -8,9 +8,12 @@ import traceback
 from collections.abc import Callable
 from pathlib import Path
 
+import markdown
+
 from slash._config import Config
 from slash._logging import LOGGER
 from slash._message import Message
+from slash._pages import page_404
 from slash._server import Client, Server
 from slash._utils import random_id
 from slash.core import Elem, Session
@@ -22,35 +25,54 @@ from slash.events import (
     SupportsOnClick,
     SupportsOnInput,
 )
-from slash.html import H1, Div
 
 
-class App:
-    """Main class for a Slash web application."""
+class BadRequestException(Exception):
+    pass
 
+
+class Router:
     def __init__(self) -> None:
-        self._server = Server("127.0.0.1", 8080)
-        self._endpoints: dict[str | re.Pattern, Callable[..., Elem]] = {}
-        self._sessions: dict[str, Session] = {}
-        self._stylesheets: list[str] = []
-        self._config = Config()
+        self._routes: dict[str | re.Pattern, Callable[..., Elem]] = {}
 
-    @property
-    def config(self) -> Config:
-        """Configuration object of application."""
-        return self._config
-
-    def add_endpoint(self, pattern: str, root: Callable[..., Elem]) -> None:
-        """Add endpoint.
+    def add_route(self, pattern: str, root: Callable[..., Elem]) -> None:
+        """Add route.
 
         Args:
-            endpoint: URL of endpoint. Either string or regex pattern.
+            pattern: Pattern to match the path of the URL.
+                Can be either string or regex pattern.
             root: Function that returns a root element of the page.
                 If pattern is a `re.Pattern`, the matched groups will
                 be provided to the function as arguments.
         """
         is_regex = any(c in pattern for c in ".^$*+?{}[]\\|()")
-        self._endpoints[re.compile(f"^{pattern}$") if is_regex else pattern] = root
+        self._routes[re.compile(f"^{pattern}$") if is_regex else pattern] = root
+
+    def _create_root(self, client: Client) -> Elem:
+        """Create a root element from the current client state."""
+        for pattern, root in self._routes.items():
+            if isinstance(pattern, str) and pattern == client.path:
+                return root()
+            if isinstance(pattern, re.Pattern):
+                if (m := pattern.match(client.path)) is not None:
+                    return root(*m.groups())
+        return page_404()
+
+
+class App(Router):
+    """Main class for a Slash web application."""
+
+    def __init__(self) -> None:
+        Router.__init__(self)
+        self._config = Config()
+        self._server = Server(self.config.host, self.config.port)
+        self._sessions: dict[str, Session] = {}
+        self._stylesheets: list[str] = []
+
+    @property
+    def config(self) -> Config:
+        """Configuration object of application."""
+        return self._config
 
     def add_stylesheet(self, path: Path) -> None:
         """Add stylesheet.
@@ -64,25 +86,12 @@ class App:
 
     def run(self) -> None:
         """Start application."""
+        self._server.host = self.config.host
+        self._server.port = self.config.port
         self._server.on_ws_connect(self._handle_ws_connect)
         self._server.on_ws_message(self._handle_ws_message)
         self._server.on_ws_disconnect(self._handle_ws_disconnect)
         self._server.serve()
-
-    def _create_root(self, path: str) -> Elem:
-        for pattern, root in self._endpoints.items():
-            if isinstance(pattern, str) and pattern == path:
-                return root()
-            if isinstance(pattern, re.Pattern):
-                if (m := pattern.match(path)) is not None:
-                    return root(*m.groups())
-
-        return self._404()
-
-    def _404(self) -> Elem:
-        return Div(
-            H1("Page not found!"), Div("Oops, this page does not exist..")
-        ).style({"margin": "auto", "max-width": "512px", "text-align": "center"})
 
     async def _handle_ws_connect(self, client: Client) -> None:
         # Create new session
@@ -90,7 +99,7 @@ class App:
 
         with session:
             try:
-                # Add stylesheets
+                # Send stylesheets
                 for url in self._stylesheets:
                     session.send(
                         Message.create(
@@ -106,10 +115,7 @@ class App:
                 exc_type, exc_value, exc_tb = sys.exc_info()
                 tb = traceback.extract_tb(exc_tb)
                 frame = tb[-1]
-                msg = (
-                    "Server error: " + str(err) + "\n"
-                    f"(at line {frame.lineno} of {frame.filename})"
-                )
+                msg = "Server error: " + str(err) + f"\n(at line {frame.lineno} of {frame.filename})"
                 LOGGER.error(msg)
                 session.log("error", msg)
             await session.flush()
@@ -127,36 +133,49 @@ class App:
 
                 # load
                 if message.event == "load":
-                    client.path = message.data["path"]
-                    client.query = message.data["query"]
-                    session.set_root(self._create_root(client.path))
+                    path, query = message.data["path"], message.data["query"]
+                    if not isinstance(path, str):
+                        msg = f"Error in `load` event: expected `path` of type string, but got `{type(path).__name__}`."
+                        raise BadRequestException(msg)
+                    if not isinstance(query, dict):
+                        msg = f"Error in `load` event: expected `query` of type dict, but got `{type(query).__name__}`."
+                        raise BadRequestException(msg)
+                    client.path, client.query = path, query
+                    session.set_root(self._create_root(client))
 
                 # click
                 if message.event == "click":
                     id = message.data["id"]
                     elem = session.get_elem(id)
                     if not isinstance(elem, SupportsOnClick):
-                        session.log("error", f"element '{id}' does not support click")
-                    else:
-                        elem.click(ClickEvent(elem))
+                        msg = f"Error in `click` event: element '{id}' does not support click."
+                        raise BadRequestException(msg)
+                    elem.click(ClickEvent(elem))
 
                 # input
                 elif message.event == "input":
                     id = message.data["id"]
                     elem = session.get_elem(id)
                     if not isinstance(elem, SupportsOnInput):
-                        session.log("error", f"element '{id}' does not support input")
-                    else:
-                        elem.input(InputEvent(elem, message.data["value"]))
+                        msg = f"Error in `input` event: element '{id}' does not support input."
+                        raise BadRequestException(msg)
+                    elem.input(InputEvent(elem, message.data["value"]))
 
                 # change
                 elif message.event == "change":
                     id = message.data["id"]
                     elem = session.get_elem(id)
                     if not isinstance(elem, SupportsOnChange):
-                        session.log("error", f"element '{id}' does not support change")
-                    else:
-                        elem.change(ChangeEvent(elem, message.data["value"]))
+                        msg = f"Error in `change` event: element '{id}' does not support change."
+                        raise BadRequestException(msg)
+                    elem.change(ChangeEvent(elem, message.data["value"]))
+
+            except BadRequestException as err:
+                session.log(
+                    "error",
+                    f"<b>Bad request</b>{markdown.markdown(str(err))}",
+                    format="html",
+                )
 
             except Exception:
                 session.send(self._message_server_error(traceback.format_exc()))
@@ -169,5 +188,6 @@ class App:
     def _message_server_error(self, error: str) -> Message:
         return Message.log(
             "error",
-            f"<span>Unexpected server error.</span><pre><code>{error}</code></pre>",
+            f"<b>Unexpected server error.</b><pre><code>{error}</code></pre>",
+            format="html",
         )

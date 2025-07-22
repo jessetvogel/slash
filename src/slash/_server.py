@@ -87,13 +87,27 @@ class Server:
         self._port = port
 
         self._callback_ws_connect: Callable[[Client], Awaitable[None]] | None = None
-        self._callback_ws_message: Callable[[Client, str], Awaitable[None]] | None = (
-            None
-        )
+        self._callback_ws_message: Callable[[Client, str], Awaitable[None]] | None = None
         self._callback_ws_disconnect: Callable[[Client], Awaitable[None]] | None = None
 
         self._files: dict[str, Path] = {}
         self._upload_callbacks: dict[str, Callable[[UploadEvent], None]] = {}
+
+    @property
+    def host(self) -> str:
+        return self._host
+
+    @host.setter
+    def host(self, host: str) -> None:
+        self._host = host
+
+    @property
+    def port(self) -> int:
+        return self._port
+
+    @port.setter
+    def port(self, port: int) -> None:
+        self._port = port
 
     def on_ws_connect(self, callback: Callable[[Client], Awaitable[None]]) -> None:
         self._callback_ws_connect = callback
@@ -105,9 +119,7 @@ class Server:
         self._callback_ws_disconnect = callback
 
     def serve(self) -> None:
-        LOGGER.info(
-            f"Serving on http://{self._host}:{self._port} .. (Press Ctrl+C to quit)"
-        )
+        LOGGER.info(f"Serving on http://{self._host}:{self._port} .. (Press Ctrl+C to quit)")
 
         # Create web.Application
         self.app = web.Application()
@@ -205,9 +217,7 @@ class Server:
 
             # Expect 'Content-Type: multipart/form-data'
             if not request.content_type.startswith("multipart/form-data"):
-                self._response_400_bad_request(
-                    "expected content type multipart/form-data"
-                )
+                self._response_400_bad_request("expected content type multipart/form-data")
 
             # Create temporary directory if non-existent
             PATH_TMP.mkdir(exist_ok=True)
@@ -286,7 +296,5 @@ class Server:
     def add_file(self, url: str, path: Path) -> None:
         self._files[url] = path
 
-    def add_upload_callback(
-        self, url: str, callback: Callable[[UploadEvent], None]
-    ) -> None:
+    def add_upload_callback(self, url: str, callback: Callable[[UploadEvent], None]) -> None:
         self._upload_callbacks[url] = callback

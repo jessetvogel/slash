@@ -24,8 +24,6 @@ def onupload(event: UploadEvent, img: Img):
 def test_upload() -> Elem:
     return Div(
         H2("Upload"),
-        Upload(text="Drop an image here!", multiple=False).onupload(
-            lambda event: onupload(event, img)
-        ),
+        Upload(text="Drop an image here!", multiple=False).onupload(lambda event: onupload(event, img)),
         img := Img("").style({"max-width": "100%"}),
     )
