@@ -192,6 +192,7 @@ class App(Router):
         elem.input(InputEvent(elem, message.data["value"]))
 
     def _handle_change_message(self, message: Message) -> None:
+        """Handle change event."""
         id = message.data["id"]
         elem = Session.require().get_elem(id)
         if not isinstance(elem, SupportsOnChange):
