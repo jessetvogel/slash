@@ -7,12 +7,12 @@ from slash.layout import Column, Row
 
 
 def storage_path() -> Path:
-    return Path("./__slash_storage__") / (Session.require().id + ".txt")
+    return Path("./tmp/__slash_storage__") / (Session.require().id + ".txt")
 
 
 def set_data(key: str, value: str) -> None:
     path = storage_path()
-    path.parent.mkdir(exist_ok=True)
+    path.parent.mkdir(exist_ok=True, parents=True)
     if not path.exists():
         data = {}
     else:
@@ -28,7 +28,7 @@ def set_data(key: str, value: str) -> None:
 
 def get_data(key: str) -> str | None:
     path = storage_path()
-    path.parent.mkdir(exist_ok=True)
+    path.parent.mkdir(exist_ok=True, parents=True)
     if not path.exists():
         return None
     with path.open("r") as file:
