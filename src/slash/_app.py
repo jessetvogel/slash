@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-import sys
 import traceback
 from collections.abc import Callable
 from pathlib import Path
@@ -27,7 +26,7 @@ from slash.events import (
 )
 
 
-class BadRequestException(Exception):
+class BadMessageException(Exception):
     pass
 
 
@@ -93,101 +92,109 @@ class App(Router):
         self._server.on_ws_disconnect(self._handle_ws_disconnect)
         self._server.serve()
 
+    def _send_stylesheets(self) -> None:
+        """Send all stylesheets to the current client."""
+        session = Session.require()
+        for url in self._stylesheets:
+            session.send(
+                Message.create(
+                    tag="link",
+                    id=random_id(),
+                    parent="head",
+                    rel="stylesheet",
+                    type="text/css",
+                    href=url,
+                )
+            )
+
     async def _handle_ws_connect(self, client: Client) -> None:
-        # Create new session
-        self._sessions[client.id] = (session := Session(self._server, client))
+        # Create and store new session instance for client
+        session = Session(self._server, client)
+        self._sessions[client.id] = session
 
         with session:
-            try:
-                # Send stylesheets
-                for url in self._stylesheets:
-                    session.send(
-                        Message.create(
-                            tag="link",
-                            id=random_id(),
-                            parent="head",
-                            rel="stylesheet",
-                            type="text/css",
-                            href=url,
-                        )
-                    )
-            except Exception as err:
-                exc_type, exc_value, exc_tb = sys.exc_info()
-                tb = traceback.extract_tb(exc_tb)
-                frame = tb[-1]
-                msg = "Server error: " + str(err) + f"\n(at line {frame.lineno} of {frame.filename})"
-                LOGGER.error(msg)
-                session.log("error", msg)
+            # Send stylesheets
+            self._send_stylesheets()
             await session.flush()
 
     async def _handle_ws_message(self, client: Client, data: str) -> None:
+        # Get session corresponding to client id
         if client.id not in self._sessions:
             LOGGER.error(f"Unknown client id {client.id}")
             return
 
-        session = self._sessions[client.id]
-
-        with session:
+        with (session := self._sessions[client.id]):
             try:
+                # Parse message
                 message = Message.from_json(data)
-
-                # load
+                # `load` event
                 if message.event == "load":
-                    path, query = message.data["path"], message.data["query"]
-                    if not isinstance(path, str):
-                        msg = f"Error in `load` event: expected `path` of type string, but got `{type(path).__name__}`."
-                        raise BadRequestException(msg)
-                    if not isinstance(query, dict):
-                        msg = f"Error in `load` event: expected `query` of type dict, but got `{type(query).__name__}`."
-                        raise BadRequestException(msg)
-                    client.path, client.query = path, query
-                    session.set_root(self._create_root(client))
-
-                # click
-                if message.event == "click":
-                    id = message.data["id"]
-                    elem = session.get_elem(id)
-                    if not isinstance(elem, SupportsOnClick):
-                        msg = f"Error in `click` event: element '{id}' does not support click."
-                        raise BadRequestException(msg)
-                    elem.click(ClickEvent(elem))
-
-                # input
+                    self._handle_load_message(client, message)
+                # `click` event
+                elif message.event == "click":
+                    self._handle_click_message(message)
+                # `input` event
                 elif message.event == "input":
-                    id = message.data["id"]
-                    elem = session.get_elem(id)
-                    if not isinstance(elem, SupportsOnInput):
-                        msg = f"Error in `input` event: element '{id}' does not support input."
-                        raise BadRequestException(msg)
-                    elem.input(InputEvent(elem, message.data["value"]))
-
-                # change
+                    self._handle_input_message(message)
+                # `change` event
                 elif message.event == "change":
-                    id = message.data["id"]
-                    elem = session.get_elem(id)
-                    if not isinstance(elem, SupportsOnChange):
-                        msg = f"Error in `change` event: element '{id}' does not support change."
-                        raise BadRequestException(msg)
-                    elem.change(ChangeEvent(elem, message.data["value"]))
-
-            except BadRequestException as err:
+                    self._handle_change_message(message)
+            except BadMessageException as err:
                 session.log(
                     "error",
                     f"<b>Bad request</b>{markdown.markdown(str(err))}",
                     format="html",
                 )
-
             except Exception:
-                session.send(self._message_server_error(traceback.format_exc()))
+                session.send(self._create_message_server_error(traceback.format_exc()))
 
             await session.flush()
 
     async def _handle_ws_disconnect(self, client: Client) -> None:
+        # Forget session corresponding to client
         self._sessions.pop(client.id)
 
-    def _message_server_error(self, error: str) -> Message:
+    def _create_message_server_error(self, error: str) -> Message:
         return Message.log(
             "error",
-            f"<b>Unexpected server error.</b><pre><code>{error}</code></pre>",
+            f"<b>Unexpected server error</b><pre><code>{error}</code></pre>",
             format="html",
         )
+
+    def _handle_load_message(self, client: Client, message: Message) -> None:
+        """Handle load event."""
+        path, query = message.data["path"], message.data["query"]
+        if not isinstance(path, str):
+            msg = f"Error in `load` event: expected `path` of type string, but got `{type(path).__name__}`."
+            raise BadMessageException(msg)
+        if not isinstance(query, dict):
+            msg = f"Error in `load` event: expected `query` of type dict, but got `{type(query).__name__}`."
+            raise BadMessageException(msg)
+        client.path, client.query = path, query
+        Session.require().set_root(self._create_root(client))
+
+    def _handle_click_message(self, message: Message) -> None:
+        """Handle click event."""
+        id = message.data["id"]
+        elem = Session.require().get_elem(id)
+        if not isinstance(elem, SupportsOnClick):
+            msg = f"Error in `click` event: element '{id}' does not support click."
+            raise BadMessageException(msg)
+        elem.click(ClickEvent(elem))
+
+    def _handle_input_message(self, message: Message) -> None:
+        """Handle input event."""
+        id = message.data["id"]
+        elem = Session.require().get_elem(id)
+        if not isinstance(elem, SupportsOnInput):
+            msg = f"Error in `input` event: element '{id}' does not support input."
+            raise BadMessageException(msg)
+        elem.input(InputEvent(elem, message.data["value"]))
+
+    def _handle_change_message(self, message: Message) -> None:
+        id = message.data["id"]
+        elem = Session.require().get_elem(id)
+        if not isinstance(elem, SupportsOnChange):
+            msg = f"Error in `change` event: element '{id}' does not support change."
+            raise BadMessageException(msg)
+        elem.change(ChangeEvent(elem, message.data["value"]))
