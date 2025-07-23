@@ -1,4 +1,4 @@
-<img src="img/banner.png" style="height: 128px;"/>
+<img src="img/banner.png" style="height: 80px;"/>
 
 Slash is a Python framework for creating web apps.
 
