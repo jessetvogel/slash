@@ -15,7 +15,7 @@ from slash._message import Message
 from slash._pages import page_404
 from slash._server import Client, Server
 from slash._utils import random_id
-from slash.core import Elem, Session
+from slash.core import Elem, PopStateEvent, Session
 from slash.events import (
     ChangeEvent,
     ClickEvent,
@@ -139,6 +139,9 @@ class App(Router):
                 # `change` event
                 elif message.event == "change":
                     self._handle_change_message(message)
+                # `popstate` event
+                elif message.event == "popstate":
+                    self._handle_popstate_message(message)
             except BadMessageException as err:
                 session.log(
                     "error",
@@ -199,3 +202,8 @@ class App(Router):
             msg = f"Error in `change` event: element '{id}' does not support change."
             raise BadMessageException(msg)
         elem.change(ChangeEvent(elem, message.data["value"]))
+
+    def _handle_popstate_message(self, message: Message) -> None:
+        """Handle popstate event."""
+        state = message.data["state"]
+        Session.require().history.popstate(PopStateEvent(state=state))

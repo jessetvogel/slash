@@ -1,10 +1,10 @@
 from slash.core import Elem
-from slash.html import H2, Details, Div, P, Summary
+from slash.html import Code, Details, Div, P, Summary
 
 
 def test_details() -> Elem:
     return Div(
-        H2("Details"),
+        P("This page tests the ", Code("Details"), " and ", Code("Summary"), " elements."),
         Details(
             Summary("Click to expand!"),
             P(

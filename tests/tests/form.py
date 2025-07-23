@@ -1,13 +1,13 @@
 from slash.basic.checkbox import Checkbox
 from slash.basic.radio import Radio
 from slash.core import Elem
-from slash.html import H2
+from slash.html import Code, P
 from slash.layout import Column, Row
 
 
 def test_form() -> Elem:
     return Column(
-        H2("Checkbox"),
+        P("This page tests the ", Code("Checkbox"), " and ", Code("Radio"), " elements."),
         Row(
             Column(
                 Checkbox("Monday"),

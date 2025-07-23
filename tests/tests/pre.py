@@ -1,10 +1,9 @@
 from slash.core import Elem
-from slash.html import H2, Div
+from slash.html import Div
 
 
 def test_pre() -> Elem:
     return Div(
-        H2("Pre"),
         Elem(
             "pre",
             Elem(

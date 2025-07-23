@@ -22,6 +22,13 @@ class P(Elem, SupportsOnClick):
         super().__init__("p", *children)
 
 
+class Code(Elem, SupportsOnClick):
+    """HTML <code> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("code", *children)
+
+
 class Br(Elem):
     """HTML <br> element."""
 
@@ -34,6 +41,27 @@ class Span(Elem, SupportsOnClick):
 
     def __init__(self, *children: Children) -> None:
         super().__init__("span", *children)
+
+
+class Ul(Elem, SupportsOnClick):
+    """HTML <ul> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("ul", *children)
+
+
+class Ol(Elem, SupportsOnClick):
+    """HTML <ul> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("ul", *children)
+
+
+class Li(Elem, SupportsOnClick):
+    """HTML <li> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("li", *children)
 
 
 class Details(Elem, SupportsOnClick):

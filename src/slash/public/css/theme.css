@@ -18,7 +18,7 @@ body {
     --aubergine: #a23f61;
 
     --primary-color: var(--blue);
-    --secondary-color: var(--orange);
+    --secondary-color: var(--yellow);
 
     --bg-dark: #f1efec;
     --bg: #f8f7f6;
@@ -200,6 +200,10 @@ select {
     box-shadow: var(--shadow);
 }
 
+textarea {
+    margin: 0px;
+}
+
 input[type="range"] {
     accent-color: var(--primary-color);
 }
@@ -262,4 +266,13 @@ a {
 
 details summary {
     cursor: pointer;
+}
+
+ul {
+    list-style-type: square;
+    padding-left: 24px;
+}
+
+li {
+    margin: 4px 0px;
 }

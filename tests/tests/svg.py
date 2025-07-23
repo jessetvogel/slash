@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from slash.basic.svg import SVG, SVGElem
 from slash.core import Elem
-from slash.html import H2, Div
+from slash.html import Div
 from slash.layout import Panel
 
 
 def test_svg() -> Elem:
     return Div(
-        H2("SVG"),
         Panel(
             SVG(
                 SVGElem(

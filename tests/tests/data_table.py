@@ -4,7 +4,7 @@ import random
 
 from slash.basic.data_table import DataTable
 from slash.core import Elem
-from slash.html import H2
+from slash.html import Code, P
 from slash.layout import Column
 
 
@@ -62,4 +62,4 @@ def test_data() -> Elem:
         for n in range(95)
     ]
 
-    return Column(H2("Data table"), DataTable(keys).set_data(data))
+    return Column(P("This page tests the ", Code("DataTable"), " element."), DataTable(keys).set_data(data))

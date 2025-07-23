@@ -1,14 +1,14 @@
 from slash.core import Elem
-from slash.html import H2, Button, Dialog, Div, Span
+from slash.html import Button, Code, Dialog, Div, P, Span
 from slash.layout import Column
 
 
 def test_dialog() -> Elem:
     return Div(
-        H2("Dialog"),
+        P("This page tests the ", Code("Dialog"), " element."),
         Div(
-            Button("Dialog.show()").onclick(lambda: dialog.show()),
-            Button("Dialog.show_modal()").onclick(lambda: dialog.show_modal()),
+            Button("Dialog.show()").onclick(lambda: dialog.show()).style({"font-family": "monospace"}),
+            Button("Dialog.show_modal()").onclick(lambda: dialog.show_modal()).style({"font-family": "monospace"}),
             dialog := Dialog(
                 Column(
                     Span("This is a dialog element!"),

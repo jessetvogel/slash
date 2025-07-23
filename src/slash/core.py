@@ -6,6 +6,7 @@ import asyncio
 import inspect
 from collections.abc import Awaitable, Callable, Mapping
 from contextvars import ContextVar
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal, Self, TypeAlias, TypeVar
 
@@ -46,6 +47,8 @@ class Session:
         self._mounted_elems: dict[str, Elem] = {}  # elements that client already has
         self._functions: set[str] = set()  # functions that client already has
         self._root: Elem | None = None
+
+        self._history = History()
 
     @staticmethod
     def current() -> Session | None:
@@ -88,6 +91,10 @@ class Session:
     @property
     def query(self) -> Mapping[str, str]:
         return self._client.query
+
+    @property
+    def history(self) -> History:
+        return self._history
 
     def set_root(self, root: Elem) -> None:
         if self._root is not None:
@@ -341,10 +348,10 @@ class Elem:
         """Element parent."""
         return self._parent
 
-    def style(self, style: dict[str, str | None]) -> Self:
+    def style(self, style: Mapping[str, str | None]) -> Self:
         """Update style."""
         self._style.update(style)
-        self._update_attrs({"style": style})
+        self._update_attrs({"style": dict(style)})
         return self
 
     def attrs(self) -> dict[str, Any]:
@@ -571,3 +578,44 @@ class Elem:
 # Types
 
 Children: TypeAlias = Elem | str | list[Elem | str]
+
+
+# History
+
+
+@dataclass
+class PopStateEvent:
+    state: Any
+
+
+class History:
+    def __init__(self) -> None:
+        self._onpopstate_handlers: list[Handler[PopStateEvent]] = []
+
+    def go(self, delta: int) -> None:
+        Session.require().send(Message(event="history", go=delta))
+
+    def forward(self) -> None:
+        self.go(1)
+
+    def back(self) -> None:
+        self.go(-1)
+
+    def push(self, state: Any, url: str | None = None) -> None:
+        """State is anything that is JSON serializable."""
+        Session.require().send(Message(event="history", push=state, url=url))
+
+    def replace(self, state: Any, url: str | None = None) -> None:
+        """State is anything that is JSON serializable."""
+        Session.require().send(Message(event="history", replace=state, url=url))
+
+    def onpopstate(self, handler: Handler[PopStateEvent]) -> Self:
+        """Add event handler for popstate event."""
+        self._onpopstate_handlers.append(handler)
+        return self
+
+    def popstate(self, event: PopStateEvent) -> None:
+        """Trigger popstate event."""
+        session = Session.require()
+        for handler in self._onpopstate_handlers:
+            session.call_handler(handler, event)

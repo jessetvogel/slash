@@ -1,10 +1,9 @@
 from slash.core import Elem
-from slash.html import H2, Div, Select, Span
+from slash.html import Div, Select, Span
 
 
 def test_select() -> Elem:
     return Div(
-        H2("Select"),
         select := Select(
             [
                 "Woodpecker",

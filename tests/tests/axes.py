@@ -8,7 +8,7 @@ import numpy as np
 from slash.basic.axes import Axes, Bar, Graph, Scatter
 from slash.basic.pie import Pie
 from slash.core import Elem
-from slash.html import H2, Button, Div, Input
+from slash.html import Button, Div, Input
 from slash.layout import Panel, Row
 
 CENTERED_PANEL = {
@@ -21,7 +21,6 @@ CENTERED_PANEL = {
 
 def test_axes() -> Elem:
     return Div(
-        H2("Axes"),
         Panel(
             axes := Axes(width=512, height=320)
             .set_title("Some random axes figure")

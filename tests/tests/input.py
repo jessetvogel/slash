@@ -1,11 +1,11 @@
 from slash.core import Elem
-from slash.html import H2, Div, Input, P
+from slash.html import Code, Div, Input, P
 from slash.layout import Panel
 
 
 def test_input() -> Elem:
     return Div(
-        H2("Input"),
+        P("This page tests the ", Code("Input"), " element."),
         Panel(
             P("The text written in the left input element should appear backwards in the right input element."),
             Input(placeholder="Write here!").oninput(lambda event: out.set_value("".join(reversed(event.value)))),

@@ -7,6 +7,8 @@ class Client {
         this.onclick = this.onclick.bind(this);
         this.oninput = this.oninput.bind(this);
         this.onchange = this.onchange.bind(this);
+        this.onpopstate = this.onpopstate.bind(this);
+        window.addEventListener("popstate", this.onpopstate);
     }
     connect() {
         const hostname = window.location.hostname;
@@ -32,14 +34,14 @@ class Client {
             }
             catch (error) {
                 console.error(`Received invalid message from server\nmessage: ${event.data}`);
-                Slash.message('error', `<b>Received invalid message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`);
+                Slash.message('error', `<b>Received invalid message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`, { format: "html" });
                 return;
             }
             try {
                 await client.handle(message);
             }
             catch (error) {
-                Slash.message('error', `<b>Failed to handle message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`);
+                Slash.message('error', `<b>Failed to handle message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`, { format: "html" });
                 return;
             }
         };
@@ -116,7 +118,9 @@ class Client {
             return;
         }
         if (event == "theme") {
-            document.body.className = message.theme;
+            const theme = message.theme;
+            document.body.className = theme;
+            window.localStorage.setItem("SLASH_THEME", theme);
             return;
         }
         if (event == "title") {
@@ -133,6 +137,21 @@ class Client {
             document.cookie = name + "=" + value + ";" + expires + ";path=/";
             ;
             return;
+        }
+        if (event == "history") {
+            if ("go" in message) {
+                window.history.go(message.go);
+                return;
+            }
+            if ("push" in message) {
+                window.history.pushState(message.push, "", message.url);
+                return;
+            }
+            if ("replace" in message) {
+                window.history.replaceState(message.replace, "", message.url);
+                return;
+            }
+            throw new Error("Invalid history event: missing field `go`, `push` or `replace`.");
         }
         throw new Error(`Unknown event '${event}'`);
     }
@@ -240,6 +259,12 @@ class Client {
             });
         }
     }
+    onpopstate(event) {
+        this.send({
+            event: "popstate",
+            state: event.state
+        });
+    }
     send(message) {
         var _a;
         (_a = this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify(message));
@@ -277,6 +302,9 @@ let client;
 function init() {
     window.Slash = Slash;
     Slash.message("warning", "", { timeout: -499 });
+    const theme = window.localStorage.getItem("SLASH_THEME");
+    if (theme !== null)
+        document.body.className = theme;
     client = new Client();
     client.connect();
 }

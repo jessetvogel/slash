@@ -8,7 +8,7 @@ import numpy as np
 
 from slash._server import PATH_PUBLIC
 from slash.core import Elem, Session
-from slash.html import H2, Button, Div, Img
+from slash.html import Button, Code, Div, Img, P
 from slash.layout import Column, Panel, Row
 
 
@@ -42,16 +42,16 @@ def generate_graph(image: Img) -> None:
 
 def test_image() -> Elem:
     return Div(
-        H2("Image"),
+        P("This page tests the ", Code("Img"), " element."),
         Panel(
             Column(
                 image := Img(
                     "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
                     alt="This is the alt text.",
-                ),
+                ).style({"background-color": "var(--black)"}),
                 Row(
-                    Button("Show an icon!").onclick(lambda _: update_image(image)),
-                    Button("Show a graph!").onclick(lambda _: generate_graph(image)),
+                    Button("Show an icon").onclick(lambda _: update_image(image)),
+                    Button("Generate a graph").onclick(lambda _: generate_graph(image)),
                 ),
             ).style({"align-items": "center"})
         ),
