@@ -13,12 +13,12 @@ from tests.dialog import test_dialog
 from tests.dom import test_dom
 from tests.download import test_download
 from tests.form import test_form
+from tests.html import test_html
 from tests.image import test_image
 from tests.input import test_input
 from tests.js import test_js
 from tests.log import test_log
 from tests.markdown import test_markdown
-from tests.pre import test_pre
 from tests.progress import test_progress
 from tests.select import test_select
 from tests.session import test_session
@@ -48,7 +48,7 @@ TESTS: dict[str, Callable[[], Elem]] = {
     "js": test_js,
     "progress": test_progress,
     "tabs": test_tabs,
-    "pre": test_pre,
+    "html": test_html,
 }
 
 

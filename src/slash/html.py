@@ -1,6 +1,6 @@
 """Slash HTML elements."""
 
-from typing import Self
+from typing import Literal, Self
 
 from slash._message import Message
 from slash.core import Attr, Children, Elem, Session
@@ -43,6 +43,13 @@ class Span(Elem, SupportsOnClick):
         super().__init__("span", *children)
 
 
+class Pre(Elem, SupportsOnClick):
+    """HTML <pre> element."""
+
+    def __init__(self, *children: Children) -> None:
+        super().__init__("pre", *children)
+
+
 class Ul(Elem, SupportsOnClick):
     """HTML <ul> element."""
 
@@ -51,10 +58,10 @@ class Ul(Elem, SupportsOnClick):
 
 
 class Ol(Elem, SupportsOnClick):
-    """HTML <ul> element."""
+    """HTML <ol> element."""
 
     def __init__(self, *children: Children) -> None:
-        super().__init__("ul", *children)
+        super().__init__("ol", *children)
 
 
 class Li(Elem, SupportsOnClick):
@@ -159,17 +166,24 @@ class A(Elem, SupportsOnClick):
     """HTML <a> element."""
 
     href = Attr("href")
+    target = Attr("target")
 
     def __init__(
         self,
         *children: Children,
         href: str = "#",
+        target: Literal["_blank", "_self", "_parent", "_top"] | str | None = None,
     ) -> None:
         super().__init__("a", *children)
         self.href = href
+        self.target = target
 
     def set_href(self, href: str) -> Self:
         self.href = href
+        return self
+
+    def set_target(self, target: str) -> Self:
+        self.target = target
         return self
 
 
@@ -262,7 +276,7 @@ class Img(Elem):
     src = Attr("src")
     alt = Attr("alt")
 
-    def __init__(self, src: str, *, alt: str = "") -> None:
+    def __init__(self, *, src: str = "", alt: str = "") -> None:
         super().__init__("img")
         self.src = src
         self.alt = alt
