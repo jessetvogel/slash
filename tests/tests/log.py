@@ -11,5 +11,5 @@ def test_log() -> Elem:
             Button("Debug").onclick(lambda: Session.require().log("debug", "Example debug message")),
             Button("Warning").onclick(lambda: Session.require().log("warning", "Example warning message")),
             Button("Error").onclick(lambda: Session.require().log("error", "Example error message")),
-        ),
+        ).style({"gap": "8px"}),
     )

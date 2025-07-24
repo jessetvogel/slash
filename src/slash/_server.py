@@ -50,28 +50,10 @@ class Client:
         self._id = random_id()
         self._send = send
         self._cookies = dict(cookies or {})
-        self.path = ""
-        self.query = {}
 
     @property
     def id(self) -> str:
         return self._id
-
-    @property
-    def path(self) -> str:
-        return self._path
-
-    @path.setter
-    def path(self, path: str) -> None:
-        self._path = path
-
-    @property
-    def query(self) -> Mapping[str, str]:
-        return MappingProxyType(self._query)
-
-    @query.setter
-    def query(self, query: dict[str, str]) -> None:
-        self._query = query
 
     @property
     def cookies(self) -> Mapping[str, str]:

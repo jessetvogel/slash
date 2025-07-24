@@ -39,8 +39,7 @@ class Client {
             console.log('Connection established!');
             client.send({
                 event: "load",
-                path: window.location.pathname,
-                query: Object.fromEntries(new URLSearchParams(window.location.search)),
+                url: window.location.href
             });
         };
 

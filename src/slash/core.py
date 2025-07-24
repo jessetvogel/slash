@@ -8,7 +8,9 @@ from collections.abc import Awaitable, Callable, Mapping
 from contextvars import ContextVar
 from dataclasses import dataclass
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Literal, Self, TypeAlias, TypeVar
+from urllib.parse import parse_qsl, urlparse
 
 from slash._logging import LOGGER
 from slash._message import Message
@@ -48,6 +50,7 @@ class Session:
         self._functions: set[str] = set()  # functions that client already has
         self._root: Elem | None = None
 
+        self._location = Location("")
         self._history = History()
 
     @staticmethod
@@ -85,12 +88,8 @@ class Session:
         return self._id
 
     @property
-    def path(self) -> str:
-        return self._client.path
-
-    @property
-    def query(self) -> Mapping[str, str]:
-        return self._client.query
+    def location(self) -> Location:
+        return self._location
 
     @property
     def history(self) -> History:
@@ -619,3 +618,58 @@ class History:
         session = Session.require()
         for handler in self._onpopstate_handlers:
             session.call_handler(handler, event)
+
+
+# Location
+
+
+class Location:
+    def __init__(self, url: str) -> None:
+        result = urlparse(url, allow_fragments=True)
+
+        self._url = url
+        self._protocol = result.scheme
+        self._host = result.netloc
+        self._path = result.path
+        self._query = dict(parse_qsl(result.query))
+        self._fragment = result.fragment
+
+        if ":" in self._host:
+            hostname, port = self._host.split(":")
+            self._hostname = hostname
+            self._port = int(port)
+        else:
+            self._hostname = self._host
+            self._port = 80
+
+    @property
+    def url(self) -> str:
+        return self._url
+
+    @property
+    def protocol(self) -> str:
+        return self._protocol
+
+    @property
+    def host(self) -> str:
+        return self._host
+
+    @property
+    def hostname(self) -> str:
+        return self._hostname
+
+    @property
+    def port(self) -> int:
+        return self._port
+
+    @property
+    def path(self) -> str:
+        return self._path
+
+    @property
+    def query(self) -> Mapping[str, str]:
+        return MappingProxyType(self._query)
+
+    @property
+    def fragment(self) -> str:
+        return self._fragment

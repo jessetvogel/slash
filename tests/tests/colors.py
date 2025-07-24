@@ -18,7 +18,10 @@ COLORS = [
 
 def test_colors() -> Elem:
     return Column(
-        P("This page tests the colors and themes."),
+        P(
+            "This page tests the colors and themes. ",
+            "The selected theme should be persistent after reloading the page.",
+        ),
         H3("Set theme"),
         Row(
             Button("dark").onclick(lambda: Session.require().set_theme("dark")),

@@ -14,6 +14,6 @@ def test_progress() -> Elem:
                 Button("50%").onclick(lambda: progress.set_value(0.5)),
                 Button("75%").onclick(lambda: progress.set_value(0.75)),
                 Button("100%").onclick(lambda: progress.set_value(1.0)),
-            ).style({"justify-content": "center"}),
-        ),
+            ).style({"justify-content": "center", "gap": "8px"}),
+        ).style({"gap": "8px"}),
     )

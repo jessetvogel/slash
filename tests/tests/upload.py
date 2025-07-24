@@ -3,7 +3,7 @@ from __future__ import annotations
 from slash.basic.upload import Upload
 from slash.core import Elem, Session
 from slash.events import UploadEvent
-from slash.html import Div, Img
+from slash.html import Code, Div, Img, P
 
 
 def onupload(event: UploadEvent, img: Img):
@@ -20,6 +20,12 @@ def onupload(event: UploadEvent, img: Img):
 
 def test_upload() -> Elem:
     return Div(
+        P(
+            "This page tests the ",
+            Code("Upload"),
+            " element. ",
+            "Upload an image using the field below, and it should appear below it.",
+        ),
         Upload(text="Drop an image here!", multiple=False).onupload(lambda event: onupload(event, img)),
-        img := Img("").style({"max-width": "100%"}),
+        img := Img().style({"max-width": "100%"}),
     )

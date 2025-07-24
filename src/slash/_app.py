@@ -15,7 +15,7 @@ from slash._message import Message
 from slash._pages import page_404
 from slash._server import Client, Server
 from slash._utils import random_id
-from slash.core import Elem, PopStateEvent, Session
+from slash.core import Elem, Location, PopStateEvent, Session
 from slash.events import (
     ChangeEvent,
     ClickEvent,
@@ -47,13 +47,14 @@ class Router:
         is_regex = any(c in pattern for c in ".^$*+?{}[]\\|()")
         self._routes[re.compile(f"^{pattern}$") if is_regex else pattern] = root
 
-    def _create_root(self, client: Client) -> Elem:
+    def _create_root(self) -> Elem:
         """Create a root element from the current client state."""
+        session = Session.require()
         for pattern, root in self._routes.items():
-            if isinstance(pattern, str) and pattern == client.path:
+            if isinstance(pattern, str) and pattern == session.location.path:
                 return root()
             if isinstance(pattern, re.Pattern):
-                if (m := pattern.match(client.path)) is not None:
+                if (m := pattern.match(session.location.path)) is not None:
                     return root(*m.groups())
         return page_404()
 
@@ -129,7 +130,7 @@ class App(Router):
                 message = Message.from_json(data)
                 # `load` event
                 if message.event == "load":
-                    self._handle_load_message(client, message)
+                    self._handle_load_message(message)
                 # `click` event
                 elif message.event == "click":
                     self._handle_click_message(message)
@@ -164,17 +165,20 @@ class App(Router):
             format="html",
         )
 
-    def _handle_load_message(self, client: Client, message: Message) -> None:
+    def _handle_load_message(self, message: Message) -> None:
         """Handle load event."""
-        path, query = message.data["path"], message.data["query"]
-        if not isinstance(path, str):
-            msg = f"Error in `load` event: expected `path` of type string, but got `{type(path).__name__}`."
+        session = Session.require()
+        url = message.data["url"]
+        if not isinstance(url, str):
+            msg = f"Error in `load` event: expected `url` of type string, but got `{type(url).__name__}`."
             raise BadMessageException(msg)
-        if not isinstance(query, dict):
-            msg = f"Error in `load` event: expected `query` of type dict, but got `{type(query).__name__}`."
+        try:
+            session._location = Location(url)  # NOTE: not very clean, but effective
+        except Exception:
+            msg = f"Error in `load` event: invalid `url` (`{url}`)."
             raise BadMessageException(msg)
-        client.path, client.query = path, query
-        Session.require().set_root(self._create_root(client))
+
+        Session.require().set_root(self._create_root())
 
     def _handle_click_message(self, message: Message) -> None:
         """Handle click event."""

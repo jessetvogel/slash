@@ -19,7 +19,7 @@ def test_history() -> Elem:
     session = Session.require()
     session.history.onpopstate(lambda event: handle_popstate(event))
 
-    state = {"animal": session.query.get("animal", "none"), "food": session.query.get("food", "none")}
+    state = {"animal": session.location.query.get("animal", "none"), "food": session.location.query.get("food", "none")}
 
     def handle_popstate(event: PopStateEvent) -> None:
         session.log(
@@ -41,7 +41,7 @@ def test_history() -> Elem:
 
     def update_state(key: str, value: str) -> None:
         set_state(key, value)
-        session.history.push(state, session.path + f"?animal={state['animal']}&food={state['food']}")
+        session.history.push(state, session.location.path + f"?animal={state['animal']}&food={state['food']}")
 
     return Column(
         P(
