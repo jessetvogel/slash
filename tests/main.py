@@ -13,6 +13,7 @@ from tests.dialog import test_dialog
 from tests.dom import test_dom
 from tests.download import test_download
 from tests.form import test_form
+from tests.history import test_history
 from tests.html import test_html
 from tests.image import test_image
 from tests.input import test_input
@@ -49,6 +50,7 @@ TESTS: dict[str, Callable[[], Elem]] = {
     "progress": test_progress,
     "tabs": test_tabs,
     "html": test_html,
+    "history": test_history,
 }
 
 

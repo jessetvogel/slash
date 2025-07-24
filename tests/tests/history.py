@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import json
 
-from slash import App
 from slash.core import Elem, PopStateEvent, Session
-from slash.html import H2, Button, Div, Span
+from slash.html import Button, Code, Div, P, Span
 from slash.layout import Column, Panel, Row
 
 
@@ -16,11 +15,11 @@ def forward() -> Button:
     return Button("Forward >").onclick(lambda: Session.require().history.forward())
 
 
-def page(animal: str, food: str) -> Elem:
+def test_history() -> Elem:
     session = Session.require()
     session.history.onpopstate(lambda event: handle_popstate(event))
 
-    state = {"animal": animal, "food": food}
+    state = {"animal": session.query.get("animal", "none"), "food": session.query.get("food", "none")}
 
     def handle_popstate(event: PopStateEvent) -> None:
         session.log(
@@ -42,37 +41,37 @@ def page(animal: str, food: str) -> Elem:
 
     def update_state(key: str, value: str) -> None:
         set_state(key, value)
-        session.history.push(state, f"/page/{state['animal']}/{state['food']}")
+        session.history.push(state, session.path + f"?animal={state['animal']}&food={state['food']}")
 
     return Column(
-        H2("History"),
+        P(
+            "This page tests the ",
+            Code("Session.history"),
+            " object.",
+            "While changing the animal or food, the page should not reload, ",
+            "but the history state (and URL) should be updated. ",
+            "Going forward and backward through history should again not reload the page, "
+            "except when leaving the page. ",
+            "When the ",
+            Code("popstate"),
+            " event is fired, a message should appear with the new state.",
+        ),
         Panel(
-            Div("Favorite animal: ", span_animal := Span(animal)),
-            Div("Favorite food: ", span_food := Span(food)),
+            Div("Favorite animal: ", span_animal := Span(state["animal"])),
+            Div("Favorite food: ", span_food := Span(state["food"])),
         ),
         Span("Navigate through history"),
-        Row(back(), forward()),
+        Row(back(), forward()).style({"gap": "8px"}),
         Span("Choose your new favorite animal"),
         Row(
             Button("Koala 🐨").onclick(lambda: update_state("animal", "koala")),
             Button("Orangutan 🦧").onclick(lambda: update_state("animal", "orangutan")),
             Button("Zebra 🦓").onclick(lambda: update_state("animal", "zebra")),
-        ).style({"align-items": "center"}),
+        ).style({"align-items": "center", "gap": "8px"}),
         Span("Choose your new favorite food"),
         Row(
             Button("Burger 🍔").onclick(lambda: update_state("food", "burger")),
             Button("Sandwich 🥪").onclick(lambda: update_state("food", "sandwich")),
             Button("Fries 🍟").onclick(lambda: update_state("food", "fries")),
-        ).style({"align-items": "center"}),
+        ).style({"align-items": "center", "gap": "8px"}),
     ).style({"padding": "8px", "gap": "8px", "align-items": "baseline"})
-
-
-def main():
-    app = App()
-    app.add_route("/", lambda: page("none", "none"))
-    app.add_route(r"/page/(\w+)/(\w+)", page)
-    app.run()
-
-
-if __name__ == "__main__":
-    main()
