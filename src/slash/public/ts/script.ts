@@ -27,9 +27,10 @@ class Client {
 
     connect() {
         // Connect to server via WebSocket
+        const scheme = window.location.protocol == "https:" ? "wss" : "ws";
         const hostname = window.location.hostname;
         const port = window.location.port;
-        this.socket = new WebSocket(`ws://${hostname}:${port}/ws`);
+        this.socket = new WebSocket(`${scheme}://${hostname}:${port}/ws`);
 
         console.log("Connecting to server ..");
 

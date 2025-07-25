@@ -628,7 +628,7 @@ class Location:
         result = urlparse(url, allow_fragments=True)
 
         self._url = url
-        self._protocol = result.scheme
+        self._scheme = result.scheme
         self._host = result.netloc
         self._path = result.path
         self._query = dict(parse_qsl(result.query))
@@ -647,8 +647,8 @@ class Location:
         return self._url
 
     @property
-    def protocol(self) -> str:
-        return self._protocol
+    def scheme(self) -> str:
+        return self._scheme
 
     @property
     def host(self) -> str:

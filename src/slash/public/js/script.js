@@ -11,9 +11,10 @@ class Client {
         window.addEventListener("popstate", this.onpopstate);
     }
     connect() {
+        const scheme = window.location.protocol == "https:" ? "wss" : "ws";
         const hostname = window.location.hostname;
         const port = window.location.port;
-        this.socket = new WebSocket(`ws://${hostname}:${port}/ws`);
+        this.socket = new WebSocket(`${scheme}://${hostname}:${port}/ws`);
         console.log("Connecting to server ..");
         const client = this;
         this.socket.onopen = function () {

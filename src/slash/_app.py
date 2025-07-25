@@ -6,6 +6,7 @@ import re
 import traceback
 from collections.abc import Callable
 from pathlib import Path
+from ssl import SSLContext
 
 import markdown
 
@@ -83,6 +84,9 @@ class App(Router):
         url = f"/style/{random_id()}.css"
         self._server.add_file(url, path)
         self._stylesheets.append(url)
+
+    def set_ssl_context(self, ssl_context: SSLContext) -> None:
+        self._server.set_ssl_context(ssl_context)
 
     def run(self) -> None:
         """Start application."""

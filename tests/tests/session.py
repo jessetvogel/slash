@@ -13,7 +13,7 @@ def test_session() -> Elem:
             Column(
                 Div(Code("Session.id"), " equals ", Code(session.id)),
                 Div(Code("Session.location.url"), " equals ", Code(session.location.url)),
-                Div(Code("Session.location.protocol"), " equals ", Code(session.location.protocol)),
+                Div(Code("Session.location.protocol"), " equals ", Code(session.location.scheme)),
                 Div(Code("Session.location.host"), " equals ", Code(session.location.host)),
                 Div(Code("Session.location.hostname"), " equals ", Code(str(session.location.hostname))),
                 Div(Code("Session.location.port"), " equals ", Code(str(session.location.port))),

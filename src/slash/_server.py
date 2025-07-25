@@ -6,6 +6,7 @@ import weakref
 from collections.abc import Awaitable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from ssl import SSLContext
 from types import MappingProxyType
 from typing import Callable
 
@@ -67,6 +68,7 @@ class Server:
     def __init__(self, host: str, port: int) -> None:
         self._host = host
         self._port = port
+        self._ssl_context: SSLContext | None = None
 
         self._callback_ws_connect: Callable[[Client], Awaitable[None]] | None = None
         self._callback_ws_message: Callable[[Client, str], Awaitable[None]] | None = None
@@ -91,6 +93,9 @@ class Server:
     def port(self, port: int) -> None:
         self._port = port
 
+    def set_ssl_context(self, ssl_context: SSLContext) -> None:
+        self._ssl_context = ssl_context
+
     def on_ws_connect(self, callback: Callable[[Client], Awaitable[None]]) -> None:
         self._callback_ws_connect = callback
 
@@ -101,7 +106,8 @@ class Server:
         self._callback_ws_disconnect = callback
 
     def serve(self) -> None:
-        LOGGER.info(f"Serving on http://{self._host}:{self._port} .. (Press Ctrl+C to quit)")
+        scheme = "https" if self._ssl_context is not None else "http"
+        LOGGER.info(f"Serving on {scheme}://{self._host}:{self._port} .. (Press Ctrl+C to quit)")
 
         # Create web.Application
         self.app = web.Application()
@@ -114,7 +120,7 @@ class Server:
         self.app.on_shutdown.append(self._on_shutdown)
 
         # Run web app
-        web.run_app(self.app, host=self._host, port=self._port, print=None)
+        web.run_app(self.app, host=self._host, port=self._port, ssl_context=self._ssl_context, print=None)
 
     async def _on_ws_request(self, request: web.Request) -> web.StreamResponse:
         # Construct websocket response
