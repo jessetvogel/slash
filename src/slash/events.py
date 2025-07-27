@@ -1,4 +1,4 @@
-"""Slash events."""
+"""This module contains the Slash event classes."""
 
 from __future__ import annotations
 

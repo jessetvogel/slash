@@ -1,4 +1,4 @@
-"""Slash HTML elements."""
+"""This module contains HTML elements as Slash elements."""
 
 from typing import Literal, Self
 

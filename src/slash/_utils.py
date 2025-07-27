@@ -1,5 +1,3 @@
-"""Slash utility functions."""
-
 import random
 import string
 

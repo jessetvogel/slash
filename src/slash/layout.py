@@ -1,4 +1,4 @@
-"""Slash layout components."""
+"""This module contains the Slash layout elements."""
 
 from slash.core import Children, Elem
 from slash.events import SupportsOnClick

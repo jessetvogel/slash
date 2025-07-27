@@ -1,5 +1,3 @@
-"""Slash logging functionality."""
-
 import logging
 
 

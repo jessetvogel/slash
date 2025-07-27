@@ -1,5 +1,3 @@
-"""Slash server."""
-
 import shutil
 import urllib.parse
 import weakref
