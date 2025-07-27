@@ -153,6 +153,13 @@ class Client {
             }
             throw new Error("Invalid history event: missing field `go`, `push` or `replace`.");
         }
+        if (event == "location") {
+            if (!("url" in message)) {
+                throw new Error("Invalid history event: missing field `url`.");
+            }
+            window.location = message.url;
+            return;
+        }
         throw new Error(`Unknown event '${event}'`);
     }
     update(elem, message) {

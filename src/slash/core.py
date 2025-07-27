@@ -268,6 +268,10 @@ class Session:
             Message.create(tag="link", id=random_id(), parent="head", rel="stylesheet", type="text/css", href=url)
         )
 
+    def set_location(self, url: str) -> None:
+        """Navigate to location."""
+        self.send(Message(event="location", url=url))
+
 
 # Attributes
 
