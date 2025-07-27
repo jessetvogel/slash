@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 import traceback
 from collections.abc import Callable
-from pathlib import Path
 from ssl import SSLContext
 
 import markdown
@@ -15,7 +14,6 @@ from slash._logging import LOGGER
 from slash._message import Message
 from slash._pages import page_404
 from slash._server import Client, Server
-from slash._utils import random_id
 from slash.core import Elem, Location, PopStateEvent, Session
 from slash.events import (
     ChangeEvent,
@@ -68,22 +66,11 @@ class App(Router):
         self._config = Config()
         self._server = Server(self.config.host, self.config.port)
         self._sessions: dict[str, Session] = {}
-        self._stylesheets: list[str] = []
 
     @property
     def config(self) -> Config:
         """Configuration object of application."""
         return self._config
-
-    def add_stylesheet(self, path: Path) -> None:
-        """Add stylesheet.
-
-        Args:
-            path: Path to stylesheet.
-        """
-        url = f"/style/{random_id()}.css"
-        self._server.add_file(url, path)
-        self._stylesheets.append(url)
 
     def set_ssl_context(self, ssl_context: SSLContext) -> None:
         self._server.set_ssl_context(ssl_context)
@@ -97,30 +84,10 @@ class App(Router):
         self._server.on_ws_disconnect(self._handle_ws_disconnect)
         self._server.serve()
 
-    def _send_stylesheets(self) -> None:
-        """Send all stylesheets to the current client."""
-        session = Session.require()
-        for url in self._stylesheets:
-            session.send(
-                Message.create(
-                    tag="link",
-                    id=random_id(),
-                    parent="head",
-                    rel="stylesheet",
-                    type="text/css",
-                    href=url,
-                )
-            )
-
     async def _handle_ws_connect(self, client: Client) -> None:
         # Create and store new session instance for client
         session = Session(self._server, client)
         self._sessions[client.id] = session
-
-        with session:
-            # Send stylesheets
-            self._send_stylesheets()
-            await session.flush()
 
     async def _handle_ws_message(self, client: Client, data: str) -> None:
         # Get session corresponding to client id
@@ -154,20 +121,15 @@ class App(Router):
                     format="html",
                 )
             except Exception:
-                session.send(self._create_message_server_error(traceback.format_exc()))
-
+                error = traceback.format_exc()
+                error_mk = "\n".join(["    " + line for line in error.split("\n")])
+                msg = markdown.markdown(error_mk)
+                session.log("error", f"<b>Server error</b>{markdown.markdown(msg)}", format="html")
             await session.flush()
 
     async def _handle_ws_disconnect(self, client: Client) -> None:
         # Forget session corresponding to client
         self._sessions.pop(client.id)
-
-    def _create_message_server_error(self, error: str) -> Message:
-        return Message.log(
-            "error",
-            f"<b>Unexpected server error</b><pre><code>{error}</code></pre>",
-            format="html",
-        )
 
     def _handle_load_message(self, message: Message) -> None:
         """Handle load event."""

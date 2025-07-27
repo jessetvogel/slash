@@ -256,6 +256,18 @@ class Session:
         """Set document title."""
         self.send(Message("title", title=title))
 
+    def add_stylesheet(self, path: Path) -> None:
+        """Add stylesheet.
+
+        Args:
+            path: Path to stylesheet.
+        """
+        url = f"/style/{random_id()}.css"
+        self._server.add_file(url, path)
+        self.send(
+            Message.create(tag="link", id=random_id(), parent="head", rel="stylesheet", type="text/css", href=url)
+        )
+
 
 # Attributes
 

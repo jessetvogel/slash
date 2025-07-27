@@ -46,13 +46,13 @@ def test_image() -> Elem:
         Panel(
             Column(
                 image := Img(
-                    "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
+                    src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
                     alt="This is the alt text.",
                 ).style({"background-color": "var(--black)"}),
                 Row(
                     Button("Show an icon").onclick(lambda _: update_image(image)),
                     Button("Generate a graph").onclick(lambda _: generate_graph(image)),
-                ),
-            ).style({"align-items": "center"})
+                ).style({"gap": "8px"}),
+            ).style({"align-items": "center", "gap": "8px"})
         ),
     )

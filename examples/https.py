@@ -17,7 +17,10 @@ PATH_KEY = Path(__file__).resolve().parent.parent / "cert" / "key.pem"
 
 
 def main():
-    print(PATH_CERT)
+    # Check if certificate files exist
+    if not PATH_CERT.exists() or not PATH_KEY.exists():
+        print(f"Make sure that certificate files {PATH_CERT} and {PATH_KEY} exist.")
+        return
 
     # Create SSL context
     ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)

@@ -22,7 +22,7 @@ def test_dom() -> Elem:
                     Button("+1").onclick(lambda: set_counter(state["count"] + 1)),
                     Button("-1").onclick(lambda: set_counter(state["count"] - 1)),
                     Button("Reset").onclick(lambda: set_counter(0)),
-                ).style({"justify-content": "center"}),
+                ).style({"justify-content": "center", "gap": "8px"}),
             ).style({"text-align": "center"}),
             Panel(
                 P("Move the black dot"),
@@ -37,7 +37,7 @@ def test_dom() -> Elem:
                 Row(
                     Button("<").onclick(lambda: row.insert(max(0, row.children.index(black) - 1), black)),
                     Button(">").onclick(lambda: row.insert(row.children.index(black) + 1, black)),
-                ).style({"justify-content": "center"}),
+                ).style({"justify-content": "center", "gap": "8px"}),
             ).style({"text-align": "center"}),
         ).style({"gap": "8px"}),
     )
