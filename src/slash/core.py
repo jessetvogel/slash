@@ -168,12 +168,12 @@ class Session:
         """Send all queued messages."""
         # Host files
         for url, path in self._queue_files:
-            self._server.add_file(url, path)
+            self._server.share_file(url, path)
         self._queue_files = []
 
         # Set upload callbacks
         for url, callback in self._queue_upload_callbacks:
-            self._server.add_upload_callback(url, callback)
+            self._server.accept_file(url, callback)
         self._queue_upload_callbacks = []
 
         # Send all messages (including flush event)
@@ -183,21 +183,28 @@ class Session:
 
         self._queue_messages = []
 
-    def host(self, path: Path) -> str:
-        """Expose file via web server.
+    def share_file(self, path: Path) -> str:
+        """Create a download endpoint for a local file.
+
+        The file at the given `path` will be served to anyone who accesses the returned URL.
+
+        Args:
+            path: Path to the local file to be made accessable.
 
         Returns:
-            URL at which the resource can be accessed.
+            URL from which the file can be accessed.
         """
         url = f"/tmp/{random_id()}"
         self._queue_files.append((url, path))
         return url
 
-    def create_upload_gate(self, handler: Handler[UploadEvent]) -> str:
-        """Add callback for file upload.
+    def accept_file(self, handler: Handler[UploadEvent]) -> str:
+        """Create an endpoint for file uploading.
+
+        When a file is uploaded to returned URL, the provided handler will be called.
 
         Returns:
-            URL to which the files must be uploaded.
+            URL to which files can be uploaded.
         """
         url = f"/upload/{random_id()}"
 
@@ -265,7 +272,7 @@ class Session:
             path: Path to stylesheet.
         """
         url = f"/style/{random_id()}.css"
-        self._server.add_file(url, path)
+        self._server.share_file(url, path)
         self.send(
             Message.create(tag="link", id=random_id(), parent="head", rel="stylesheet", type="text/css", href=url)
         )

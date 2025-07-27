@@ -76,7 +76,7 @@ class Upload(Elem):
     def _setup_form(self) -> None:
         session = Session.require()
 
-        url = session.create_upload_gate(self.upload)
+        url = session.accept_file(self.upload)
         self.set_attr("action", url)
 
         session.execute(Upload.JS_SETUP_FORM, [self.id, self._label_id, self._input_id])

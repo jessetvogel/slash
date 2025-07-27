@@ -14,7 +14,7 @@ def onupload(event: UploadEvent, img: Img):
 
     for file in event.files:
         if file.path.suffix in [".png", ".jpg", ".jpeg"]:
-            img.src = session.host(file.path)
+            img.src = session.share_file(file.path)
             break
 
 

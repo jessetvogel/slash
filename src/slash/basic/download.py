@@ -16,5 +16,5 @@ class Download(Elem):
     def _setup_download(self) -> None:
         session = Session.require()
 
-        url = session.host(self._file)
+        url = session.share_file(self._file)
         self.set_attr("href", url)

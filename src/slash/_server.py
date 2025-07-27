@@ -149,7 +149,7 @@ class Server:
                 elif msg.type == WSMsgType.ERROR:
                     LOGGER.warning(f"WebSocket error: {ws.exception()}")
 
-            LOGGER.debug("WebSocket disconnected")
+            LOGGER.debug("WebSocket disconnect")
 
             # Call `_callback_ws_disconnect`
             if self._callback_ws_disconnect is not None:
@@ -281,8 +281,8 @@ class Server:
         with path.open("rb") as file:
             return web.Response(status=status, content_type=mime_type, body=file.read())
 
-    def add_file(self, url: str, path: Path) -> None:
+    def share_file(self, url: str, path: Path) -> None:
         self._files[url] = path
 
-    def add_upload_callback(self, url: str, callback: Callable[[UploadEvent], None]) -> None:
+    def accept_file(self, url: str, callback: Callable[[UploadEvent], None]) -> None:
         self._upload_callbacks[url] = callback

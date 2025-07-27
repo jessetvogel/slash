@@ -20,7 +20,7 @@ def update_image(img: Img) -> None:
         Path(PATH_PUBLIC / "img/error.png"),
     ][int(4 * random.random())]
 
-    img.src = Session.require().host(path)
+    img.src = Session.require().share_file(path)
     img.style({"height": "64px"})
 
 
@@ -36,7 +36,7 @@ def generate_graph(image: Img) -> None:
     plt.plot(xs, ys)
     plt.savefig(path)
 
-    image.src = Session.require().host(path)
+    image.src = Session.require().share_file(path)
     image.style({"height": "256px"})
 
 
