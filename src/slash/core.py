@@ -742,33 +742,55 @@ class PopStateEvent:
 
 
 class History:
+    """Class representing the JavaScript `window.history` object."""
+
     def __init__(self) -> None:
         self._onpopstate_handlers: list[Handler[PopStateEvent]] = []
 
     def go(self, delta: int) -> None:
+        """Call the JavaScript `window.history.go` method."""
         Session.require().send(Message(event="history", go=delta))
 
     def forward(self) -> None:
+        """Call the JavaScript `window.history.forward` method."""
         self.go(1)
 
     def back(self) -> None:
+        """Call the JavaScript `window.history.back` method."""
         self.go(-1)
 
     def push(self, state: Any, url: str | None = None) -> None:
-        """State is anything that is JSON serializable."""
+        """Call the JavaScript `window.history.pushState` method.
+
+        Args:
+            state: State to set. Must be JSON serializable.
+            url: URL to set.
+        """
         Session.require().send(Message(event="history", push=state, url=url))
 
     def replace(self, state: Any, url: str | None = None) -> None:
-        """State is anything that is JSON serializable."""
+        """Call the JavaScript `window.history.replaceState` method.
+
+        Args:
+            state: State to set. Must be JSON serializable.
+            url: URL to set.
+        """
         Session.require().send(Message(event="history", replace=state, url=url))
 
-    def onpopstate(self, handler: Handler[PopStateEvent]) -> Self:
-        """Add event handler for popstate event."""
+    def onpopstate(self, handler: Handler[PopStateEvent]) -> None:
+        """Add event handler for popstate event.
+
+        Args:
+            handler: Handler to call on popstate event.
+        """
         self._onpopstate_handlers.append(handler)
-        return self
 
     def popstate(self, event: PopStateEvent) -> None:
-        """Trigger popstate event."""
+        """Trigger popstate event.
+
+        Args:
+            event: Popstate event to pass to handlers.
+        """
         session = Session.require()
         for handler in self._onpopstate_handlers:
             session.call_handler(handler, event)
@@ -778,7 +800,14 @@ class History:
 
 
 class Location:
+    """Class containing detailed information on client location."""
+
     def __init__(self, url: str) -> None:
+        """Initialize location from URL.
+
+        Args:
+            url: URL of location.
+        """
         result = urlparse(url, allow_fragments=True)
 
         self._url = url
@@ -798,32 +827,40 @@ class Location:
 
     @property
     def url(self) -> str:
+        """URL of location."""
         return self._url
 
     @property
     def scheme(self) -> str:
+        """Scheme of location, such as 'http' or 'https'."""
         return self._scheme
 
     @property
     def host(self) -> str:
+        """Host of location, such as '127.0.0.1:8080'."""
         return self._host
 
     @property
     def hostname(self) -> str:
+        """Hostname of location, such as '127.0.0.1'."""
         return self._hostname
 
     @property
     def port(self) -> int:
+        """Port of location, such as 8080."""
         return self._port
 
     @property
     def path(self) -> str:
+        """Path of location, such as '/path'."""
         return self._path
 
     @property
     def query(self) -> Mapping[str, str]:
+        """Query of location as key value mapping."""
         return MappingProxyType(self._query)
 
     @property
     def fragment(self) -> str:
+        """Fragment of location, which is everything after the '#' characeter."""
         return self._fragment
