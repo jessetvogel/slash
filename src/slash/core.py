@@ -176,9 +176,11 @@ class Session:
             self._server.add_upload_callback(url, callback)
         self._queue_upload_callbacks = []
 
-        # Send all messages
+        # Send all messages (including flush event)
+        self.send(Message("flush"))
         for data in self._queue_messages:
             await self._client.send(data)
+
         self._queue_messages = []
 
     def host(self, path: Path) -> str:

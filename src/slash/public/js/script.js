@@ -4,6 +4,7 @@ class Client {
     constructor() {
         this.socket = null;
         this.functions = {};
+        this.queue = [];
         this.onclick = this.onclick.bind(this);
         this.oninput = this.oninput.bind(this);
         this.onchange = this.onchange.bind(this);
@@ -37,12 +38,21 @@ class Client {
                 Slash.message('error', `<b>Received invalid message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`, { format: "html" });
                 return;
             }
-            try {
-                await client.handle(message);
+            if (message.event == "flush") {
+                const queue = client.queue;
+                client.queue = [];
+                for (const message of queue) {
+                    try {
+                        await client.handle(message);
+                    }
+                    catch (error) {
+                        Slash.message('error', `<b>Failed to handle message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`, { format: "html" });
+                        return;
+                    }
+                }
             }
-            catch (error) {
-                Slash.message('error', `<b>Failed to handle message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`, { format: "html" });
-                return;
+            else {
+                client.queue.push(message);
             }
         };
         this.socket.onerror = function (error) {

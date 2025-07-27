@@ -36,7 +36,7 @@ def test_axes() -> Elem:
                 ).oninput(
                     lambda event: set_axes_title(axes, event.value),
                 ),
-            ),
+            ).style({"gap": "8px"}),
         ).style(CENTERED_PANEL),
         Panel(
             pie := Pie(width=512, height=320).onmount(lambda _: update_pie(pie)),

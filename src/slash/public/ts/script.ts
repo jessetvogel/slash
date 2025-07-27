@@ -10,10 +10,12 @@ type Message = {
 class Client {
     socket: WebSocket | null;
     functions: { [name: string]: Function };
+    queue: Message[];
 
     constructor() {
         this.socket = null;
         this.functions = {};
+        this.queue = [];
 
         // Cool trick
         this.onclick = this.onclick.bind(this);
@@ -64,16 +66,27 @@ class Client {
                 return;
             }
 
-            try {
-                await client.handle(message);
+            if (message.event == "flush") {
+                // Handle all message in the queue only on flush event
+                const queue = client.queue;
+                client.queue = [];
+                for (const message of queue) {
+                    try {
+                        await client.handle(message);
+                    }
+                    catch (error) {
+                        Slash.message(
+                            'error',
+                            `<b>Failed to handle message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`,
+                            { format: "html" }
+                        );
+                        return;
+                    }
+                }
             }
-            catch (error) {
-                Slash.message(
-                    'error',
-                    `<b>Failed to handle message from server</b><pre><code>${event.data}</code></pre><span>${error}</span>`,
-                    { format: "html" }
-                );
-                return;
+            else {
+                // Otherwise, add message to the queue
+                client.queue.push(message);
             }
         };
 

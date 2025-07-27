@@ -91,4 +91,4 @@ def test_select() -> Elem:
             lambda: span.set_text(f"You selected '{select.value}'"),
         ),
         span := Span().style({"padding": "8px"}),
-    )
+    ).style({"text-align": "center"})
