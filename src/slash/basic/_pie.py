@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from typing import Self
 
 from slash._utils import default_color
-from slash.basic.svg import SVG, SVGElem
+from slash.basic._svg import SVG, SVGElem
 from slash.core import Elem
 
 

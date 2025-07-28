@@ -1,4 +1,4 @@
-from slash.basic.tabs import Tabs
+from slash.basic._tabs import Tabs
 from slash.core import Elem
 from slash.html import Div
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import random
 
-from slash.basic.data_table import DataTable
+from slash.basic._data_table import DataTable
 from slash.core import Elem
 from slash.html import Code, P
 from slash.layout import Column

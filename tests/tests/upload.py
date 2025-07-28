@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from slash.basic.upload import Upload
+from slash.basic._upload import Upload
 from slash.core import Elem, Session
 from slash.events import UploadEvent
 from slash.html import Code, Div, Img, P

@@ -11,3 +11,6 @@ tmp/
 
 # GIMP files
 *.xcf
+
+# Build files
+build/

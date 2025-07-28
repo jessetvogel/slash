@@ -1,4 +1,4 @@
-from slash.basic.markdown import Markdown
+from slash.basic._markdown import Markdown
 from slash.core import Elem
 from slash.html import Code, Div, P, Textarea
 from slash.layout import Panel

@@ -1,14 +1,16 @@
 """Slash basic components."""
 
-from slash.basic.axes import Axes
-from slash.basic.checkbox import Checkbox
-from slash.basic.data_table import DataTable
-from slash.basic.markdown import Markdown
-from slash.basic.pie import Pie
-from slash.basic.progress import Progress
-from slash.basic.radio import Radio
-from slash.basic.svg import SVG
-from slash.basic.tabs import Tabs
+from slash.basic._axes import Axes
+from slash.basic._checkbox import Checkbox
+from slash.basic._data_table import DataTable
+from slash.basic._download import Download
+from slash.basic._markdown import Markdown
+from slash.basic._pie import Pie
+from slash.basic._progress import Progress
+from slash.basic._radio import Radio
+from slash.basic._svg import SVG
+from slash.basic._tabs import Tabs
+from slash.basic._upload import Upload
 
 __all__: list[str] = [
     "Axes",
@@ -20,4 +22,6 @@ __all__: list[str] = [
     "Checkbox",
     "Radio",
     "DataTable",
+    "Download",
+    "Upload",
 ]

@@ -26,7 +26,7 @@ classifiers = [
 dependencies = ["aiohttp", "markdown"]
 
 [project.optional-dependencies]
-dev = ["ruff"]
+dev = ["ruff", "sphinx", "sphinx-autodoc-typehints", "sphinx-rtd-theme"]
 test = []
 
 [project.urls]

@@ -1,5 +1,5 @@
-from slash.basic.checkbox import Checkbox
-from slash.basic.radio import Radio
+from slash.basic._checkbox import Checkbox
+from slash.basic._radio import Radio
 from slash.core import Elem
 from slash.html import Code, P
 from slash.layout import Column, Row

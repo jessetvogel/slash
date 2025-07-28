@@ -1,4 +1,4 @@
-from slash.basic.progress import Progress
+from slash.basic._progress import Progress
 from slash.core import Elem
 from slash.html import Button, Div
 from slash.layout import Column, Row

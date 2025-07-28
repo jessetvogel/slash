@@ -5,8 +5,8 @@ import random
 
 import numpy as np
 
-from slash.basic.axes import Axes, Bar, Graph, Scatter
-from slash.basic.pie import Pie
+from slash.basic._axes import Axes, Bar, Graph, Scatter
+from slash.basic._pie import Pie
 from slash.core import Elem
 from slash.html import Button, Div, Input
 from slash.layout import Panel, Row

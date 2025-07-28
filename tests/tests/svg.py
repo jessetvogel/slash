@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from slash.basic.svg import SVG, SVGElem
+from slash.basic._svg import SVG, SVGElem
 from slash.core import Elem
 from slash.html import Div
 from slash.layout import Panel

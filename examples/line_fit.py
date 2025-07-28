@@ -4,8 +4,8 @@ from __future__ import annotations
 import numpy as np
 
 from slash import App
-from slash.basic.axes import Axes
-from slash.basic.progress import Progress
+from slash.basic._axes import Axes
+from slash.basic._progress import Progress
 from slash.core import Elem
 from slash.html import (
     H1,

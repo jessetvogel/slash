@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from slash._server import PATH_PUBLIC
-from slash.basic.download import Download
+from slash.basic._download import Download
 from slash.core import Elem
 from slash.html import Code, Div, P
 

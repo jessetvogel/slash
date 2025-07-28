@@ -35,9 +35,8 @@ class Session:
     def __init__(self, server: Server, client: Client) -> None:
         """Initialize session instance.
 
-        Args:
-            server: Server instance.
-            client: Client instance.
+        :param server: Server instance.
+        :param client: Client instance.
         """
         self._server = server
         self._client = client
@@ -208,7 +207,8 @@ class Session:
     def accept_file(self, handler: Handler[UploadEvent]) -> str:
         """Create an endpoint for file uploading.
 
-        When a file is uploaded to returned URL, the provided handler will be called.
+        Args:
+            handler: Handler to be called when files are upload.
 
         Returns:
             URL to which files can be uploaded.
@@ -594,8 +594,7 @@ class Elem:
         """Append to the children of this element.
 
         Args:
-            children: Child or children to append. Either an element, string or
-                list of elements and strings.
+            children: Child or children to append. Either an element, string or list of elements and strings.
 
         Returns:
             Self.
@@ -614,8 +613,7 @@ class Elem:
 
         Args:
             position: Index before which to insert children.
-            children: Child or children to append. Either an element, string or
-                list of elements and strings.
+            children: Child or children to append. Either an element, string or list of elements and strings.
 
         Returns:
             Self.
@@ -668,7 +666,7 @@ class Elem:
             elem: Element to check.
 
         Returns:
-            If this element contains the given element `True`, otherwise `False.
+            If this element contains the given element `True`, otherwise `False`.
         """
         return elem._parent is self or (elem._parent is not None and self.contains(elem._parent))
 
@@ -832,27 +830,27 @@ class Location:
 
     @property
     def scheme(self) -> str:
-        """Scheme of location, such as 'http' or 'https'."""
+        """Scheme of location, such as ``http`` or ``https``."""
         return self._scheme
 
     @property
     def host(self) -> str:
-        """Host of location, such as '127.0.0.1:8080'."""
+        """Host of location, such as ``127.0.0.1:8080``."""
         return self._host
 
     @property
     def hostname(self) -> str:
-        """Hostname of location, such as '127.0.0.1'."""
+        """Hostname of location, such as ``127.0.0.1``."""
         return self._hostname
 
     @property
     def port(self) -> int:
-        """Port of location, such as 8080."""
+        """Port of location, such as ``8080``."""
         return self._port
 
     @property
     def path(self) -> str:
-        """Path of location, such as '/path'."""
+        """Path of location, such as ``/path``."""
         return self._path
 
     @property
@@ -862,5 +860,5 @@ class Location:
 
     @property
     def fragment(self) -> str:
-        """Fragment of location, which is everything after the '#' characeter."""
+        """Fragment of location, which is everything after the ``#`` characeter."""
         return self._fragment
