@@ -2,7 +2,7 @@ slash package
 =============
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 4
    :hidden:
 
    slash.basic

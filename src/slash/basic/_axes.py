@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Self
@@ -24,17 +24,25 @@ class View:
     v_max: float = 1.0
 
 
-class Axes(SVG):
-    JS_POSITION_LEGEND = JSFunction(
-        ["legend_id", "rect_id", "right"],
-        """
+_JS_POSITION_LEGEND = JSFunction(
+    ["legend_id", "rect_id", "right"],
+    """
 const l = document.getElementById(legend_id);
 const r = document.getElementById(rect_id);
 const w = l.getBBox().width;
 l.style.transform = `translateX(${right - w}px)`;
 r.setAttribute("width", w + 16);
 """,
-    )
+)
+
+
+class Axes(SVG):
+    """Figure with x-axis and y-axis.
+
+    Args:
+        width: Width of the figure in pixels.
+        height: Height of the figure in pixels.
+    """
 
     def __init__(self, *, width: int = 384, height: int = 256) -> None:
         super().__init__()
@@ -62,6 +70,7 @@ r.setAttribute("width", w + 16);
 
     @property
     def title(self) -> str | None:
+        """Title to appear at the top of the figure."""
         return self._title
 
     @title.setter
@@ -74,6 +83,7 @@ r.setAttribute("width", w + 16);
 
     @property
     def xlabel(self) -> str | None:
+        """Description of the x-axis to appear below it."""
         return self._xlabel
 
     @xlabel.setter
@@ -86,6 +96,7 @@ r.setAttribute("width", w + 16);
 
     @property
     def ylabel(self) -> str | None:
+        """Description of the y-axis to appear next to it."""
         return self._ylabel
 
     @ylabel.setter
@@ -98,6 +109,7 @@ r.setAttribute("width", w + 16);
 
     @property
     def legend(self) -> bool:
+        """Flag indicating whether to show legend."""
         return self._legend
 
     @legend.setter
@@ -110,6 +122,7 @@ r.setAttribute("width", w + 16);
 
     @property
     def grid(self) -> bool:
+        """Flag indicating whether to show grid."""
         return self._grid
 
     @grid.setter
@@ -145,6 +158,11 @@ r.setAttribute("width", w + 16);
         return self
 
     def add_plot(self, plot: Plot) -> Self:
+        """Add plot to the figure.
+
+        Args:
+            plot: Plot instance to add.
+        """
         if plot.color is None:
             plot.color = self._next_color()
 
@@ -156,6 +174,7 @@ r.setAttribute("width", w + 16);
         return self
 
     def clear_plots(self) -> Self:
+        """Remove all plots from the figure."""
         self._plots.clear()
         self._color_counter = 0
         return self
@@ -287,7 +306,7 @@ r.setAttribute("width", w + 16);
         bg.set_attr("height", int(y_bottom - y_top))
 
         Session.require().execute(
-            Axes.JS_POSITION_LEGEND,
+            _JS_POSITION_LEGEND,
             [self._svg_legend.id, bg.id, self._view.u_max - 24],
         )
 
@@ -464,7 +483,16 @@ def round_125(x: float) -> float:
 
 
 @dataclass
-class Plot:
+class Plot(ABC):
+    """Abstract class containing information for a plot in a :py:class:`Axes` figure.
+
+    Args:
+        xs: X-coordinates of data points.
+        ys: Y-coordinates of data points.
+        color: Color in HTML notation. If ``None``, one of the default colors is used.
+        label: Label to be used in the legend.
+    """
+
     xs: Sequence[float]
     ys: Sequence[float]
     color: str | None = None
@@ -472,11 +500,26 @@ class Plot:
 
     @abstractmethod
     def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]) -> None:
-        pass
+        """Construct plot elements inside frame.
+
+        Args:
+            frame: Element to construct plot elements in.
+            xy_to_uv: Function for converting abstract xy-coordinates to
+                viewport coordinates.
+        """
 
 
 @dataclass
 class Graph(Plot):
+    """Graph plot.
+
+    Args:
+        xs: X-coordinates of data points.
+        ys: Y-coordinates of data points.
+        color: Color in HTML notation. If ``None``, one of the default colors is used.
+        label: Label to be used in the legend.
+    """
+
     def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]):
         points = []
         for x, y in zip(self.xs, self.ys):
@@ -493,6 +536,15 @@ class Graph(Plot):
 
 @dataclass
 class Scatter(Plot):
+    """Scatter plot.
+
+    Args:
+        xs: X-coordinates of data points.
+        ys: Y-coordinates of data points.
+        color: Color in HTML notation. If ``None``, one of the default colors is used.
+        label: Label to be used in the legend.
+    """
+
     def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]):
         circles = SVGElem("g", **{"fill": self.color})
         for x, y in zip(self.xs, self.ys):
@@ -503,6 +555,16 @@ class Scatter(Plot):
 
 @dataclass
 class Bar(Plot):
+    """Bar plot.
+
+    Args:
+        xs: X-coordinates of data points.
+        ys: Y-coordinates of data points.
+        color: Color in HTML notation. If ``None``, one of the default colors is used.
+        label: Label to be used in the legend.
+        width: Width of the bars.
+    """
+
     width: float | None = None
 
     def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]):

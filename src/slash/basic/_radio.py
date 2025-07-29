@@ -7,6 +7,13 @@ from slash.events import ClickEvent, SupportsOnClick
 
 
 class Radio(Elem, SupportsOnClick):
+    """Radio button element.
+
+    Args:
+        label: Text label after radio button.
+        checked: Flag indicating if radio button is selected.
+    """
+
     def __init__(self, label: str = "", *, checked: bool = False) -> None:
         super().__init__("label", label)
         self._label = label
@@ -55,6 +62,13 @@ class Radio(Elem, SupportsOnClick):
                 connection._update_checked()
 
     def connect(self, other: Radio) -> Self:
+        """Connect to other radio button.
+
+        In a group of connected radio buttons, at most one can be selected at a time.
+
+        Args:
+            other: Radio button to connect to.
+        """
         if other not in self._connections:
             for connection in self._connections:
                 other.connect(connection)

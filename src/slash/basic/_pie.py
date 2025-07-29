@@ -10,6 +10,13 @@ from slash.core import Elem
 
 
 class Pie(SVG):
+    """Pie chart element.
+
+    Args:
+        width: Width of figure in pixels.
+        height: Height of figure in pixels.
+    """
+
     def __init__(self, *, width: int = 384, height: int = 256) -> None:
         super().__init__()
 
@@ -29,6 +36,7 @@ class Pie(SVG):
 
     @property
     def title(self) -> str | None:
+        """Title to appear at the top of the figure."""
         return self._title
 
     @title.setter
@@ -41,6 +49,7 @@ class Pie(SVG):
 
     @property
     def legend(self) -> bool:
+        """Flag indicating whether to show legend."""
         return self._legend
 
     @legend.setter
@@ -53,6 +62,7 @@ class Pie(SVG):
 
     @property
     def gap(self) -> float:
+        """Radius of gap in the center of the pie in pixels."""
         return self._gap
 
     @gap.setter
@@ -65,6 +75,7 @@ class Pie(SVG):
 
     @property
     def radius(self) -> float:
+        """Radius of the pie in pixels."""
         return self._radius
 
     @radius.setter
@@ -76,7 +87,12 @@ class Pie(SVG):
         return self
 
     def render(self, labels: Sequence[str], values: Sequence[float]) -> Self:
-        # Clear
+        """Render the pie chart.
+
+        Args:
+            labels: Sequence of labels for each of the categories.
+            values: Sequence of values for each of the categories.
+        """
         self.clear()
         self._color_counter = 0
 

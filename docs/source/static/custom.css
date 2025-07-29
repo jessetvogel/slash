@@ -58,14 +58,8 @@ body {
     --invert-filter: invert(0);
 }
 
-code.docutils.literal.notranslate {
-    color: var(--red);
-    border-radius: 2px;
-    padding: 3px;
-    margin: 0px 1px;
-}
-
-.wy-nav-content-wrap {
+.wy-nav-content-wrap,
+.wy-nav-content {
     background-color: var(--bg);
 
     a,
@@ -90,11 +84,38 @@ code.docutils.literal.notranslate {
 
 .wy-menu-vertical {
 
-    /* a, */
-    /* a:visited, */
     p.caption {
         color: color-mix(in srgb, var(--blue) 75%, white);
+        letter-spacing: 1px;
     }
+}
+
+img.logo {
+    max-height: 48px;
+}
+
+.btn {
+    box-shadow: none !important;
+    padding: 6px 12px !important;
+
+    &.btn-neutral {
+        background-color: var(--white) !important;
+
+        &:hover {
+            background-color: #eee !important;
+        }
+    }
+
+    &:focus {
+        transition: 0s outline;
+        outline: 1px solid var(--blue) !important;
+        outline-offset: 1px;
+    }
+}
+
+.wy-side-nav-search input[type="text"] {
+    border-radius: 4px;
+    border-color: var(--light-gray);
 }
 
 dl.py.property {
@@ -118,4 +139,36 @@ dl.py.property>dt.sig.sig-object.py {
         background-color: var(--white);
         border-radius: 4px;
     }
+}
+
+.highlight {
+
+    .k,
+    .kn {
+        color: var(--green);
+    }
+
+    .s2 {
+        color: var(--red);
+    }
+
+    .nn,
+    .nf {
+        color: var(--blue);
+    }
+
+    .vm {
+        color: var(--indigo);
+    }
+
+    .gp {
+        color: var(--light-gray);
+    }
+}
+
+code.docutils.literal.notranslate {
+    color: var(--red);
+    border-radius: 2px;
+    padding: 3px;
+    margin: 0px 1px;
 }

@@ -7,6 +7,13 @@ Datum = Mapping[str, Any]
 
 
 class DataTable(Elem):
+    """Table for displaying rows of data.
+
+    Args:
+        keys: Sequence of column headings.
+        max_rows: Maximum number of rows displayed at once.
+    """
+
     def __init__(self, keys: Sequence[str], *, max_rows: int = 10) -> None:
         super().__init__("div")
         self.add_class("slash-data-table")
@@ -161,6 +168,12 @@ class DataTable(Elem):
         self._update_data()
 
     def set_data(self, data: Sequence[Datum]) -> Self:
+        """Set data for table contents.
+
+        Args:
+            data: Sequence of rows of data, each row being a mapping whose keys
+                correspond to the `keys` of the table and whose values are the data.
+        """
         self._data = data
         self._index = 0
         self._update_data()

@@ -3,10 +3,17 @@ from slash.html import Span
 
 
 class Progress(Elem):
-    def __init__(self, text: str | None = None):
+    """Progress bar element.
+
+    Args:
+        value: Number between 0 and 1 indicating the progress.
+        text: Text in the center of the progress bar. Defaults to the percentage of progress.
+    """
+
+    def __init__(self, value: float = 0.0, text: str | None = None):
         super().__init__("div", Span())
         self.add_class("slash-progress")
-        self._value = 0.0
+        self._value = value
         self._text = text
         self.onmount(lambda _: self._update())
 
@@ -22,5 +29,5 @@ class Progress(Elem):
     def _update(self):
         percentage = int(self._value * 100)
         self.style({"--value": f"{percentage}%"})
-        self.children[0].text = self._text or f"{percentage}%"
+        self.children[0].text = self._text if self._text is not None else f"{percentage}%"
         (self.add_class if self._value == 1.0 else self.remove_class)("completed")

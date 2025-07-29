@@ -5,6 +5,13 @@ from slash.events import ClickEvent, SupportsOnClick
 
 
 class Checkbox(Elem, SupportsOnClick):
+    """Checkbox element.
+
+    Args:
+        label: Text label after checkbox.
+        checked: Flag indicating if checkbox is checked.
+    """
+
     def __init__(self, label: str = "", *, checked: bool = False) -> None:
         super().__init__("label", label)
         self._label = label

@@ -4,6 +4,13 @@ from slash.core import Elem, Session
 
 
 class Download(Elem):
+    """Download button element.
+
+    Args:
+        file: Path to file to download.
+        text: Text shown on the button.
+    """
+
     def __init__(self, file: Path, *, text: str = "Download") -> None:
         super().__init__("a", text)
         self.set_attr("download", file.name)

@@ -14,10 +14,6 @@ class Row(Elem, SupportsOnClick):
         )
         self.add_class("slash-row")
 
-    @property
-    def tag(self) -> str:
-        return "div"
-
 
 class Column(Elem, SupportsOnClick):
     """Column element."""
@@ -28,10 +24,6 @@ class Column(Elem, SupportsOnClick):
             *children,
         )
         self.add_class("slash-column")
-
-    @property
-    def tag(self) -> str:
-        return "div"
 
 
 class Panel(Elem):

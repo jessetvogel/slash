@@ -6,6 +6,12 @@ from slash.html import HTML
 
 
 class Markdown(HTML):
+    """Markdown element.
+
+    Args:
+        markdown: String of markdown to be formatted as HTML.
+    """
+
     def __init__(self, markdown: str) -> None:
         super().__init__("")
         self.set_markdown(markdown)

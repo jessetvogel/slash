@@ -29,6 +29,14 @@ ALLOWED_MIME_TYPES = {
 
 @dataclass
 class UploadedFile:
+    """Class containing information about an uploaded file.
+
+    Args:
+        name: Name of the uploaded file.
+        path: Path to the temporarily saved file.
+        size: Size of the file in bytes.
+    """
+
     name: str
     path: Path
     size: int
@@ -36,6 +44,12 @@ class UploadedFile:
 
 @dataclass
 class UploadEvent:
+    """Event that fires when one or more file are uploaded.
+
+    Args:
+        files: List of uploaded files.
+    """
+
     files: list[UploadedFile]
 
 

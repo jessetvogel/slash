@@ -35,8 +35,9 @@ class Session:
     def __init__(self, server: Server, client: Client) -> None:
         """Initialize session instance.
 
-        :param server: Server instance.
-        :param client: Client instance.
+        Args:
+            server: Server instance.
+            client: Client instance.
         """
         self._server = server
         self._client = client
@@ -161,7 +162,7 @@ class Session:
             jsfunction: JavaScript function instance to execute.
             args: List of arguments to provide to the function.
             name: If set, the output of the function will be stored on the client under this name.
-                The output can later be accessed in JavaScript using `Slash.value(name)`.
+                The output can later be accessed in JavaScript using ``Slash.value(name)``.
         """
         # Define function if not defined yet
         if jsfunction.id not in self._functions:
@@ -315,14 +316,13 @@ class Session:
 
 
 class Attr(property):
-    """The `Attr` class represents an attribute of an element."""
+    """Property class representing an attribute of an element.
+
+    Args:
+        name: Name of the attribute.
+    """
 
     def __init__(self, name: str) -> None:
-        """Initialize attribute.
-
-        Args:
-            name: Name of the attribute.
-        """
         super().__init__(self._get, self._set)
         self._name = name
         self._private = "_" + name
@@ -336,7 +336,6 @@ class Attr(property):
 
     @property
     def name(self) -> str:
-        """Name of the attribute."""
         return self._name
 
 
@@ -355,7 +354,14 @@ class UnmountEvent:
 
 
 class Elem:
-    """Base element class. All elements and components derive from this class."""
+    """Base class for all Slash elements.
+
+    Args:
+        tag: HTML tag of the element.
+        children: Child or children of element. Either an element, string or
+            list of elements and strings.
+        attrs: Additional attribute values.
+    """
 
     def __init__(
         self,
@@ -363,14 +369,6 @@ class Elem:
         *children: Elem | str | list[Elem | str],
         **attrs: str | int,
     ) -> None:
-        """Initialize element.
-
-        Args:
-            tag: Tag of the element.
-            children: Child or children of element. Either an element, string or
-                list of elements and strings.
-            attrs: Additional attribute values.
-        """
         self._tag = tag
         self._children: list[Elem | str] = []
         for child in children:
@@ -397,41 +395,35 @@ class Elem:
 
     @property
     def id(self) -> str:
-        """Element id."""
         return self._id
 
     @property
     def tag(self) -> str:
-        """Element tag."""
         return self._tag
 
     @property
     def children(self) -> list[Elem | str]:
-        """List of children."""
         return list(self._children)
 
     @property
     def parent(self) -> Elem | None:
-        """Parent of element, or `None` if is root element."""
+        """Parent of element, or ``None`` if the element is the root element."""
         return self._parent
 
     def style(self, style: Mapping[str, str | None]) -> Self:
-        """Update style.
+        """Update CSS style of element.
 
         Args:
             style: Mapping with CSS attributes as keys. If a value is a string,
                 the CSS attribute is set to that value. If a value is `None`, the
                 CSS attribute is reset.
-
-        Returns:
-            Self.
         """
         self._style.update(style)
         self._update_attrs({"style": dict(style)})
         return self
 
     def attrs(self) -> dict[str, Any]:
-        """Element attributes.
+        """Get element attributes.
 
         Returns:
             Dictionary containing the element attributes.
@@ -466,27 +458,21 @@ class Elem:
         return attrs
 
     def set_attr(self, name: str, value: str | int = "") -> Self:
-        """Set attribute.
+        """Set attribute of element.
 
         Args:
             name: Attribute name.
             value: Attribute value.
-
-        Returns:
-            Self.
         """
         self._attrs[name] = value
         self._update_attrs({name: value})
         return self
 
     def remove_attr(self, name: str) -> Self:
-        """Remove attribute.
+        """Remove attribute from element.
 
         Args:
             name: Attribute name.
-
-        Returns:
-            Self.
         """
         if name in self._attrs:
             del self._attrs[name]
@@ -497,7 +483,7 @@ class Elem:
         """Check if element is mounted.
 
         Returns:
-            If element is mounted `True`, otherwise `False`.
+            Boolean indicating if element is mounted.
         """
         return Session.require().get_elem(self.id) is self
 
@@ -506,9 +492,6 @@ class Elem:
 
         Args:
             handler: Handler to be called when element is mounted.
-
-        Returns:
-            Self.
         """
         self._onmount_handlers.append(handler)
         return self
@@ -518,9 +501,6 @@ class Elem:
 
         Args:
             handler: Handler to be called when element is unmounted.
-
-        Returns:
-            Self.
         """
         self._onunmount_handlers.append(handler)
         return self
@@ -595,9 +575,6 @@ class Elem:
 
         Args:
             children: Child or children to append. Either an element, string or list of elements and strings.
-
-        Returns:
-            Self.
         """
         for child in children:
             if isinstance(child, list):
@@ -614,9 +591,6 @@ class Elem:
         Args:
             position: Index before which to insert children.
             children: Child or children to append. Either an element, string or list of elements and strings.
-
-        Returns:
-            Self.
         """
         offset = 0
         for child in children:
@@ -660,13 +634,13 @@ class Elem:
                     session.send(Message("create", parent=self.id, text=elem, position=position))
 
     def contains(self, elem: Elem) -> bool:
-        """Check if element is contained by this element.
+        """Check if another element is contained by this element.
 
         Args:
-            elem: Element to check.
+            elem: The other element.
 
         Returns:
-            If this element contains the given element `True`, otherwise `False`.
+            Boolean indicating if this element contains the other element.
         """
         return elem._parent is self or (elem._parent is not None and self.contains(elem._parent))
 
@@ -698,26 +672,20 @@ class Elem:
         return "".join(parts)
 
     def add_class(self, name: str) -> Self:
-        """Add class.
+        """Add one or more classes to element.
 
         Args:
             name: Name of class to add. Multiple names may be provided separated by spaces.
-
-        Returns:
-            Self.
         """
         self._classes.update(name.split(" "))
         self._update_attrs({"class": " ".join(self._classes)})
         return self
 
     def remove_class(self, name: str) -> Self:
-        """Remove class.
+        """Remove one or more classes from element.
 
         Args:
             name: Name of class to add. Multiple names may be provided separated by spaces.
-
-        Returns:
-            Self.
         """
         for name in name.split(" "):
             if name in self._classes:
@@ -740,25 +708,25 @@ class PopStateEvent:
 
 
 class History:
-    """Class representing the JavaScript `window.history` object."""
+    """Class representing the JavaScript ``window.history`` object."""
 
     def __init__(self) -> None:
         self._onpopstate_handlers: list[Handler[PopStateEvent]] = []
 
     def go(self, delta: int) -> None:
-        """Call the JavaScript `window.history.go` method."""
+        """Call the JavaScript ``window.history.go`` method."""
         Session.require().send(Message(event="history", go=delta))
 
     def forward(self) -> None:
-        """Call the JavaScript `window.history.forward` method."""
+        """Call the JavaScript ``window.history.forward`` method."""
         self.go(1)
 
     def back(self) -> None:
-        """Call the JavaScript `window.history.back` method."""
+        """Call the JavaScript ``window.history.back`` method."""
         self.go(-1)
 
     def push(self, state: Any, url: str | None = None) -> None:
-        """Call the JavaScript `window.history.pushState` method.
+        """Call the JavaScript ``window.history.pushState`` method.
 
         Args:
             state: State to set. Must be JSON serializable.
@@ -767,7 +735,7 @@ class History:
         Session.require().send(Message(event="history", push=state, url=url))
 
     def replace(self, state: Any, url: str | None = None) -> None:
-        """Call the JavaScript `window.history.replaceState` method.
+        """Call the JavaScript ``window.history.replaceState`` method.
 
         Args:
             state: State to set. Must be JSON serializable.
@@ -776,18 +744,18 @@ class History:
         Session.require().send(Message(event="history", replace=state, url=url))
 
     def onpopstate(self, handler: Handler[PopStateEvent]) -> None:
-        """Add event handler for popstate event.
+        """Add event handler for `popstate` event.
 
         Args:
-            handler: Handler to call on popstate event.
+            handler: Handler to call on `popstate` event.
         """
         self._onpopstate_handlers.append(handler)
 
     def popstate(self, event: PopStateEvent) -> None:
-        """Trigger popstate event.
+        """Trigger `popstate` event.
 
         Args:
-            event: Popstate event to pass to handlers.
+            event: Popstate event to be passed to handlers.
         """
         session = Session.require()
         for handler in self._onpopstate_handlers:
@@ -860,5 +828,5 @@ class Location:
 
     @property
     def fragment(self) -> str:
-        """Fragment of location, which is everything after the ``#`` characeter."""
+        """Fragment of location, that is the part after the ``#`` character."""
         return self._fragment

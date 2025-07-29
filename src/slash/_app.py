@@ -27,18 +27,35 @@ class BadMessageException(Exception):
     pass
 
 
-class Router:
-    def __init__(self) -> None:
-        self._routes: dict[str | re.Pattern, Callable[..., Elem]] = {}
+class App:
+    """Main class for a Slash web application."""
 
-    def add_route(self, pattern: str, root: Callable[..., Elem]) -> None:
-        """Add route.
+    def __init__(self) -> None:
+        self._config = Config()
+        self._server = Server(self.config.host, self.config.port)
+        self._routes: dict[str | re.Pattern, Callable[..., Elem]] = {}
+        self._sessions: dict[str, Session] = {}
+
+    @property
+    def config(self) -> Config:
+        """Configuration object of application."""
+        return self._config
+
+    def set_ssl_context(self, ssl_context: SSLContext) -> None:
+        """Set SSL context to use for the web server.
 
         Args:
-            pattern: Pattern to match the path of the URL.
-                Can be either string or regex pattern.
-            root: Function that returns a root element of the page.
-                If pattern is a `re.Pattern`, the matched groups will
+            ssl_context: SSL context to use for the web server.
+        """
+        self._server.set_ssl_context(ssl_context)
+
+    def add_route(self, pattern: str, root: Callable[..., Elem]) -> None:
+        """Add route from a path pattern.
+
+        Args:
+            pattern: String or regex pattern to match the path of the URL.
+            root: Function that returns the root element of the page.
+                If `pattern` is a :py:class:`re.Pattern`, the matched groups will
                 be provided to the function as arguments.
         """
         is_regex = any(c in pattern for c in ".^$*+?{}[]\\|()")
@@ -55,26 +72,8 @@ class Router:
                     return root(*m.groups())
         return page_404()
 
-
-class App(Router):
-    """Main class for a Slash web application."""
-
-    def __init__(self) -> None:
-        Router.__init__(self)
-        self._config = Config()
-        self._server = Server(self.config.host, self.config.port)
-        self._sessions: dict[str, Session] = {}
-
-    @property
-    def config(self) -> Config:
-        """Configuration object of application."""
-        return self._config
-
-    def set_ssl_context(self, ssl_context: SSLContext) -> None:
-        self._server.set_ssl_context(ssl_context)
-
     def run(self) -> None:
-        """Start application."""
+        """Run the application."""
         self._server.host = self.config.host
         self._server.port = self.config.port
         self._server.on_ws_connect(self._handle_ws_connect)
@@ -138,9 +137,9 @@ class App(Router):
             raise BadMessageException(msg)
         try:
             session._location = Location(url)  # NOTE: not very clean, but effective
-        except Exception:
+        except Exception as err:
             msg = f"Error in `load` event: invalid `url` (`{url}`)."
-            raise BadMessageException(msg)
+            raise BadMessageException(msg) from err
 
         Session.require().set_root(self._create_root())
 

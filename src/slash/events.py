@@ -2,18 +2,19 @@
 
 from __future__ import annotations
 
+import sys
 from typing import Self
 
-from slash._server import UploadEvent
+from slash._server import UploadedFile, UploadEvent
 from slash.core import Elem, Handler, MountEvent, Session, UnmountEvent
-
-UploadEvent  # so that `UploadEvent` can be imported from `slash.events`
-MountEvent  # so that `MountEvent` can be imported from `slash.events`
-UnmountEvent  # so that `UnmountEvent` can be imported from `slash.events`
 
 
 class ClickEvent:
-    """Event that fires when an element is clicked."""
+    """Event that fires when an element is clicked.
+
+    Args:
+        target: Element that was clicked.
+    """
 
     def __init__(self, target: Elem) -> None:
         self._target = target
@@ -25,7 +26,7 @@ class ClickEvent:
 
 
 class SupportsOnClick:
-    """Mixin class for onclick support."""
+    """Mix-in class for `onclick` support."""
 
     @property
     def onclick_handlers(self) -> list[Handler[ClickEvent]]:
@@ -34,14 +35,22 @@ class SupportsOnClick:
         return self._onclick_handlers
 
     def onclick(self, handler: Handler[ClickEvent]) -> Self:
-        """Add event handler for click event."""
+        """Add event handler for click event.
+
+        Args:
+            handler: Function to be called when a click event is fired.
+        """
         assert isinstance(self, Elem)
         self.onclick_handlers.append(handler)
         self.set_attr("onclick", True)
         return self
 
     def click(self, event: ClickEvent) -> None:
-        """Trigger click event."""
+        """Trigger click event.
+
+        Args:
+            event: Click event instance to be passed to handlers.
+        """
         assert isinstance(self, Elem)
         session = Session.require()
         for handler in self.onclick_handlers:
@@ -52,7 +61,12 @@ class SupportsOnClick:
 
 
 class InputEvent:
-    """Event that fires when the editable content of an element is updated."""
+    """Event that fires when the editable content of an element is updated.
+
+    Args:
+        target: Element whose content was updated.
+        value: Value of the updated content.
+    """
 
     def __init__(self, target: Elem, value: str) -> None:
         self._target = target
@@ -70,7 +84,7 @@ class InputEvent:
 
 
 class SupportsOnInput:
-    """Mixin class for oninput support."""
+    """Mix-in class for `oninput` support."""
 
     @property
     def oninput_handlers(self) -> list[Handler[InputEvent]]:
@@ -79,14 +93,22 @@ class SupportsOnInput:
         return self._oninput_handlers
 
     def oninput(self, handler: Handler[InputEvent]) -> Self:
-        """Add event handler for input event."""
+        """Add event handler for input event.
+
+        Args:
+            handler: Function to be called when an input event is fired.
+        """
         assert isinstance(self, Elem)
         self.oninput_handlers.append(handler)
         self.set_attr("oninput", True)
         return self
 
     def input(self, event: InputEvent) -> None:
-        """Trigger input event."""
+        """Trigger input event.
+
+        Args:
+            event: Input event instance to be passed to handlers.
+        """
         assert isinstance(self, Elem)
         session = Session.require()
         for handler in self.oninput_handlers:
@@ -97,7 +119,12 @@ class SupportsOnInput:
 
 
 class ChangeEvent:
-    """Event that fires when the editable content of an element is changed."""
+    """Event that fires when the editable content of an element is changed.
+
+    Args:
+        target: Element whose content was changed.
+        value: Value of the changed content.
+    """
 
     def __init__(self, target: Elem, value: str) -> None:
         self._target = target
@@ -115,7 +142,7 @@ class ChangeEvent:
 
 
 class SupportsOnChange:
-    """Mixin class for onchange support."""
+    """Mix-in class for `onchange` support."""
 
     @property
     def onchange_handlers(self) -> list[Handler[ChangeEvent]]:
@@ -124,18 +151,34 @@ class SupportsOnChange:
         return self._onchange_handlers
 
     def onchange(self, handler: Handler[ChangeEvent]) -> Self:
-        """Add event handler for change event."""
+        """Add event handler for change event.
+
+        Args:
+            handler: Function to be called when a change event is fired.
+        """
         assert isinstance(self, Elem)
         self.onchange_handlers.append(handler)
         self.set_attr("onchange", True)
         return self
 
     def change(self, event: ChangeEvent) -> None:
-        """Trigger change event."""
+        """Trigger change event.
+
+        Args:
+            event: Change event instance to be passed to handlers.
+        """
         assert isinstance(self, Elem)
         session = Session.require()
         for handler in self.onchange_handlers:
             session.call_handler(handler, event)
 
     def has_onchange_handlers(self) -> bool:
+        """Returns true if element has at least one `onchange` handler."""
         return bool(self.onchange_handlers)
+
+
+# So that these events can be imported from `slash.events`
+__all__ = [
+    name for name, obj in vars(sys.modules[__name__]).items() if isinstance(obj, type) and obj.__module__ == __name__
+]
+__all__ += ["UploadEvent", "UploadedFile", "MountEvent", "UnmountEvent"]

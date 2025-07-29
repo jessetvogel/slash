@@ -4,6 +4,13 @@ from slash.html import Div
 
 
 class Tabs(Elem, SupportsOnChange):
+    """Tabs element.
+
+    Args:
+        labels: List of labels for the tabs.
+        value: Label of currently selected tab.
+    """
+
     def __init__(self, labels: list[str], *, value: str | None = None) -> None:
         super().__init__(
             "div",

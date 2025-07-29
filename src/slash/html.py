@@ -1,4 +1,4 @@
-"""This module contains HTML elements as Slash elements."""
+"""This module contains the Slash HTML elements."""
 
 from typing import Literal, Self
 
@@ -9,161 +9,168 @@ from slash.js import JSFunction
 
 
 class Div(Elem, SupportsOnClick):
-    """HTML <div> element."""
+    """HTML ``<div>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("div", *children)
 
 
 class P(Elem, SupportsOnClick):
-    """HTML <p> element."""
+    """HTML ``<p>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("p", *children)
 
 
 class Code(Elem, SupportsOnClick):
-    """HTML <code> element."""
+    """HTML ``<code>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("code", *children)
 
 
 class Br(Elem):
-    """HTML <br> element."""
+    """HTML ``<br>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("br", *children)
 
 
 class Span(Elem, SupportsOnClick):
-    """HTML <span> element."""
+    """HTML ``<span>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("span", *children)
 
 
 class Pre(Elem, SupportsOnClick):
-    """HTML <pre> element."""
+    """HTML ``<pre>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("pre", *children)
 
 
 class Ul(Elem, SupportsOnClick):
-    """HTML <ul> element."""
+    """HTML ``<ul>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("ul", *children)
 
 
 class Ol(Elem, SupportsOnClick):
-    """HTML <ol> element."""
+    """HTML ``<ol>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("ol", *children)
 
 
 class Li(Elem, SupportsOnClick):
-    """HTML <li> element."""
+    """HTML ``<li>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("li", *children)
 
 
 class Details(Elem, SupportsOnClick):
-    """HTML <details> element."""
+    """HTML ``<details>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("details", *children)
 
 
 class Summary(Elem, SupportsOnClick):
-    """HTML <summary> element."""
+    """HTML ``<summary>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("summary", *children)
 
 
 class Label(Elem, SupportsOnClick):
-    """HTML <label> element."""
+    """HTML ``<label>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("label", *children)
 
 
 class Table(Elem, SupportsOnClick):
-    """HTML <table> element."""
+    """HTML ``<table>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("table", *children)
 
 
 class Tr(Elem, SupportsOnClick):
-    """HTML <tr> element."""
+    """HTML ``<tr>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("tr", *children)
 
 
 class Th(Elem, SupportsOnClick):
-    """HTML <th> element."""
+    """HTML ``<th>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("th", *children)
 
 
 class Td(Elem, SupportsOnClick):
-    """HTML <td> element."""
+    """HTML ``<td>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("td", *children)
 
 
 class H1(Elem, SupportsOnClick):
-    """HTML <h1> element."""
+    """HTML ``<h1>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h1", *children)
 
 
 class H2(Elem, SupportsOnClick):
-    """HTML <h2> element."""
+    """HTML ``<h2>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h2", *children)
 
 
 class H3(Elem, SupportsOnClick):
-    """HTML <h3> element."""
+    """HTML ``<h3>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h3", *children)
 
 
 class H4(Elem, SupportsOnClick):
-    """HTML <h4> element."""
+    """HTML ``<h4>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h4", *children)
 
 
 class H5(Elem, SupportsOnClick):
-    """HTML <h5> element."""
+    """HTML ``<h5>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h5", *children)
 
 
 class H6(Elem, SupportsOnClick):
-    """HTML <h6> element."""
+    """HTML ``<h6>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("h6", *children)
 
 
 class A(Elem, SupportsOnClick):
-    """HTML <a> element."""
+    """HTML ``<a>`` element.
+
+    Args:
+        children: Child or children of element. Either an element, string or
+            list of elements and strings.
+        href: URL that the link points to.
+        target: Where to display the linked URL.
+    """
 
     href = Attr("href")
     target = Attr("target")
@@ -188,14 +195,21 @@ class A(Elem, SupportsOnClick):
 
 
 class Button(Elem, SupportsOnClick):
-    """HTML <button> element."""
+    """HTML ``<button>`` element."""
 
     def __init__(self, *children: Children) -> None:
         super().__init__("button", *children)
 
 
 class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
-    """HTML <input> element."""
+    """HTML ``<input>`` element.
+
+    Args:
+        type: Type of input field, e.g. ``text``, ``number``, ``password``, etc.
+        name: Name of the input field.
+        value: Default value of the input field.
+        placeholder: Placeholder text when input is empty.
+    """
 
     type = Attr("type")
     name = Attr("name")
@@ -234,7 +248,12 @@ class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
 
 
 class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
-    """HTML <textarea> element."""
+    """HTML ``<textarea>`` element.
+
+    Args:
+        value: Contents of the textarea.
+        placeholder: Placeholder text when textarea is empty.
+    """
 
     placeholder = Attr("placeholder")
 
@@ -271,7 +290,12 @@ class Textarea(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
 
 
 class Img(Elem):
-    """HTML <img> element."""
+    """HTML ``<img>`` element.
+
+    Args:
+        src: URL to the image to show.
+        alt: Textual replacement for the image.
+    """
 
     src = Attr("src")
     alt = Attr("alt")
@@ -291,7 +315,7 @@ class Img(Elem):
 
 
 class Select(Elem, SupportsOnChange):
-    """HTML <select> element."""
+    """HTML ``<select>`` element."""
 
     def __init__(self, options: list[str]):
         super().__init__("select", *[Elem("option", option) for option in options])
@@ -316,31 +340,36 @@ class Select(Elem, SupportsOnChange):
         self.value = event.value
 
 
-class Dialog(Elem):
-    """HTML <dialog> element."""
+_JS_DIALOG_SHOW = JSFunction(["id"], "document.getElementById(id).show()")
+_JS_DIALOG_SHOW_MODAL = JSFunction(["id"], "document.getElementById(id).showModal()")
+_JS_DIALOG_CLOSE = JSFunction(["id"], "document.getElementById(id).close()")
 
-    JS_SHOW = JSFunction(["id"], "document.getElementById(id).show()")
-    JS_SHOW_MODAL = JSFunction(
-        ["id"],
-        "document.getElementById(id).showModal()",
-    )
-    JS_CLOSE = JSFunction(["id"], "document.getElementById(id).close()")
+
+class Dialog(Elem):
+    """HTML ``<dialog>`` element."""
 
     def __init__(self, *children: Children):
         super().__init__("dialog", *children)
 
     def show(self) -> None:
-        Session.require().execute(self.JS_SHOW, [self.id])
+        """Show dialog modelessly using the ``HTMLDialogElement.show()`` JavaScript method."""
+        Session.require().execute(_JS_DIALOG_SHOW, [self.id])
 
     def show_modal(self) -> None:
-        Session.require().execute(self.JS_SHOW_MODAL, [self.id])
+        """Show dialog as a modal using the ``HTMLDialogElement.showModal()`` JavaScript method."""
+        Session.require().execute(_JS_DIALOG_SHOW_MODAL, [self.id])
 
     def close(self) -> None:
-        Session.require().execute(self.JS_CLOSE, [self.id])
+        """Close the dialog using the ``HTMLDialogElement.close()`` JavaScript method."""
+        Session.require().execute(_JS_DIALOG_CLOSE, [self.id])
 
 
 class HTML(Elem):
-    """Element containing arbitrary HTML."""
+    """HTML ``<div>`` element that contains arbitrary HTML.
+
+    Args:
+        html: Arbitrary HTML content.
+    """
 
     def __init__(self, html: str) -> None:
         super().__init__("div")
