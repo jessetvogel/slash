@@ -23,4 +23,4 @@ Slash is a Python framework for web applications.
    :caption: Examples
 
    examples/hello
-   examples/https
+   examples/events

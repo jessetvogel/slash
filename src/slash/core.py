@@ -343,11 +343,35 @@ class Attr(property):
 
 
 class MountEvent:
-    """Event that fires when an element is mounted."""
+    """Event that fires when an element is mounted.
+
+    Args:
+        target: Element that was mounted.
+    """
+
+    def __init__(self, target: Elem) -> None:
+        self._target = target
+
+    @property
+    def target(self) -> Elem:
+        """Element that was mounted."""
+        return self._target
 
 
 class UnmountEvent:
-    """Event that fires when an element is unmounted."""
+    """Event that fires when an element is unmounted.
+
+    Args:
+        target: Element that was unmounted.
+    """
+
+    def __init__(self, target: Elem) -> None:
+        self._target = target
+
+    @property
+    def target(self) -> Elem:
+        """Element that was unmounted."""
+        return self._target
 
 
 # Elements
@@ -530,7 +554,7 @@ class Elem:
 
         # Call mount event handlers
         for handler in self._onmount_handlers:
-            session.call_handler(handler, MountEvent())
+            session.call_handler(handler, MountEvent(self))
 
     def unmount(self) -> None:
         """Unmount element."""
@@ -553,7 +577,7 @@ class Elem:
 
         # Call unmount hook
         for handler in self._onunmount_handlers:
-            session.call_handler(handler, UnmountEvent())
+            session.call_handler(handler, UnmountEvent(self))
 
     def _update_attrs(self, attrs: dict[str, Any]) -> None:
         """Send message to client to update attribute values."""
