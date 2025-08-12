@@ -27,7 +27,6 @@ dependencies = ["aiohttp", "markdown"]
 
 [project.optional-dependencies]
 dev = ["ruff", "sphinx", "sphinx-autodoc-typehints", "sphinx-rtd-theme"]
-test = []
 
 [project.urls]
 "Homepage" = "https://github.com/jessetvogel/slash"
