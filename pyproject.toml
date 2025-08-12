@@ -5,11 +5,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "slash"
 version = "0.0.1"
-description = "Python dashboard framework"
+description = "Python web framework"
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
-keywords = ["slash", "dashboard", "framework"]
+keywords = ["slash", "web", "framework"]
 authors = [{ name = "Jesse Vogel", email = "jesse.t.vogel@gmail.com" }]
 maintainers = [{ name = "Jesse Vogel", email = "jesse.t.vogel@gmail.com" }]
 
