@@ -27,8 +27,7 @@ def main():
     ssl_context.load_cert_chain(PATH_CERT, PATH_KEY)
 
     # Create and run application
-    app = App()
-    app.set_ssl_context(ssl_context)
+    app = App(ssl_context=ssl_context)
     app.add_route("/", home)
     app.run()
 
