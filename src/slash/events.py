@@ -56,9 +56,6 @@ class SupportsOnClick:
         for handler in self.onclick_handlers:
             session.call_handler(handler, event)
 
-    def has_onclick_handlers(self) -> bool:
-        return bool(self.onclick_handlers)
-
 
 class InputEvent:
     """Event that fires when the editable content of an element is updated.
@@ -114,9 +111,6 @@ class SupportsOnInput:
         for handler in self.oninput_handlers:
             session.call_handler(handler, event)
 
-    def has_oninput_handlers(self) -> bool:
-        return bool(self.oninput_handlers)
-
 
 class ChangeEvent:
     """Event that fires when the editable content of an element is changed.
@@ -171,10 +165,6 @@ class SupportsOnChange:
         session = Session.require()
         for handler in self.onchange_handlers:
             session.call_handler(handler, event)
-
-    def has_onchange_handlers(self) -> bool:
-        """Returns true if element has at least one `onchange` handler."""
-        return bool(self.onchange_handlers)
 
 
 # So that these events can be imported from `slash.events`

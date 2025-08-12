@@ -77,10 +77,20 @@ class Client:
 
 
 class Server:
-    def __init__(self, host: str, port: int) -> None:
+    def __init__(
+        self,
+        host: str = "127.0.0.1",
+        port: int = 8080,
+        *,
+        ssl_context: SSLContext | None = None,
+        enable_upload: bool = True,
+        max_upload_size: int = 10_000_000,  # 10 MB
+    ) -> None:
         self._host = host
         self._port = port
-        self._ssl_context: SSLContext | None = None
+        self._ssl_context = ssl_context
+        self._enable_upload = enable_upload
+        self._max_upload_size = max_upload_size
 
         self._callback_ws_connect: Callable[[Client], Awaitable[None]] | None = None
         self._callback_ws_message: Callable[[Client, str], Awaitable[None]] | None = None
@@ -88,25 +98,6 @@ class Server:
 
         self._files: dict[str, Path] = {}
         self._upload_callbacks: dict[str, Callable[[UploadEvent], None]] = {}
-
-    @property
-    def host(self) -> str:
-        return self._host
-
-    @host.setter
-    def host(self, host: str) -> None:
-        self._host = host
-
-    @property
-    def port(self) -> int:
-        return self._port
-
-    @port.setter
-    def port(self, port: int) -> None:
-        self._port = port
-
-    def set_ssl_context(self, ssl_context: SSLContext) -> None:
-        self._ssl_context = ssl_context
 
     def on_ws_connect(self, callback: Callable[[Client], Awaitable[None]]) -> None:
         self._callback_ws_connect = callback
@@ -211,6 +202,10 @@ class Server:
         if method != "POST":
             return self._response_405_method_not_allowed()
 
+        # Check if file upload is enabled
+        if not self._enable_upload:
+            return self._response_403_forbidden("file upload is disabled")
+
         # Check if path corresponds to an upload callback
         if path in self._upload_callbacks:
             callback = self._upload_callbacks[path]
@@ -236,6 +231,10 @@ class Server:
                         while chunk := await field.read_chunk():
                             file.write(chunk)
                             size += len(chunk)
+                            if size >= self._max_upload_size:
+                                return self._response_413_content_too_large(
+                                    f"maximum file size is {self._max_upload_size} bytes"
+                                )
                     files.append(UploadedFile(name, filepath, size))
 
             # If no files were uploaded, respond with bad request
@@ -263,19 +262,22 @@ class Server:
             shutil.rmtree(PATH_TMP)
 
     def _response_400_bad_request(self, msg: str | None = None) -> web.Response:
-        text = "400 Bad Request"
-        if msg:
-            text += f" ({msg})"
+        text = f"400 Bad Request ({msg})" if msg else "400 Bad Request"
         return web.Response(status=400, text=text)
 
-    def _response_403_forbidden(self) -> web.Response:
-        return web.Response(status=403, text="403 Forbidden")
+    def _response_403_forbidden(self, msg: str | None = None) -> web.Response:
+        text = f"403 Forbidden ({msg})" if msg else "403 Forbidden"
+        return web.Response(status=403, text=text)
 
     def _response_404_not_found(self) -> web.Response:
         return web.Response(status=404, text="404 Not Found")
 
     def _response_405_method_not_allowed(self) -> web.Response:
-        return web.Response(status=405, text="404 Method Not Allowed")
+        return web.Response(status=405, text="405 Method Not Allowed")
+
+    def _response_413_content_too_large(self, msg: str | None = None) -> web.Response:
+        text = f"413 Content Too Large ({msg})" if msg else "413 Content Too Large"
+        return web.Response(status=413, text=text)
 
     def _response_file(self, path: Path, *, status: int = 200) -> web.Response:
         # Check file existence
@@ -297,4 +299,8 @@ class Server:
         self._files[url] = path
 
     def accept_file(self, url: str, callback: Callable[[UploadEvent], None]) -> None:
+        if not self._enable_upload:
+            raise RuntimeError(
+                "File uploading is disabled. To enable file uploading, set `enable_upload` to `True` in `App`."
+            )
         self._upload_callbacks[url] = callback

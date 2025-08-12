@@ -1,6 +1,6 @@
 <img src="img/banner.png" style="height: 80px;"/>
 
-Slash is a Python framework for creating web apps.
+Slash is a Python framework for web applications.
 
 ## 📦 Installation
 

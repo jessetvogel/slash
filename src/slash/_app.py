@@ -7,7 +7,6 @@ from ssl import SSLContext
 
 import markdown
 
-from slash._config import Config
 from slash._logging import LOGGER
 from slash._message import Message
 from slash._pages import page_404
@@ -28,26 +27,30 @@ class BadMessageException(Exception):
 
 
 class App:
-    """Main class for a Slash web application."""
+    """Main class for a Slash web application.
 
-    def __init__(self) -> None:
-        self._config = Config()
-        self._server = Server(self.config.host, self.config.port)
+    Args:
+        host: Hostname on which to serve the web server.
+        port: Port on which to serve the web server.
+        ssl_context: SSL context to use for the web server.
+        enable_upload: Boolean flag indicating whether file upload is enabled.
+        max_upload_size: Maximum file size for uploaded files in bytes.
+    """
+
+    def __init__(
+        self,
+        host: str = "127.0.0.1",
+        port: int = 8080,
+        *,
+        ssl_context: SSLContext | None = None,
+        enable_upload: bool = True,
+        max_upload_size: int = 10_000_000,  # 10 MB
+    ) -> None:
+        self._server = Server(
+            host, port, ssl_context=ssl_context, enable_upload=enable_upload, max_upload_size=max_upload_size
+        )
         self._routes: dict[str | re.Pattern, Callable[..., Elem]] = {}
         self._sessions: dict[str, Session] = {}
-
-    @property
-    def config(self) -> Config:
-        """Configuration object of application."""
-        return self._config
-
-    def set_ssl_context(self, ssl_context: SSLContext) -> None:
-        """Set SSL context to use for the web server.
-
-        Args:
-            ssl_context: SSL context to use for the web server.
-        """
-        self._server.set_ssl_context(ssl_context)
 
     def add_route(self, pattern: str, root: Callable[..., Elem]) -> None:
         """Add route from a path pattern.
@@ -74,8 +77,6 @@ class App:
 
     def run(self) -> None:
         """Run the application."""
-        self._server.host = self.config.host
-        self._server.port = self.config.port
         self._server.on_ws_connect(self._handle_ws_connect)
         self._server.on_ws_message(self._handle_ws_message)
         self._server.on_ws_disconnect(self._handle_ws_disconnect)

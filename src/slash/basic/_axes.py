@@ -39,6 +39,14 @@ r.setAttribute("width", w + 16);
 class Axes(SVG):
     """Figure with x-axis and y-axis.
 
+    Example:
+
+        >>> from slash.basic import Axes, Graph
+        >>>
+        >>> axes = Axes()
+        >>> axes.add_plot(Graph([0, 1, 2, 3], [42, 37, 96, 51]))
+        >>> axes.render()
+
     Args:
         width: Width of the figure in pixels.
         height: Height of the figure in pixels.
@@ -439,7 +447,7 @@ class Axes(SVG):
     def xticks(self) -> Sequence[tuple[float, str]]:
         if self._xticks is not None:
             return self._xticks
-        interval = round_125((self._view.x_max - self._view.x_min) / 10)
+        interval = _round_125((self._view.x_max - self._view.x_min) / 10)
         x = math.ceil(self._view.x_min / interval) * interval
         ticks = [x]
         while x + interval <= self._view.x_max:
@@ -454,7 +462,7 @@ class Axes(SVG):
     def yticks(self) -> Sequence[tuple[float, str]]:
         if self._yticks is not None:
             return self._yticks
-        interval = round_125((self._view.y_max - self._view.y_min) / 10)
+        interval = _round_125((self._view.y_max - self._view.y_min) / 10)
         y = math.ceil(self._view.y_min / interval) * interval
         ticks = [y]
         while y + interval <= self._view.y_max:
@@ -471,7 +479,7 @@ class Axes(SVG):
         return default_color(self._color_counter - 1)
 
 
-def round_125(x: float) -> float:
+def _round_125(x: float) -> float:
     """Round to the nearest 1, 2 or 5 times a power of 10."""
     if x == 0:
         return 0
