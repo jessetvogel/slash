@@ -53,6 +53,8 @@ class Session:
         self._location = Location("")
         self._history = History()
 
+        self._data: dict[str, str] = {}
+
     @staticmethod
     def current() -> Session | None:
         """Get the current session.
@@ -310,6 +312,26 @@ class Session:
             url: URL to navigate to.
         """
         self.send(Message(event="location", url=url))
+
+    def set_data(self, name: str, value: str) -> None:
+        """Set session data.
+
+        Args:
+            name: Data entry key.
+            value: Data entry value.
+        """
+        self._data[name] = value
+
+    def get_data(self, name: str) -> str | None:
+        """Get session data.
+
+        Args:
+            name: Data entry key.
+
+        Returns:
+            Data entry value.
+        """
+        return self._data.get(name, None)
 
 
 # Attributes

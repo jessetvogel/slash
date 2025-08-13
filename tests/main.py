@@ -18,6 +18,7 @@ from tests.html import test_html
 from tests.image import test_image
 from tests.input import test_input
 from tests.js import test_js
+from tests.latex import test_latex
 from tests.log import test_log
 from tests.markdown import test_markdown
 from tests.progress import test_progress
@@ -51,6 +52,7 @@ TESTS: dict[str, Callable[[], Elem]] = {
     "tabs": test_tabs,
     "html": test_html,
     "history": test_history,
+    "latex": test_latex,
 }
 
 
