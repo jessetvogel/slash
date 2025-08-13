@@ -305,6 +305,16 @@ class Session:
             Message.create(tag="link", id=random_id(), parent="head", rel="stylesheet", type="text/css", href=url)
         )
 
+    def add_script(self, path: Path) -> None:
+        """Add script.
+
+        Args:
+            path: Path to script.
+        """
+        url = f"/style/{random_id()}.js"
+        self._server.share_file(url, path)
+        self.send(Message.create(tag="script", id=random_id(), parent="head", type="text/javascript", src=url))
+
     def set_location(self, url: str) -> None:
         """Navigate to location.
 
