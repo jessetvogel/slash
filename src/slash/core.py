@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import inspect
-from collections.abc import Awaitable, Callable, Mapping
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextvars import ContextVar
 from dataclasses import dataclass
 from pathlib import Path
@@ -22,7 +22,7 @@ from slash.js import JSFunction
 
 T = TypeVar("T")
 
-Handler: TypeAlias = Callable[[T], Awaitable[None] | None] | Callable[[], Awaitable[None] | None]
+Handler: TypeAlias = Callable[[T], Awaitable[Any] | Any] | Callable[[], Awaitable[Any] | Any]
 
 # Session
 
@@ -422,7 +422,7 @@ class Elem:
     def __init__(
         self,
         tag: str,
-        *children: Elem | str | list[Elem | str],
+        *children: Elem | str | Sequence[Elem | str],
         **attrs: str | int,
     ) -> None:
         self._tag = tag
@@ -752,7 +752,7 @@ class Elem:
 
 # Types
 
-Children: TypeAlias = Elem | str | list[Elem | str]
+Children: TypeAlias = Elem | str | Sequence[Elem | str]
 
 
 # History
