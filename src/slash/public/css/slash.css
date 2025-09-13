@@ -250,7 +250,7 @@
     position: relative;
     cursor: pointer;
     padding-left: 26px;
-    margin: 6px;
+    margin: 6px 6px 6px 0px;
 
     &::before {
         content: "";
