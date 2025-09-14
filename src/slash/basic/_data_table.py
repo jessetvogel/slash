@@ -42,7 +42,6 @@ class DataTable(Elem):
         self._sort_key: str | None
 
         self._init_table()
-        self._update_controls()
 
     @property
     def max_rows(self) -> int:
@@ -133,11 +132,11 @@ class DataTable(Elem):
         """Update table data."""
         for i, tr in zip(range(self._max_rows), self._table.children[1:]):
             assert isinstance(tr, Tr)
-            if self._index + i >= len(self._data):
+            index = self._index + i
+            if index >= len(self._data):
                 tr.style({"display": "none"})
                 continue
             tr.style({"display": None})
-            index = self._index + i
             if self._sort_indices is not None:
                 index = self._sort_indices[index] if self._sort_asc else self._sort_indices[len(self._data) - 1 - index]
             datum = self._data[index]
@@ -166,6 +165,20 @@ class DataTable(Elem):
         self._set_sort_key(None)
         self._update_sort()
         self._update_data()
+        self._update_controls()
+
+    def set_keys(self, keys: Sequence[str]) -> Self:
+        """Set keys for table columns.
+
+        Args:
+            keys: Sequence of column headings.
+        """
+        self._keys = list(keys)
+        if self._sort_key not in self._keys:
+            self._set_sort_key(None)
+        self._update_sort_indices()
+        self._init_table()
+        return self
 
     def set_data(self, data: Sequence[Datum]) -> Self:
         """Set data for table contents.
@@ -176,5 +189,6 @@ class DataTable(Elem):
         """
         self._data = data
         self._index = 0
+        self._update_sort_indices()
         self._update_data()
         return self
