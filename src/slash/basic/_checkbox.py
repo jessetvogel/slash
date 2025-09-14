@@ -12,7 +12,7 @@ class Checkbox(Elem, SupportsOnClick):
         checked: Flag indicating if checkbox is checked.
     """
 
-    def __init__(self, label: str = "", *, checked: bool = False) -> None:
+    def __init__(self, label: str | Elem = "", *, checked: bool = False) -> None:
         super().__init__("label", label)
         self._label = label
         self._checked = checked
@@ -20,7 +20,7 @@ class Checkbox(Elem, SupportsOnClick):
         self.onclick(self._handle_click)
 
     @property
-    def label(self) -> str:
+    def label(self) -> str | Elem:
         return self._label
 
     @label.setter
