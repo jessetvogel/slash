@@ -5,8 +5,7 @@ import random
 
 import numpy as np
 
-from slash.basic._axes import Axes, Bar, Graph, Scatter
-from slash.basic._pie import Pie
+from slash.basic import Axes, Bar, FillBetween, Graph, Pie, Scatter
 from slash.core import Elem
 from slash.html import Button, Div, Input
 from slash.layout import Panel, Row
@@ -56,10 +55,14 @@ def update_axes(axes: Axes) -> None:
     xs = [n / 5 for n in range(n + 1)]
     ys = [0.2 + 0.4 * math.sin(f * x + p) for x in xs]
 
+    y1s = [0.6 + 0.1 * math.sin(f * x + p) for x in xs]
+    y2s = [0.7 + 0.1 * math.sin(f * x + p) for x in xs]
+
     axes.clear_plots()
     axes.add_plot(Bar(xs, ys, label="bar"))
     axes.add_plot(Graph(xs, ys, label="graph"))
     axes.add_plot(Scatter(xs, ys, label="scatter"))
+    axes.add_plot(FillBetween(xs, y1s, y2s, label="fill", opacity=0.5))
 
     axes.set_xlim(-1.0, 11.0)
     axes.set_ylim(-1.0, 1.0)

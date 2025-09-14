@@ -1,6 +1,6 @@
 """This module contains the Slash basic components."""
 
-from slash.basic._axes import Axes, Bar, Graph, Plot, Scatter
+from slash.basic._axes import Axes, Bar, FillBetween, Graph, Plot, Scatter
 from slash.basic._checkbox import Checkbox
 from slash.basic._data_table import DataTable
 from slash.basic._download import Download
@@ -31,4 +31,5 @@ __all__: list[str] = [
     "SVGElem",
     "Tabs",
     "Upload",
+    "FillBetween",
 ]

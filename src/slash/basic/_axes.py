@@ -498,6 +498,7 @@ class Plot(ABC):
         xs: X-coordinates of data points.
         ys: Y-coordinates of data points.
         color: Color in HTML notation. If ``None``, one of the default colors is used.
+        opacity: Opacity value.
         label: Label to be used in the legend.
     """
 
@@ -505,6 +506,7 @@ class Plot(ABC):
     ys: Sequence[float]
     color: str | None = None
     label: str | None = None
+    opacity: float = 1.0
 
     @abstractmethod
     def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]) -> None:
@@ -525,6 +527,7 @@ class Graph(Plot):
         xs: X-coordinates of data points.
         ys: Y-coordinates of data points.
         color: Color in HTML notation. If ``None``, one of the default colors is used.
+        opacity: Opacity value.
         label: Label to be used in the legend.
     """
 
@@ -550,11 +553,12 @@ class Scatter(Plot):
         xs: X-coordinates of data points.
         ys: Y-coordinates of data points.
         color: Color in HTML notation. If ``None``, one of the default colors is used.
+        opacity: Opacity value.
         label: Label to be used in the legend.
     """
 
     def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]):
-        circles = SVGElem("g", **{"fill": self.color})
+        circles = SVGElem("g", fill=self.color, opacity=str(self.opacity))
         for x, y in zip(self.xs, self.ys):
             u, v = xy_to_uv(x, y)
             circles.append(SVGElem("circle", cx=u, cy=v, r=3))
@@ -569,6 +573,7 @@ class Bar(Plot):
         xs: X-coordinates of data points.
         ys: Y-coordinates of data points.
         color: Color in HTML notation. If ``None``, one of the default colors is used.
+        opacity: Opacity value.
         label: Label to be used in the legend.
         width: Width of the bars.
     """
@@ -576,7 +581,7 @@ class Bar(Plot):
     width: float | None = None
 
     def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]):
-        bars = SVGElem("g", **{"fill": self.color})
+        bars = SVGElem("g", fill=self.color, opacity=str(self.opacity))
 
         width = self.width or 0.5 * max(abs(x2 - x1) for x1, x2 in zip(self.xs, self.xs[1:]))
 
@@ -587,3 +592,49 @@ class Bar(Plot):
             bars.append(SVGElem("rect", x=u1, y=y, width=u2 - u1, height=height))
 
         frame.append(bars)
+
+
+@dataclass
+class FillBetween(Plot):
+    """Fill plot.
+
+    Args:
+        xs: X-coordinates of data points.
+        ys: First set of y-coordinates of data points.
+        zs: Second set of y-coordinates of data points.
+        color: Color in HTML notation. If ``None``, one of the default colors is used.
+        opacity: Opacity value.
+        label: Label to be used in the legend.
+    """
+
+    def __init__(
+        self,
+        xs: Sequence[float],
+        ys: Sequence[float],
+        zs: Sequence[float] | None = None,
+        color: str | None = None,
+        opacity: float = 1.0,
+        label: str | None = None,
+    ) -> None:
+        super().__init__(xs, ys, color=color, opacity=opacity, label=label)
+
+        self.zs: Sequence[float] = zs if zs is not None else [0.0] * len(xs)
+
+    def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]):
+        points = []
+        for x, y in zip(self.xs, self.ys):
+            u, v = xy_to_uv(x, y)
+            points.append(f"{u},{v}")
+        for x, z in zip(reversed(self.xs), reversed(self.zs)):
+            u, v = xy_to_uv(x, z)
+            points.append(f"{u},{v}")
+
+        frame.append(
+            SVGElem(
+                "polyline",
+                points=" ".join(points),
+                fill=self.color,
+                stroke="none",
+                opacity=str(self.opacity),
+            )
+        )
