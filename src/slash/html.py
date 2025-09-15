@@ -1,5 +1,7 @@
 """This module contains the Slash HTML elements."""
 
+from __future__ import annotations
+
 from typing import Literal, Self
 
 from slash._message import Message
@@ -317,9 +319,9 @@ class Img(Elem):
 class Select(Elem, SupportsOnChange):
     """HTML ``<select>`` element."""
 
-    def __init__(self, options: list[str]):
-        super().__init__("select", *[Elem("option", option) for option in options])
-        self._value = options[0]
+    def __init__(self, options: list[Option]):
+        super().__init__("select", *options)
+        self._value: str = options[0].value
         self.onchange(self._handle_change)
 
     @property
@@ -338,6 +340,26 @@ class Select(Elem, SupportsOnChange):
 
     def _handle_change(self, event: ChangeEvent) -> None:
         self.value = event.value
+
+
+class Option(Elem):
+    """HTML ``<option>`` element."""
+
+    value = Attr("value")
+    disabled = Attr("disabled")
+    hidden = Attr("hidden")
+
+    def __init__(
+        self,
+        text: str = "",
+        value: str | None = None,
+        disabled: bool = False,
+        hidden: bool = False,
+    ) -> None:
+        super().__init__("option", text)
+        self.value = value if value is not None else text
+        self.disabled = "" if disabled else None
+        self.hidden = "" if hidden else None
 
 
 _JS_DIALOG_SHOW = JSFunction(["id"], "document.getElementById(id).show()")

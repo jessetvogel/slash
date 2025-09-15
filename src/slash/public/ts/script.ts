@@ -308,7 +308,7 @@ class Client {
             }
 
             if (attr == "value") {
-                if ('value' in elem) {
+                if ("value" in elem) {
                     elem.value = message.value;
                     continue;
                 }
