@@ -24,9 +24,9 @@ class LaTeX(HTML):
 
     def set_latex(self, latex) -> Self:
         if self._display:
-            self.set_html(f"\[{latex}\]")
+            self.set_html(f"\\[{latex}\\]")
         else:
-            self.set_html(f"\({latex}\)")
+            self.set_html(f"\\({latex}\\)")
         return self
 
     def _add_script(self) -> None:
