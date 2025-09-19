@@ -268,8 +268,6 @@
     }
 
     &.checked {
-        background-color: var(--bg-extra-light);
-
         &::after {
             content: "";
             position: absolute;
