@@ -220,6 +220,14 @@ class Axes(SVG):
         self._view.y_min = self.ylim[0] if self.ylim[0] is not None else min(y for p in self._plots for y in p.ys)
         self._view.y_max = self.ylim[1] if self.ylim[1] is not None else max(y for p in self._plots for y in p.ys)
 
+        if self._view.x_min == self._view.x_max:
+            self._view.x_min -= 0.5
+            self._view.x_max += 0.5
+
+        if self._view.y_min == self._view.y_max:
+            self._view.y_min -= 0.5
+            self._view.y_max += 0.5
+
     def _update_defs(self) -> None:
         if not hasattr(self, "_svg_defs"):
             self._svg_defs = SVGElem("defs")
