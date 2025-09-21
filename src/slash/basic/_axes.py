@@ -215,10 +215,19 @@ class Axes(SVG):
         self._view.u_min = 48 if self.ylabel is not None else 24
         self._view.u_max = self._width - 16
 
-        self._view.x_min = self.xlim[0] if self.xlim[0] is not None else min(x for p in self._plots for x in p.xs)
-        self._view.x_max = self.xlim[1] if self.xlim[1] is not None else max(x for p in self._plots for x in p.xs)
-        self._view.y_min = self.ylim[0] if self.ylim[0] is not None else min(y for p in self._plots for y in p.ys)
-        self._view.y_max = self.ylim[1] if self.ylim[1] is not None else max(y for p in self._plots for y in p.ys)
+        def either(a: float | None, b: float) -> float:
+            return a if a is not None else b
+
+        if self._plots:
+            self._view.x_min = either(self.xlim[0], min(x for p in self._plots for x in p.xs))
+            self._view.x_max = either(self.xlim[1], max(x for p in self._plots for x in p.xs))
+            self._view.y_min = either(self.ylim[0], min(y for p in self._plots for y in p.ys))
+            self._view.y_max = either(self.ylim[1], max(y for p in self._plots for y in p.ys))
+        else:
+            self._view.x_min = either(self.xlim[0], 0.0)
+            self._view.x_max = either(self.xlim[1], self._view.x_min + 1.0)
+            self._view.y_min = either(self.ylim[0], 0.0)
+            self._view.y_max = either(self.ylim[1], self._view.y_min + 1.0)
 
         if self._view.x_min == self._view.x_max:
             self._view.x_min -= 0.5
