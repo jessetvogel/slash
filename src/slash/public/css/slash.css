@@ -282,6 +282,11 @@
             filter: var(--invert-filter);
         }
     }
+
+    &.disabled {
+        opacity: 0.4;
+        cursor: default;
+    }
 }
 
 .slash-radio::before {

@@ -13,11 +13,15 @@ def test_form() -> Elem:
                 Checkbox("Monday"),
                 Checkbox("Tuesday"),
                 Checkbox("Wednesday"),
+                Checkbox("This should be checked by default", checked=True),
+                Checkbox("This should be disabled", disabled=True),
             ),
             Column(
                 radio := Radio("13:00"),
                 Radio("14:00").connect(radio),
                 Radio("15:00").connect(radio),
+                Radio("This should be checked by default", checked=True).connect(radio),
+                Radio("This should be disabled", disabled=True).connect(radio),
             ),
         ).style({"gap": "32px"}),
     )
