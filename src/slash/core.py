@@ -588,8 +588,12 @@ class Elem:
         for handler in self._onmount_handlers:
             session.call_handler(handler, MountEvent(self))
 
-    def unmount(self) -> None:
-        """Unmount element."""
+    def unmount(self, *, reset_parent: bool = True) -> None:
+        """Unmount element.
+
+        Args:
+            reset_parent: Flag indicating whether parent should be reset.
+        """
         session = Session.require()
 
         # If not yet mounted, raise exception
@@ -599,7 +603,11 @@ class Elem:
         # Unmount children
         for child in self.children:
             if isinstance(child, Elem):
-                child.unmount()
+                child.unmount(reset_parent=False)
+
+        # Reset parent
+        if reset_parent:
+            self._parent = None
 
         # Unmark as mounted
         session._mounted_elems.pop(self.id)
@@ -624,6 +632,10 @@ class Elem:
                     child.unmount()
             if (session := Session.current()) is not None:
                 session.send(Message.clear(self.id))
+        else:
+            for child in self.children:
+                if isinstance(child, Elem):
+                    child._parent = None
         self._children = []
 
     def append(self, *children: Children) -> Self:

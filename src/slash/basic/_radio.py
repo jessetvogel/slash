@@ -16,7 +16,7 @@ class Radio(Elem, SupportsOnClick):
     """
 
     def __init__(self, label: str | Elem = "", *, checked: bool = False, disabled: bool = False) -> None:
-        super().__init__("label", label)
+        super().__init__("label")
         self.label = label
         self.checked = checked
         self.disabled = disabled
@@ -34,7 +34,7 @@ class Radio(Elem, SupportsOnClick):
         self.clear()
         self.append(label)
 
-    def set_label(self, label: str) -> Self:
+    def set_label(self, label: str | Elem) -> Self:
         self.label = label
         return self
 
