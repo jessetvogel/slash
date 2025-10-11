@@ -262,7 +262,7 @@ class Axes(SVG):
             self._svg_axes = SVGElem(
                 "polyline",
                 fill="none",
-                **{"stroke": "var(--fg)", "stroke-width": "1"},
+                **{"stroke": "var(--text)", "stroke-width": "1"},
             )
             self.append(self._svg_axes)
 
@@ -302,7 +302,7 @@ class Axes(SVG):
                 width=0,
                 height=0,
                 fill="color-mix(in srgb, var(--bg-light) 67%, transparent)",
-                stroke="var(--border-light)",
+                stroke="var(--border)",
             )
         )
 
@@ -320,7 +320,7 @@ class Axes(SVG):
                         **{
                             "text-anchor": "start",
                             "dominant-baseline": "middle",
-                            "fill": "var(--fg)",
+                            "fill": "var(--text)",
                         },
                     )
                 )
@@ -349,7 +349,7 @@ class Axes(SVG):
         if not hasattr(self, "_svg_ticks"):
             self._svg_ticks = SVGElem(
                 "g",
-                **{"stroke": "var(--fg)", "stroke-width": "1"},
+                **{"stroke": "var(--text)", "stroke-width": "1"},
             )
             self.append(self._svg_ticks)
 
@@ -359,7 +359,7 @@ class Axes(SVG):
             {
                 "font-size": "10px",
                 "stroke-width": "0",
-                "fill": "var(--fg)",
+                "fill": "var(--text)",
             }
         )
 
@@ -394,7 +394,7 @@ class Axes(SVG):
 
     def _update_grid(self) -> None:
         if not hasattr(self, "_svg_grid"):
-            self._svg_grid = SVGElem("g", **{"stroke": "var(--fg)", "stroke-width": "1", "opacity": 0.2})
+            self._svg_grid = SVGElem("g", **{"stroke": "var(--text)", "stroke-width": "1", "opacity": 0.2})
             self.append(self._svg_grid)
 
         self._svg_grid.clear()
@@ -410,7 +410,7 @@ class Axes(SVG):
 
     def _update_labels(self) -> None:
         if not hasattr(self, "_svg_labels"):
-            self._svg_labels = SVGElem("g").style({"fill": "var(--fg)"})
+            self._svg_labels = SVGElem("g").style({"fill": "var(--text)"})
             self.append(self._svg_labels)
 
         self._svg_labels.clear()

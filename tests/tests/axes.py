@@ -7,8 +7,8 @@ import numpy as np
 
 from slash.basic import Axes, Bar, FillBetween, Graph, Pie, Scatter
 from slash.core import Elem
-from slash.html import Button, Div, Input
-from slash.layout import Panel, Row
+from slash.html import Button, Input
+from slash.layout import Column, Panel, Row
 
 CENTERED_PANEL = {
     "display": "flex",
@@ -19,7 +19,7 @@ CENTERED_PANEL = {
 
 
 def test_axes() -> Elem:
-    return Div(
+    return Column(
         Panel(
             axes := Axes(width=512, height=320)
             .set_title("Some random axes figure")
@@ -35,7 +35,7 @@ def test_axes() -> Elem:
                 ).oninput(
                     lambda event: set_axes_title(axes, event.value),
                 ),
-            ).style({"gap": "8px"}),
+            ).style({"gap": "16px"}),
         ).style(CENTERED_PANEL),
         Panel(
             pie := Pie(width=512, height=320).onmount(lambda _: update_pie(pie)),
@@ -45,7 +45,7 @@ def test_axes() -> Elem:
             bar := Axes(width=512, height=320).onmount(lambda _: update_bar(bar)),
             Button("Update bar chart").onclick(lambda _: update_bar(bar)),
         ).style(CENTERED_PANEL),
-    )
+    ).style({"gap": "16px"})
 
 
 def update_axes(axes: Axes) -> None:

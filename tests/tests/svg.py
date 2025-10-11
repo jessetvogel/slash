@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from slash.basic._svg import SVG, SVGElem
 from slash.core import Elem
-from slash.html import Div
+from slash.html import Code, Div, P
 from slash.layout import Panel
 
 
 def test_svg() -> Elem:
     return Div(
+        P("This page tests the ", Code("SVG"), " element."),
         Panel(
             SVG(
                 SVGElem(

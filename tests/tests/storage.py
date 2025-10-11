@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from slash.core import Elem, Session
-from slash.html import Button, Input, Span
+from slash.html import Button, Input, P, Span
 from slash.layout import Column, Row
 
 
@@ -58,9 +58,9 @@ def update_storage(value: str, span: Span) -> None:
 
 def test_storage() -> Elem:
     return Column(
-        span := Span().onmount(lambda: update_span(span)),
+        P(span := Span().onmount(lambda: update_span(span))),
         Row(
             input := Input(placeholder="Enter new value here"),
             Button("Store").onclick(lambda: update_storage(input.value, span)),
-        ),
+        ).style({"gap": "16px"}),
     )

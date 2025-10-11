@@ -16,6 +16,6 @@ def test_markdown() -> Elem:
         ),
         Textarea(placeholder="Write some markdown..")
         .oninput(lambda event: output.set_markdown(event.value))
-        .style({"width": "100%", "box-sizing": "border-box", "margin": "8px 0px"}),
+        .style({"width": "100%", "box-sizing": "border-box", "margin": "16px 0px"}),
         Panel(output),
     )

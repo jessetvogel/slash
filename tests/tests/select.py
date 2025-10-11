@@ -1,9 +1,10 @@
 from slash.core import Elem
-from slash.html import Div, Option, Select, Span
+from slash.html import Code, Div, Option, P, Select, Span
 
 
 def test_select() -> Elem:
     return Div(
+        P("This page tests the ", Code("Select"), " element."),
         select := Select(
             [
                 Option("Select a bird ..", disabled=True, hidden=True),

@@ -199,8 +199,11 @@ class A(Elem, SupportsOnClick):
 class Button(Elem, SupportsOnClick):
     """HTML ``<button>`` element."""
 
-    def __init__(self, *children: Children) -> None:
+    disabled = Attr("disabled")
+
+    def __init__(self, *children: Children, disabled: bool = False) -> None:
         super().__init__("button", *children)
+        self.disabled = "" if disabled else None
 
 
 class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
@@ -321,6 +324,9 @@ class Select(Elem, SupportsOnChange):
 
     def __init__(self, options: list[Option]):
         super().__init__("select", *options)
+        if not all(isinstance(option, Option) for option in options):
+            msg = "Children of `Select` must be of type `Option`"
+            raise ValueError(msg)
         self._value: str = options[0].value
         self.onchange(self._handle_change)
 

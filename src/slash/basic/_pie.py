@@ -102,7 +102,7 @@ class Pie(SVG):
         r, g = self.radius, self.gap
 
         self.append(style := Elem("style"))
-        self.style({"fill": "var(--fg)"})
+        self.style({"fill": "var(--text)"})
 
         if self.title is not None:
             self.append(
@@ -176,7 +176,7 @@ class Pie(SVG):
                     y1=v + (r - 8) * math.sin(theta + d_theta / 2.0),
                     x2=8 if text_anchor == "start" else self._width - 8,
                     y2=v + (r - 8) * math.sin(theta + d_theta / 2.0),
-                    stroke="var(--fg)",
+                    stroke="var(--text)",
                 ).set_attr("stroke-width", 1)
             )
 

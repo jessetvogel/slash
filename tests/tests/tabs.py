@@ -1,6 +1,6 @@
 from slash.basic._tabs import Tabs
 from slash.core import Elem
-from slash.html import Div
+from slash.html import Code, Div, P
 
 
 def test_tabs() -> Elem:
@@ -13,6 +13,7 @@ def test_tabs() -> Elem:
             content.set_text("You made it to the third tab!")
 
     return Div(
+        P("This page tests the ", Code("Tabs"), " element."),
         tabs := Tabs(
             ["Tab 1", "Tab 2", "Tab 3"],
         ).onchange(lambda event: set_tab(event.value)),

@@ -19,6 +19,7 @@ from slash.html import (
     Label,
     Li,
     Ol,
+    Option,
     P,
     Pre,
     Select,
@@ -97,7 +98,14 @@ def test_html() -> Elem:
         H3(Code("Pre")),
         Pre("This is a <pre> element.\nThis should be on a new line."),
         H3(Code("Select")),
-        Select(["This is a <select> element.", "Yes, it really is.", "Are you sure?", "Yes, I am sure."]),
+        Select(
+            [
+                Option("This is a <select> element."),
+                Option("Yes, it really is."),
+                Option("Are you sure?"),
+                Option("Yes, I am sure."),
+            ]
+        ),
         H3(Code("Span")),
         Span("This is a <span> element."),
         H3(Code("Table"), ", ", Code("Tr"), ", ", Code("Th"), ", and ", Code("Td")),

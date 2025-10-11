@@ -1,4 +1,17 @@
 body {
+    /* Background, text colors, borders */
+    --bg-dark: #f1efec;
+    --bg: #f8f7f6;
+    --bg-light: #fff;
+    --bg-extra-light: #fff;
+
+    --text: #101010;
+    --text-muted: #6f6f6f;
+
+    --highlight: #fff;
+    --border: #ccc;
+    --border-muted: #bbb;
+
     /* Colors */
     --white: #ffffff;
     --black: #101010;
@@ -17,42 +30,22 @@ body {
     --pink: #ce5ca7;
     --aubergine: #a23f61;
 
-    --primary-color: var(--blue);
-    --secondary-color: var(--yellow);
-
-    --bg-dark: #f1efec;
-    --bg: #f8f7f6;
-    --bg-light: #fff;
-
-    --fg: var(--black);
-
-    --border: #bbb;
-    --border-light: #ccc;
-
-    --button-bg: var(--white);
-    --button-bg-hover: #eee;
-    --button-text-color: var(--black);
-    --button-border: 1px solid var(--border-light);
-
-    --input-bg-color: var(--white);
-    --input-text-color: var(--black);
-    --input-border: 1px solid var(--border-light);
-
-    --pre-bg-color: #eee;
-    --pre-text-color: #574f43;
-    --pre-border: 1px solid var(--border);
-
-    --dialog-bg-color: var(--bg);
-    --dialog-border: 1px solid var(--border);
-    --dialog-backdrop-color: rgba(0, 0, 0, 0.075);
-
-    --blockquote-bg-color: #eee;
-    --blockquote-text-color: #444;
-
+    /* Semantic colors */
     --error-text-color: var(--red);
     --info-text-color: var(--blue);
     --warning-text-color: var(--yellow);
     --debug-text-color: var(--green);
+
+    --primary-color: var(--blue);
+    --secondary-color: var(--yellow);
+
+    /* Specifics */
+
+    --dialog-backdrop-color: rgba(0, 0, 0, 0.075);
+
+    --code-bg: var(--bg);
+    --code-text: var(--text-muted);
+    --code-border: var(--border-muted);
 
     --shadow: 0px 0px 8px rgba(0, 0, 0, 0.075);
     --invert-filter: invert(0);
@@ -62,36 +55,26 @@ body {
 }
 
 body.dark {
+    /* Background, text colors, borders */
     --bg-dark: #161515;
     --bg: #252524;
     --bg-light: #3d3c3a;
     --bg-extra-light: #5b5a57;
 
-    --fg: #f9f9f9;
-    --fg-soft: #777;
+    --text: #f2f2f2;
+    --text-muted: #ccc;
 
-    --border-light: #777069;
-    --border: #44413f;
+    --highlight: #999999;
+    --border: #777069;
+    --border-muted: #44413f;
 
-    --button-bg: var(--bg-light);
-    --button-bg-hover: var(--bg-extra-light);
-    --button-text-color: var(--white);
-    --button-border: 1px solid var(--border-light);
+    /* Specifics */
 
-    --input-bg-color: var(--bg-light);
-    --input-text-color: var(--fg);
-    --input-border: 1px solid var(--border-light);
-
-    --pre-bg-color: var(--bg-light);
-    --pre-text-color: #b0aa9d;
-    --pre-border: 1px solid var(--border-light);
-
-    --dialog-bg-color: var(--bg);
-    --dialog-border: 1px solid var(--border);
     --dialog-backdrop-color: rgba(0, 0, 0, 0.67);
 
-    --blockquote-bg-color: #eee;
-    --blockquote-text-color: #444;
+    --code-bg: var(--bg);
+    --code-text: var(--text-muted);
+    --code-border: var(--border-muted);
 
     --error-text-color: var(--red);
     --info-text-color: var(--blue);
@@ -119,16 +102,16 @@ input {
 
 body {
     background-color: var(--bg-dark);
-    color: var(--fg);
+    color: var(--text);
 }
 
 button,
 input[type~="button"],
 input[type~="reset"],
 input[type~="submit"] {
-    background-color: var(--button-bg);
-    color: var(--button-text-color);
-    border: var(--button-border);
+    background-color: var(--bg-light);
+    color: var(--text);
+    border: 1px solid var(--border);
     border-radius: 4px;
     font-size: 1rem;
     padding: 8px 16px;
@@ -140,23 +123,28 @@ input[type~="submit"] {
     transition: background-color 0.2s;
 
     &:hover {
-        background-color: var(--button-bg-hover);
+        background-color: var(--bg-extra-light);
     }
 
-    &.disabled {
-        opacity: 0.5;
+    &.disabled,
+    &:disabled {
+        opacity: 0.4;
         cursor: default;
 
         &:hover {
-            background-color: var(--button-bg);
+            background-color: var(--bg-light);
         }
     }
 }
 
+*::placeholder {
+    color: var(--text-muted);
+}
+
 input[type~="color"] {
-    background-color: var(--button-bg);
-    color: var(--button-text-color);
-    border: var(--button-border);
+    background-color: var(--bg-light);
+    color: var(--text);
+    border: 1px solid var(--border);
     border-radius: 4px;
     font-size: 1rem;
     padding: 6px;
@@ -169,7 +157,7 @@ input[type~="color"] {
     transition: background-color 0.2s;
 
     &:hover {
-        background-color: var(--button-bg-hover);
+        background-color: var(--bg-extra-light);
     }
 }
 
@@ -187,9 +175,9 @@ input[type~="url"],
 input[type~="week"],
 textarea,
 select {
-    background-color: var(--input-bg-color);
-    color: var(--input-text-color);
-    border: var(--input-border);
+    background-color: var(--bg-light);
+    color: var(--text);
+    border: 1px solid var(--border);
     border-radius: 4px;
     padding: 8px;
     line-height: 22px;
@@ -207,9 +195,9 @@ input[type="range"] {
 }
 
 dialog {
-    background-color: var(--dialog-bg-color);
-    color: var(--fg);
-    border: var(--dialog-border);
+    background-color: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border-muted);
     border-radius: 8px;
     box-shadow: var(--shadow);
     padding: 16px;
@@ -223,18 +211,18 @@ dialog {
 }
 
 blockquote {
-    color: var(--blockquote-text-color);
+    color: var(--text-muted);
     /* padding: 0.01px; */
     padding-left: 12px;
     margin: 0px;
-    border-left: 8px solid var(--border);
+    border-left: 8px solid var(--border-muted);
     font-style: italic;
 }
 
 code {
-    background-color: var(--pre-bg-color);
-    color: var(--pre-text-color);
-    border: var(--pre-border);
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    border: 1px solid var(--code-border);
     border-radius: 4px;
     padding: 3px;
     margin: 0px 2px;
@@ -250,7 +238,7 @@ pre code {
 }
 
 hr {
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-muted);
     border-bottom: 0px;
 }
 

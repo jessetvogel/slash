@@ -17,5 +17,5 @@ def test_js() -> Elem:
         Column(
             textarea := Textarea("alert('Test successful!');", placeholder="Write some JS here.."),
             Button("Execute").onclick(execute),
-        ).style({"gap": "8px"}),
+        ).style({"gap": "16px"}),
     )
