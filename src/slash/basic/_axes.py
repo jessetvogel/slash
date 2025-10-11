@@ -465,31 +465,49 @@ class Axes(SVG):
         if self._xticks is not None:
             return self._xticks
         interval = _round_125((self._view.x_max - self._view.x_min) / 10)
+        decimals = self._decimals_from_interval(interval)
         x = math.ceil(self._view.x_min / interval) * interval
         ticks = [x]
         while x + interval <= self._view.x_max:
             x += interval
             ticks.append(x)
-        return [(x, f"{x:.1f}") for x in ticks]
+        return [(x, f"{x:.{decimals}f}") for x in ticks]
 
     def set_xticks(self, xticks: Sequence[float | tuple[float, str]] | None) -> Self:
-        self._xticks = [(x, f"{x:.1f}") if isinstance(x, float) else x for x in xticks] if xticks is not None else None
+        self._xticks: list[tuple[float, str]] | None
+        if xticks is not None:
+            x_values = [x if isinstance(x, float) else x[0] for x in xticks]
+            decimals = self._decimals_from_interval(min(abs(x2 - x1) for x1, x2 in zip(x_values, x_values[1:])))
+            self._xticks = [(x, f"{x:.{decimals}f}") if isinstance(x, float) else x for x in xticks]
+        else:
+            self._xticks = None
         return self
 
     def yticks(self) -> Sequence[tuple[float, str]]:
         if self._yticks is not None:
             return self._yticks
         interval = _round_125((self._view.y_max - self._view.y_min) / 10)
+        decimals = self._decimals_from_interval(interval)
         y = math.ceil(self._view.y_min / interval) * interval
         ticks = [y]
         while y + interval <= self._view.y_max:
             y += interval
             ticks.append(y)
-        return [(y, f"{y:.1f}") for y in ticks]
+        return [(y, f"{y:.{decimals}f}") for y in ticks]
 
     def set_yticks(self, yticks: Sequence[float | tuple[float, str]] | None) -> Self:
-        self._yticks = [(y, f"{y:.1f}") if isinstance(y, float) else y for y in yticks] if yticks is not None else None
+        self._yticks: list[tuple[float, str]] | None
+        if yticks is not None:
+            y_values = [y if isinstance(y, float) else y[0] for y in yticks]
+            decimals = self._decimals_from_interval(min(abs(y2 - y1) for y1, y2 in zip(y_values, y_values[1:])))
+            self._yticks = [(y, f"{y:.{decimals}f}") if isinstance(y, float) else y for y in yticks]
+        else:
+            self._yticks = None
         return self
+
+    def _decimals_from_interval(self, interval: float) -> int:
+        """Compute number of decimals required to distinguish numbers that are interval apart."""
+        return max(0, math.ceil(-math.log10(interval)))
 
     def _next_color(self) -> str:
         self._color_counter += 1
