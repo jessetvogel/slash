@@ -184,6 +184,7 @@ select {
     outline: none;
     font-size: 1rem;
     box-shadow: var(--shadow);
+    font-family: var(--main-font);
 }
 
 textarea {
