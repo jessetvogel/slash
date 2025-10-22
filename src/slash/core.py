@@ -184,11 +184,12 @@ class Session:
         self._queue_upload_callbacks = []
 
         # Send all messages (including flush event)
-        self.send(Message("flush"))
-        for data in self._queue_messages:
-            await self._client.send(data)
+        if self._queue_messages:
+            self.send(Message("flush"))
+            for data in self._queue_messages:
+                await self._client.send(data)
 
-        self._queue_messages = []
+            self._queue_messages = []
 
     def share_file(self, path: Path) -> str:
         """Create a download endpoint for a local file.

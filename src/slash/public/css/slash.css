@@ -9,7 +9,6 @@
     align-items: center;
     justify-content: center;
     gap: 32px;
-    background-color: var(--main-bg-color);
     animation: fade-in 1.0s forwards;
 
     span {
