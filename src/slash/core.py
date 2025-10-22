@@ -20,9 +20,9 @@ from slash.js import JSFunction
 
 # Types
 
-T = TypeVar("T")
+E = TypeVar("E")
 
-Handler: TypeAlias = Callable[[T], Awaitable[Any] | Any] | Callable[[], Awaitable[Any] | Any]
+Handler: TypeAlias = Callable[[E], None | Awaitable[None]] | Callable[[], None | Awaitable[None]]
 
 # Session
 
@@ -227,7 +227,7 @@ class Session:
         self._queue_upload_callbacks.append((url, callback))
         return url
 
-    def call_handler(self, handler: Handler[T], event: T) -> None:
+    def call_handler(self, handler: Handler[E], event: E) -> None:
         """Call event handler in the context of the session.
 
         Args:
