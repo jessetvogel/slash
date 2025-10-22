@@ -53,8 +53,6 @@ class Session:
         self._location = Location("")
         self._history = History()
 
-        self._data: dict[str, str] = {}
-
     @staticmethod
     def current() -> Session | None:
         """Get the current session.
@@ -323,25 +321,26 @@ class Session:
         """
         self.send(Message(event="location", url=url))
 
-    def set_data(self, name: str, value: str) -> None:
-        """Set session data.
+    def set_data(self, key: str, value: str | None) -> None:
+        """Set value in local storage.
 
         Args:
-            name: Data entry key.
-            value: Data entry value.
+            key: Data entry key.
+            value: Data entry value. If `None`, then the key is removed.
         """
-        self._data[name] = value
+        self._client.localstorage_set(key, value)
+        self.send(Message("data", key=key, value=value))
 
-    def get_data(self, name: str) -> str | None:
-        """Get session data.
+    def get_data(self, key: str) -> str | None:
+        """Get value in local storage.
 
         Args:
-            name: Data entry key.
+            key: Data entry key.
 
         Returns:
             Data entry value.
         """
-        return self._data.get(name, None)
+        return self._client.localstorage_get(key)
 
 
 # Attributes

@@ -47,7 +47,11 @@ class App:
         max_upload_size: int = 10_000_000,  # 10 MB
     ) -> None:
         self._server = Server(
-            host, port, ssl_context=ssl_context, enable_upload=enable_upload, max_upload_size=max_upload_size
+            host,
+            port,
+            ssl_context=ssl_context,
+            enable_upload=enable_upload,
+            max_upload_size=max_upload_size,
         )
         self._routes: dict[str | re.Pattern, Callable[..., Elem]] = {}
         self._sessions: dict[str, Session] = {}
@@ -97,6 +101,9 @@ class App:
             try:
                 # Parse message
                 message = Message.from_json(data)
+                # `data` event
+                if message.event == "data":
+                    self._handle_data_message(client, message)
                 # `load` event
                 if message.event == "load":
                     self._handle_load_message(message)
@@ -128,6 +135,18 @@ class App:
     async def _handle_ws_disconnect(self, client: Client) -> None:
         # Forget session corresponding to client
         self._sessions.pop(client.id)
+
+    def _handle_data_message(self, client: Client, message: Message) -> None:
+        """Handle data event."""
+        key = message.data["key"]
+        value = message.data["value"]
+        if not isinstance(key, str):
+            msg = f"Error in `data` event: expected `key` of type string, but got `{type(key).__name__}`."
+            raise BadMessageException(msg)
+        if not isinstance(value, str):
+            msg = f"Error in `data` event: expected `value` of type string, but got `{type(value).__name__}`."
+            raise BadMessageException(msg)
+        client.localstorage_set(key, value)
 
     def _handle_load_message(self, message: Message) -> None:
         """Handle load event."""

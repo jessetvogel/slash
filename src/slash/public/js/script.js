@@ -20,6 +20,11 @@ class Client {
         const client = this;
         this.socket.onopen = function () {
             console.log('Connection established!');
+            for (let i = 0; i < window.localStorage.length; ++i) {
+                const key = window.localStorage.key(i);
+                const value = window.localStorage.getItem(key);
+                client.send({ event: "data", key: key, value: value });
+            }
             client.send({
                 event: "load",
                 url: window.location.href
@@ -131,6 +136,15 @@ class Client {
             const theme = message.theme;
             document.body.className = theme;
             window.localStorage.setItem("SLASH_THEME", theme);
+            return;
+        }
+        if (event == "data") {
+            const key = message.key;
+            const value = message.value;
+            if (value == null)
+                window.localStorage.removeItem(key);
+            else
+                window.localStorage.setItem(key, value);
             return;
         }
         if (event == "title") {

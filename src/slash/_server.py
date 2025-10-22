@@ -63,6 +63,7 @@ class Client:
         self._id = random_id()
         self._send = send
         self._cookies = dict(cookies or {})
+        self._localstorage: dict[str, str] = {}
 
     @property
     def id(self) -> str:
@@ -74,6 +75,15 @@ class Client:
 
     async def send(self, data: str) -> None:
         await self._send(data)
+
+    def localstorage_set(self, key: str, value: str | None) -> None:
+        if value is None:
+            self._localstorage.pop(key, None)
+        else:
+            self._localstorage[key] = value
+
+    def localstorage_get(self, key: str) -> str | None:
+        return self._localstorage.get(key, None)
 
 
 class Server:
