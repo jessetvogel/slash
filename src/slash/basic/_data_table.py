@@ -142,7 +142,7 @@ class DataTable(Elem):
             datum = self._data[index]
             for key, td in zip(self._keys, tr.children):
                 assert isinstance(td, Td)
-                cell = str(datum[key]) if key in datum else Span("empty").style({"opacity": "0.5"})
+                cell = str(datum[key]) if key in datum else Span("-").style({"color": "var(--text-muted)"})
                 td.clear()
                 td.append(cell)
 

@@ -133,7 +133,10 @@ class Server:
         self.app.on_shutdown.append(self._on_shutdown)
 
         # Run web app
-        web.run_app(self.app, host=self._host, port=self._port, ssl_context=self._ssl_context, print=None)
+        try:
+            web.run_app(self.app, host=self._host, port=self._port, ssl_context=self._ssl_context, print=None)
+        except Exception as err:
+            LOGGER.error(str(err))
 
     async def _on_ws_request(self, request: web.Request) -> web.StreamResponse:
         # Construct websocket response

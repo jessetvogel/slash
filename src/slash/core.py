@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import inspect
+import traceback
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextvars import ContextVar
 from dataclasses import dataclass
@@ -11,6 +12,8 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Literal, Self, TypeAlias, TypeVar
 from urllib.parse import parse_qsl, urlparse
+
+import markdown
 
 from slash._logging import LOGGER
 from slash._message import Message
@@ -259,7 +262,13 @@ class Session:
 
         async def wrapper(session: Session, task: Awaitable[None]) -> None:
             token = Session._current.set(session)
-            await task
+            try:
+                await task
+            except Exception:
+                error = traceback.format_exc()
+                error_mk = "\n".join(["    " + line for line in error.split("\n")])
+                msg = markdown.markdown(error_mk)
+                session.log("error", f"<b>Server error</b>{markdown.markdown(msg)}", format="html")
             await session.flush()
             Session._current.reset(token)
 

@@ -13,6 +13,7 @@ from tests.details import test_details
 from tests.dialog import test_dialog
 from tests.dom import test_dom
 from tests.download import test_download
+from tests.errors import test_errors
 from tests.form import test_form
 from tests.history import test_history
 from tests.html import test_html
@@ -60,6 +61,7 @@ TESTS: dict[str, Callable[[], Elem]] = dict(
             "latex": test_latex,
             "loading": test_loading,
             "tinker": test_tinker,
+            "errors": test_errors,
         }.items()
     )
 )
