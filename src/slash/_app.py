@@ -5,8 +5,6 @@ import traceback
 from collections.abc import Callable
 from ssl import SSLContext
 
-import markdown
-
 from slash._logging import LOGGER
 from slash._message import Message
 from slash._pages import page_404
@@ -20,6 +18,7 @@ from slash.events import (
     SupportsOnClick,
     SupportsOnInput,
 )
+from slash.html import Code, Pre
 
 
 class BadMessageException(Exception):
@@ -120,16 +119,10 @@ class App:
                 elif message.event == "popstate":
                     self._handle_popstate_message(message)
             except BadMessageException as err:
-                session.log(
-                    "error",
-                    f"<b>Bad request</b>{markdown.markdown(str(err))}",
-                    format="html",
-                )
+                session.log("error", Pre(Code(str(err))), title="Bad request")
             except Exception:
                 error = traceback.format_exc()
-                error_mk = "\n".join(["    " + line for line in error.split("\n")])
-                msg = markdown.markdown(error_mk)
-                session.log("error", f"<b>Server error</b>{markdown.markdown(msg)}", format="html")
+                session.log("error", Pre(Code(error)), title="Server error")
             await session.flush()
 
     async def _handle_ws_disconnect(self, client: Client) -> None:

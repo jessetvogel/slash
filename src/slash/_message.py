@@ -61,8 +61,11 @@ class Message:
             return Message(event="execute", name=name, args=args)
 
     @staticmethod
-    def log(type: str, message: str, format: str) -> Message:
-        return Message(event="log", type=type, message=message, format=format)
+    def log(type: str, title: str, message: str, *, id: str | None = None) -> Message:
+        if id is not None:
+            return Message(event="log", type=type, title=title, message=message, id=id)
+        else:
+            return Message(event="log", type=type, title=title, message=message)
 
     def __repr__(self) -> str:
         return str(self.__dict__)

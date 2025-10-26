@@ -68,9 +68,12 @@
     --icon-size: 24px;
 
     .message {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
         position: relative;
         max-width: 512px;
-        padding: 8px 8px 8px 38px;
+        padding: 8px 8px;
         border-radius: 8px;
         border: 1px solid var(--border);
         background-color: var(--bg-light);
@@ -78,8 +81,9 @@
         animation: slide-in-right 0.5s forwards, fade-in 0.5s forwards;
         line-height: 22px;
 
-        &.remove {
-            animation: fade-out 0.5s forwards;
+        .title {
+            display: flex;
+            padding-left: 30px;
         }
 
         .icon {
@@ -136,6 +140,10 @@
             &::before {
                 background-color: var(--error-text-color);
             }
+        }
+
+        &.remove {
+            animation: fade-out 0.5s forwards;
         }
 
         p {

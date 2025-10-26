@@ -13,8 +13,6 @@ from types import MappingProxyType
 from typing import Any, Literal, Self, TypeAlias, TypeVar
 from urllib.parse import parse_qsl, urlparse
 
-import markdown
-
 from slash._logging import LOGGER
 from slash._message import Message
 from slash._server import Client, Server, UploadEvent
@@ -145,18 +143,33 @@ class Session:
     def log(
         self,
         type: Literal["info", "debug", "warning", "error"],
-        message: str,
+        message: str | Elem,
         *,
-        format: Literal["text", "html"] = "text",
+        title: str | None = None,
     ) -> None:
         """Send logging message to the client.
 
         Args:
             type: Type of logging message. Either 'info', 'debug', 'warning' or 'error'.
             message: Contents of the message.
-            format: Either 'text' or 'html'.
+            title: Title of the message. By default, 'Info', 'Debug', 'Warning' or 'Error'.
         """
-        self.send(Message.log(type, message, format))
+        if title is None:
+            title = type.capitalize()
+
+        if isinstance(message, Elem):
+            id = random_id()  # generate id where message can mount to
+            self.send(Message.log(type, title, "", id=id))
+            if message.parent is not None or message.is_mounted():
+                msg = "Element to log must be unmounted and have no parent"
+                raise ValueError(msg)
+            message.mount()  # initially mounts to body
+            self.send(Message.update(message.id, parent=id))  # move to log
+        elif isinstance(message, str):
+            self.send(Message.log(type, title, message))
+        else:
+            msg = f"Failed to log message of type `{type(message)}`, expected `str` or `Elem`"
+            raise ValueError(msg)
 
     def execute(self, jsfunction: JSFunction, args: list[Any], name: str | None = None) -> None:
         """Execute a JavaScript function.
@@ -266,9 +279,7 @@ class Session:
                 await task
             except Exception:
                 error = traceback.format_exc()
-                error_mk = "\n".join(["    " + line for line in error.split("\n")])
-                msg = markdown.markdown(error_mk)
-                session.log("error", f"<b>Server error</b>{markdown.markdown(msg)}", format="html")
+                session.log("error", Elem("pre", Elem("code", error)), title="Server error")
             await session.flush()
             Session._current.reset(token)
 
@@ -591,9 +602,7 @@ class Elem:
             if isinstance(child, Elem):
                 child.mount()
             else:
-                session.send(
-                    Message(event="create", parent=self.id, text=child),
-                )
+                session.send(Message(event="create", parent=self.id, text=child))
 
         # Mark as mounted
         session._mounted_elems[self.id] = self
