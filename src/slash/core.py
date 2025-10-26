@@ -291,7 +291,12 @@ class Session:
         Args:
             theme: Either 'light' or 'dark'.
         """
-        self.send(Message("theme", theme=theme))
+        self.set_data("SLASH_THEME", theme)
+        self.send(Message.update(id="body", **{"class": theme}))
+
+    def get_theme(self) -> Literal["light", "dark"]:
+        """Get current theme."""
+        return self.get_data("SLASH_THEME") or "light"  # type: ignore[return-value]
 
     def set_title(self, title: str) -> None:
         """Set document title.

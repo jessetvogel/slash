@@ -132,12 +132,6 @@ class Client {
             Slash.message(type, text, { format: format });
             return;
         }
-        if (event == "theme") {
-            const theme = message.theme;
-            document.body.className = theme;
-            window.localStorage.setItem("SLASH_THEME", theme);
-            return;
-        }
         if (event == "data") {
             const key = message.key;
             const value = message.value;

@@ -196,14 +196,6 @@ class Client {
             return;
         }
 
-        // theme
-        if (event == "theme") {
-            const theme = message.theme;
-            document.body.className = theme;
-            window.localStorage.setItem("SLASH_THEME", theme);
-            return;
-        }
-
         // data
         if (event == "data") {
             const key = message.key;
