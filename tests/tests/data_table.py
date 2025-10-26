@@ -9,40 +9,15 @@ from slash.layout import Column
 
 
 def test_data() -> Elem:
-    keys = ["ID", "Name", "Age", "Place"]
+    keys = ["ID", "Name", "Age", "Place", "HTML", "Mixed"]
     data = [
         {
             "ID": n,
             "Name": random.choice(
-                [
-                    "Peter",
-                    "Andrew",
-                    "James",
-                    "John",
-                    "Philip",
-                    "Bart",
-                    "Thomas",
-                    "Matt",
-                    "Thad",
-                    "Simon",
-                    "Judas",
-                ]
+                ["Peter", "Andrew", "James", "John", "Philip", "Bart", "Thomas", "Matt", "Thad", "Simon", "Judas"]
             )
             + " "
-            + random.choice(
-                [
-                    "Smith",
-                    "Brown",
-                    "Jones",
-                    "Miller",
-                    "Davis",
-                    "Moore",
-                    "Lee",
-                    "White",
-                    "Green",
-                    "Black",
-                ]
-            ),
+            + random.choice(["Smith", "Brown", "Jones", "Miller", "Davis", "Moore", "Lee", "White", "Green", "Black"]),
             "Age": random.randint(18, 90),
             "Place": random.choice(
                 [
@@ -56,6 +31,16 @@ def test_data() -> Elem:
                     "Lisabon",
                     "Oslo",
                     "Stockholm",
+                    None,
+                ]
+            ),
+            "HTML": random.choice([Elem("b", "<b>"), Elem("i", "<i>"), Code("<code>"), None]),
+            "Mixed": random.choice(
+                [
+                    123,
+                    45.6,
+                    None,
+                    Code("html"),
                 ]
             ),
         }

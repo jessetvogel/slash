@@ -1,9 +1,11 @@
-from typing import Any, Literal, Mapping, Self, Sequence
+import functools
+from numbers import Real
+from typing import Any, Literal, Mapping, Self, Sequence, TypeAlias
 
 from slash.core import Elem
 from slash.html import Button, Div, Label, Span, Td, Th, Tr
 
-Datum = Mapping[str, Any]
+Datum: TypeAlias = Mapping[str, int | float | str | Elem]
 
 
 class DataTable(Elem):
@@ -95,7 +97,33 @@ class DataTable(Elem):
             self._sort_indices = None
         else:
             sort_key = self._sort_key
-            self._sort_indices = sorted(range(len(self._data)), key=lambda i: self._data[i].get(sort_key, None))
+
+            def compare(i: int, j: int) -> Any:
+                value_i = self._data[i].get(sort_key)
+                value_j = self._data[j].get(sort_key)
+
+                if isinstance(value_i, Elem):  # compare `Elem` based on text
+                    value_i = value_i.text
+                if isinstance(value_j, Elem):  # compare `Elem` based on text
+                    value_j = value_j.text
+
+                if value_i == value_j:  # same values
+                    return 0
+                if value_i is None:  # `None` is always last
+                    return 1
+                if value_j is None:  # `None` is always last
+                    return -1
+                NUMERIC = (int, float, Real)
+                if isinstance(value_i, NUMERIC) and isinstance(value_j, NUMERIC):  # compare numbers
+                    return value_i - value_j
+                if isinstance(value_i, NUMERIC):  # numbers before strings
+                    return -1
+                if isinstance(value_j, NUMERIC):  # numbers before strings
+                    return 1
+
+                return int(value_i > value_j) - int(value_i < value_j)
+
+            self._sort_indices = sorted(range(len(self._data)), key=functools.cmp_to_key(compare))
 
     def _update_sort(self) -> None:
         """Update sort labels in table header."""
@@ -142,7 +170,12 @@ class DataTable(Elem):
             datum = self._data[index]
             for key, td in zip(self._keys, tr.children):
                 assert isinstance(td, Td)
-                cell = str(datum[key]) if key in datum else Span("-").style({"color": "var(--text-muted)"})
+                cell: Elem | str
+                if key not in datum or datum[key] is None:
+                    cell = Span("-").style({"color": "var(--text-muted)"})
+                else:
+                    value = datum[key]
+                    cell = value if isinstance(value, Elem) else str(value)
                 td.clear()
                 td.append(cell)
 
