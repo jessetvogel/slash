@@ -39,8 +39,8 @@ class Client {
                 message = JSON.parse(event.data);
             }
             catch (error) {
-                console.error(`Received invalid message from server\nmessage: ${event.data}`);
-                Slash.message('error', 'Received invalid message from server', create('div', {}, [
+                console.error(`Invalid message from server\nMessage: ${event.data}`);
+                Slash.message('error', 'Invalid message from server', create('div', {}, [
                     create('pre', {}, create('code', {}, event.data)),
                     create('span', {}, `${error}`)
                 ]));
@@ -55,7 +55,7 @@ class Client {
                     }
                     catch (error) {
                         Slash.message('error', 'Failed to handle message from server', create('div', {}, [
-                            create('pre', {}, create('code', {}, event.data)),
+                            create('pre', {}, create('code', {}, `${message}`)),
                             create('span', {}, `${error}`)
                         ]));
                         return;
