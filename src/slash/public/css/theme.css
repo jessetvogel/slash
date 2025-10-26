@@ -51,7 +51,8 @@ body {
     --invert-filter: invert(0);
 
     /* Fonts */
-    --main-font: 'DM Sans';
+    --font-main: 'DM Sans';
+    --font-mono: monospace;
 }
 
 body.dark {
@@ -95,7 +96,7 @@ body {
 body,
 button,
 input {
-    font-family: var(--main-font);
+    font-family: var(--font-main);
 }
 
 /* Default style */
@@ -184,7 +185,7 @@ select {
     outline: none;
     font-size: 1rem;
     box-shadow: var(--shadow);
-    font-family: var(--main-font);
+    font-family: var(--font-main);
 }
 
 textarea {
@@ -228,6 +229,7 @@ code {
     padding: 3px;
     margin: 0px 2px;
     box-shadow: var(--shadow);
+    font-size: var(--font-mono);
 }
 
 pre code {
