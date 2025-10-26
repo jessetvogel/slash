@@ -142,33 +142,30 @@ class Session:
 
     def log(
         self,
-        type: Literal["info", "debug", "warning", "error"],
-        message: str | Elem,
+        message: str,
         *,
-        title: str | None = None,
+        level: Literal["info", "debug", "warning", "error"] = "info",
+        details: str | Elem | None = None,
     ) -> None:
         """Send logging message to the client.
 
         Args:
-            type: Type of logging message. Either 'info', 'debug', 'warning' or 'error'.
-            message: Contents of the message.
-            title: Title of the message. By default, 'Info', 'Debug', 'Warning' or 'Error'.
+            message: Message to display.
+            level: Type of logging message. Either 'info', 'debug', 'warning' or 'error'.
+            details: Details of message to display.
         """
-        if title is None:
-            title = type.capitalize()
-
-        if isinstance(message, Elem):
+        if isinstance(details, str) or details is None:
+            self.send(Message.log(level, message, details))
+        elif isinstance(details, Elem):
             id = random_id()  # generate id where message can mount to
-            self.send(Message.log(type, title, "", id=id))
-            if message.parent is not None or message.is_mounted():
-                msg = "Element to log must be unmounted and have no parent"
+            self.send(Message.log(level, message, {"id": id}))
+            if details.parent is not None or details.is_mounted():
+                msg = "Details element must be unmounted and have no parent"
                 raise ValueError(msg)
-            message.mount()  # initially mounts to body
-            self.send(Message.update(message.id, parent=id))  # move to log
-        elif isinstance(message, str):
-            self.send(Message.log(type, title, message))
+            details.mount()  # initially mounts to body
+            self.send(Message.update(details.id, parent=id))  # move to log
         else:
-            msg = f"Failed to log message of type `{type(message)}`, expected `str` or `Elem`"
+            msg = f"Failed to log message with details of type `{type(details)}`, expected `str` or `Elem` or `None"
             raise ValueError(msg)
 
     def execute(self, jsfunction: JSFunction, args: list[Any], name: str | None = None) -> None:
@@ -279,7 +276,7 @@ class Session:
                 await task
             except Exception:
                 error = traceback.format_exc()
-                session.log("error", Elem("pre", Elem("code", error)), title="Server error")
+                session.log("Server error", level="error", details=Elem("pre", Elem("code", error)))
             await session.flush()
             Session._current.reset(token)
 

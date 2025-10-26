@@ -119,10 +119,10 @@ class App:
                 elif message.event == "popstate":
                     self._handle_popstate_message(message)
             except BadMessageException as err:
-                session.log("error", Pre(Code(str(err))), title="Bad request")
+                session.log("Bad request", level="error", details=Pre(Code(str(err))))
             except Exception:
                 error = traceback.format_exc()
-                session.log("error", Pre(Code(error)), title="Server error")
+                session.log("Server error", level="error", details=Pre(Code(error)))
             await session.flush()
 
     async def _handle_ws_disconnect(self, client: Client) -> None:

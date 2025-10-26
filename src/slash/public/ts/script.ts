@@ -194,13 +194,18 @@ class Client {
 
         // log
         if (event == 'log') {
-            const type = message.type;
-            const title = message.title;
             const text = message.message;
-            const id = message.id;
-            const options = (id !== undefined) ? { id: id } : {};
-            console.log(`[${type}] %c${text}`, 'color:rgb(216, 198, 162);');
-            Slash.message(type, title, text, options);
+            const level = message.level;
+            let details;
+            if (typeof message.details === 'string') {
+                details = message.details;
+            } else if (typeof message.details === 'object') {
+                details = create('div', { id: message.details.id });
+            } else {
+                details = null;
+            }
+            console.log(`[${level}] %c${text}`, 'color:rgb(216, 198, 162);');
+            Slash.message(level, text, details);
             return;
         }
 
@@ -407,16 +412,17 @@ class Slash {
         return Slash.values[name];
     }
 
-    static message(type: string, title: string, message: string | HTMLElement, options: { timeout?: number, id?: string, permanent?: boolean } = {}): void {
-        const div = create('div', { class: 'message ' + type }, [
+    static message(level: string, message: string, details: string | HTMLElement | null, options: { timeout?: number, permanent?: boolean } = {}): void {
+        const div = create('div', { class: 'message ' + level }, [
             create('div', { class: 'title' }, [
                 create('span', { class: 'icon' }),
-                create('span', { style: "font-weight: bold" }, title)
+                create('span', { style: details === null ? '' : 'font-weight: bold' }, message)
             ])
         ]);
-        const msg = create('div', {}, message);
-        if (options.id !== undefined) msg.id = options.id;
-        div.append(msg);
+
+        if (details !== null) {
+            div.append(details);
+        }
 
         if (options.permanent !== true) {
             const timeout = options.timeout || 10_000; // 10 sec
