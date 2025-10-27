@@ -249,9 +249,6 @@ class Session:
         """
         num_params = len(inspect.signature(handler).parameters)
 
-        if num_params != 0 and num_params != 1:
-            raise RuntimeError("Handler must haves 0 or 1 parameters")
-
         # Call handler with session context
         token = Session._current.set(self)
         try:
@@ -449,27 +446,17 @@ class Elem:
     ) -> None:
         self._tag = tag
         self._children: list[Elem | str] = []
-        for child in children:
-            if isinstance(child, list):
-                self._children.extend(child)
-            elif isinstance(child, Elem) or isinstance(child, str):
-                self._children.append(child)
-            else:
-                raise TypeError(f"Invalid child type: {type(child)}")
-        self._style: dict[str, str | None] = {}
         self._attrs = attrs
-        self._classes: set[str] = set()
 
         self._id = random_id()
         self._parent: Elem | None = None
+        self._style: dict[str, str | None] = {}
+        self._classes: set[str] = set()
 
         self._onmount_handlers: list[Handler[MountEvent]] = []
         self._onunmount_handlers: list[Handler[UnmountEvent]] = []
 
-        # Set parent of children
-        for child in self._children:
-            if isinstance(child, Elem):
-                child._parent = self
+        self.append(*children)
 
     @property
     def id(self) -> str:
@@ -583,7 +570,7 @@ class Elem:
         self._onunmount_handlers.append(handler)
         return self
 
-    def mount(self) -> None:
+    def mount(self) -> Self:
         """Mount element."""
         session = Session.require()
 
@@ -608,7 +595,9 @@ class Elem:
         for handler in self._onmount_handlers:
             session.call_handler(handler, MountEvent(self))
 
-    def unmount(self, *, reset_parent: bool = True) -> None:
+        return self
+
+    def unmount(self, *, reset_parent: bool = True) -> Self:
         """Unmount element.
 
         Args:
@@ -639,12 +628,14 @@ class Elem:
         for handler in self._onunmount_handlers:
             session.call_handler(handler, UnmountEvent(self))
 
+        return self
+
     def _update_attrs(self, attrs: dict[str, Any]) -> None:
         """Send message to client to update attribute values."""
         if (session := Session.current()) is not None and self.is_mounted():
             session.send(Message.update(self.id, **attrs))
 
-    def clear(self) -> None:
+    def clear(self) -> Self:
         """Unmount all children."""
         if self.is_mounted():
             for child in self.children:
@@ -657,6 +648,7 @@ class Elem:
                 if isinstance(child, Elem):
                     child._parent = None
         self._children = []
+        return self
 
     def append(self, *children: Children) -> Self:
         """Append to the children of this element.
@@ -670,7 +662,7 @@ class Elem:
             elif isinstance(child, Elem) or isinstance(child, str):
                 self._append_or_insert_elem(child)
             else:
-                raise TypeError(f"Object of type {type(child)} cannot be appended")
+                raise TypeError(f"Expected child of type `Elem` or `str`, but got `{type(child)}`")
         return self
 
     def insert(self, position: int, *children: Children) -> Self:

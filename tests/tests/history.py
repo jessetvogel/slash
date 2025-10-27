@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 
 from slash.core import Elem, PopStateEvent, Session
-from slash.html import Button, Code, Div, P, Span
+from slash.html import Button, Code, Div, P, Pre, Span
 from slash.layout import Column, Panel, Row
 
 
@@ -23,9 +23,9 @@ def test_history() -> Elem:
 
     def handle_popstate(event: PopStateEvent) -> None:
         session.log(
-            "debug",
-            (f"Received <code>popstate</code> event with state:<pre><code>{json.dumps(event.state)}</code></pre>"),
-            format="html",
+            "Event popstate",
+            level="debug",
+            details=Pre(Code(json.dumps(event.state))),
         )
         if isinstance(event.state, dict):
             set_state("animal", event.state["animal"])

@@ -41,7 +41,7 @@ body {
 
     /* Specifics */
 
-    --dialog-backdrop-color: rgba(0, 0, 0, 0.075);
+    --dialog-backdrop-color: rgba(0, 0, 0, 0.1);
 
     --code-bg: var(--bg);
     --code-text: var(--text-muted);
