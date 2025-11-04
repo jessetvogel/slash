@@ -309,7 +309,7 @@
         color: var(--text);
         border-collapse: collapse;
         box-shadow: var(--shadow);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-muted);
     }
 
     td,
