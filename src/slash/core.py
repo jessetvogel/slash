@@ -23,7 +23,7 @@ from slash.js import JSFunction
 
 E = TypeVar("E")
 
-Handler: TypeAlias = Callable[[E], None | Awaitable[None]] | Callable[[], None | Awaitable[None]]
+Handler: TypeAlias = Callable[[E], Any] | Callable[[], Any]
 
 # Session
 
