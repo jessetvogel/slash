@@ -6,7 +6,7 @@ import asyncio
 import inspect
 import traceback
 from collections.abc import Awaitable, Callable, Mapping, Sequence
-from contextvars import ContextVar
+from contextvars import ContextVar, Token
 from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
@@ -42,6 +42,8 @@ class Session:
         """
         self._server = server
         self._client = client
+
+        self._tokens: list[Token[Session]] = []
 
         self._queue_messages: list[str] = []
         self._queue_files: list[tuple[str, Path]] = []
@@ -250,11 +252,8 @@ class Session:
         num_params = len(inspect.signature(handler).parameters)
 
         # Call handler with session context
-        token = Session._current.set(self)
-        try:
+        with self:
             result = handler(*[event][:num_params])  # type: ignore[call-arg]
-        finally:
-            Session._current.reset(token)
 
         # If handler is async, create task
         if inspect.isawaitable(result):
@@ -268,19 +267,18 @@ class Session:
         """
 
         async def wrapper(session: Session, task: Awaitable[None]) -> None:
-            token = Session._current.set(session)
-            try:
-                await task
-            except Exception:
-                error = traceback.format_exc()
-                session.log("Server error", level="error", details=Elem("pre", Elem("code", error)))
-            await session.flush()
-            Session._current.reset(token)
+            with self:
+                try:
+                    await task
+                except Exception:
+                    error = traceback.format_exc()
+                    session.log("Server error", level="error", details=Elem("pre", Elem("code", error)))
+                await session.flush()
 
         asyncio.create_task(wrapper(self, task))
 
     def __enter__(self) -> None:
-        self._token = Session._current.set(self)
+        self._tokens.append(Session._current.set(self))
 
     def __exit__(
         self,
@@ -288,7 +286,7 @@ class Session:
         exc_value: BaseException | None,
         traceback: object | None,
     ) -> None:
-        Session._current.reset(self._token)
+        Session._current.reset(self._tokens.pop())
 
     def set_theme(self, theme: Literal["light", "dark"]) -> None:
         """Set theme.
