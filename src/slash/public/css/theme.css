@@ -51,7 +51,7 @@ body {
     --invert-filter: invert(0);
 
     /* Fonts */
-    --font-main: 'DM Sans';
+    --font-main: 'DM Sans', sans-serif;
     --font-mono: monospace;
 }
 

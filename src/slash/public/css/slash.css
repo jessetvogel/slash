@@ -1,4 +1,4 @@
-#slash-loading {
+.slash-loading {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -10,14 +10,14 @@
     justify-content: center;
     gap: 32px;
     animation: fade-in 1.0s forwards;
+    background-color: color-mix(in srgb, var(--bg-dark) 75%, rgba(0, 0, 0, 0.1));
+    backdrop-filter: blur(4px);
 
-    span {
-        font-size: 1.25rem;
-        font-weight: bold;
+    > :first-child {
         text-align: center;
     }
 
-    div {
+    > :last-child {
         width: 48px;
         height: 48px;
         border: 4px solid var(--text);

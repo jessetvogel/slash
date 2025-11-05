@@ -5,6 +5,7 @@ from slash.basic._checkbox import Checkbox
 from slash.basic._data_table import DataTable
 from slash.basic._download import Download
 from slash.basic._latex import LaTeX
+from slash.basic._loading import Loading
 from slash.basic._markdown import Markdown
 from slash.basic._pie import Pie
 from slash.basic._progress import Progress
@@ -32,4 +33,5 @@ __all__: list[str] = [
     "Tabs",
     "Upload",
     "FillBetween",
+    "Loading",
 ]

@@ -1,4 +1,4 @@
-import { $, create } from './utils.js';
+import { $, $$, create } from './utils.js';
 
 window.addEventListener('DOMContentLoaded', init);
 
@@ -55,7 +55,7 @@ class Client {
             });
         };
 
-        const loading = $('slash-loading');
+        const loading = $$('.slash-loading')[0];
 
         this.socket.onmessage = async function (event) {
             loading?.remove();
