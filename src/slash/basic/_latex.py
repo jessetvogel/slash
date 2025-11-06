@@ -32,11 +32,11 @@ class LaTeX(HTML):
     def _add_script(self) -> None:
         IS_KATEX_LOADED = "Is KaTeX loaded?"
         session = Session.require()
-        if session.get_data(IS_KATEX_LOADED) is not None:
+        if hasattr(session, IS_KATEX_LOADED):
             return
 
         session.execute(_JS_LOAD_KATEX, [])
-        session.set_data(IS_KATEX_LOADED, "true")
+        setattr(session, IS_KATEX_LOADED, "true")
 
 
 # See: https://katex.org/docs/browser#starter-template
