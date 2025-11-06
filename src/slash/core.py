@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import inspect
 import traceback
+from asyncio import Future
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextvars import ContextVar, Token
 from dataclasses import dataclass
@@ -276,6 +277,10 @@ class Session:
                 await session.flush()
 
         asyncio.create_task(wrapper(self, task))
+
+    def create_future(self) -> Future:
+        """Create future instance."""
+        return asyncio.get_running_loop().create_future()
 
     def __enter__(self) -> None:
         self._tokens.append(Session._current.set(self))

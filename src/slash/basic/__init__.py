@@ -2,6 +2,7 @@
 
 from slash.basic._axes import Axes, Bar, FillBetween, Graph, Plot, Scatter
 from slash.basic._checkbox import Checkbox
+from slash.basic._confirm import confirm
 from slash.basic._data_table import DataTable
 from slash.basic._download import Download
 from slash.basic._latex import LaTeX
@@ -18,6 +19,7 @@ __all__: list[str] = [
     "Axes",
     "Bar",
     "Checkbox",
+    "confirm",
     "DataTable",
     "Download",
     "Graph",

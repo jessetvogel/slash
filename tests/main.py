@@ -8,6 +8,7 @@ from slash.html import H2, A, Button, Div, Li, P, Ul
 from slash.layout import Column, Row
 from tests.axes import test_axes
 from tests.colors import test_colors
+from tests.confirm import test_confirm
 from tests.data_table import test_data
 from tests.details import test_details
 from tests.dialog import test_dialog
@@ -62,6 +63,7 @@ TESTS: dict[str, Callable[[], Elem]] = dict(
             "loading": test_loading,
             "tinker": test_tinker,
             "errors": test_errors,
+            "confirm": test_confirm,
         }.items()
     )
 )
