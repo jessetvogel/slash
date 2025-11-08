@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import inspect
 import traceback
-from asyncio import Future
+from asyncio import Future, Task
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextvars import ContextVar, Token
 from dataclasses import dataclass
@@ -45,6 +45,7 @@ class Session:
         self._client = client
 
         self._tokens: list[Token[Session]] = []
+        self._tasks: list[Task] = []
 
         self._queue_messages: list[str] = []
         self._queue_files: list[tuple[str, Path]] = []
@@ -189,6 +190,9 @@ class Session:
 
     async def flush(self) -> None:
         """Send all queued messages to the client."""
+        # Clean tasks
+        self._clean_tasks()
+
         # Host files
         for url, path in self._queue_files:
             self._server.share_file(url, path)
@@ -260,23 +264,35 @@ class Session:
         if inspect.isawaitable(result):
             self.create_task(result)
 
-    def create_task(self, task: Awaitable[None]) -> None:
+    def create_task(self, coroutine: Awaitable[None]) -> None:
         """Create task in the context of the session.
 
         Args:
-            task: Awaitable function to run.
+            coroutine: Awaitable function to run.
         """
 
-        async def wrapper(session: Session, task: Awaitable[None]) -> None:
+        async def wrapper(session: Session, coroutine: Awaitable[None]) -> None:
             with self:
                 try:
-                    await task
+                    await coroutine
                 except Exception:
                     error = traceback.format_exc()
                     session.log("Server error", level="error", details=Elem("pre", Elem("code", error)))
                 await session.flush()
 
-        asyncio.create_task(wrapper(self, task))
+        task = asyncio.create_task(wrapper(self, coroutine))
+        self._tasks.append(task)
+
+    def cancel_tasks(self, msg: str | None = None) -> None:
+        """Cancel all tasks associated with this session."""
+        for task in self._tasks:
+            if not task.done():
+                task.cancel(msg)
+        self._tasks = []
+
+    def _clean_tasks(self) -> None:
+        """Discard all done tasks."""
+        self._tasks = [task for task in self._tasks if not task.done()]
 
     def create_future(self) -> Future:
         """Create future instance."""
