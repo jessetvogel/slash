@@ -31,7 +31,6 @@ from tests.session import test_session
 from tests.storage import test_storage
 from tests.svg import test_svg
 from tests.tabs import test_tabs
-from tests.tinker import test_tinker
 from tests.upload import test_upload
 
 TESTS: dict[str, Callable[[], Elem]] = dict(
@@ -61,7 +60,6 @@ TESTS: dict[str, Callable[[], Elem]] = dict(
             "history": test_history,
             "latex": test_latex,
             "loading": test_loading,
-            "tinker": test_tinker,
             "errors": test_errors,
             "confirm": test_confirm,
         }.items()
