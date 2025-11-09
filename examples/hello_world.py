@@ -7,12 +7,8 @@ def home() -> Elem:
     return H1("Hello world!").style({"text-align": "center"})
 
 
-def main():
+if __name__ == "__main__":
     # Create and run application
     app = App()
     app.add_route("/", home)
     app.run()
-
-
-if __name__ == "__main__":
-    main()

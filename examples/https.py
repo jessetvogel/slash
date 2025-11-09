@@ -16,11 +16,11 @@ PATH_CERT = Path(__file__).resolve().parent.parent / "cert" / "cert.pem"
 PATH_KEY = Path(__file__).resolve().parent.parent / "cert" / "key.pem"
 
 
-def main():
+if __name__ == "__main__":
     # Check if certificate files exist
     if not PATH_CERT.exists() or not PATH_KEY.exists():
         print(f"Make sure that certificate files {PATH_CERT} and {PATH_KEY} exist.")
-        return
+        exit(0)
 
     # Create SSL context
     ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -30,7 +30,3 @@ def main():
     app = App(ssl_context=ssl_context)
     app.add_route("/", home)
     app.run()
-
-
-if __name__ == "__main__":
-    main()

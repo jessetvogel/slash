@@ -68,11 +68,7 @@ def home() -> Elem:
     )
 
 
-def main():
+if __name__ == "__main__":
     app = App()
     app.add_route("/", home)
     app.run()
-
-
-if __name__ == "__main__":
-    main()

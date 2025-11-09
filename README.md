@@ -33,13 +33,10 @@ from slash.html import Span
 def home():
     return Span("Hello world").style({"color": "red"})
 
-def main():
+if __name__ == "__main__":
     app = App()
     app.add_endpoint("/", home)
     app.run()
-
-if __name__ == "__main__":
-    main()
 ```
 
 For more elaborate examples, take a look at the `examples` folder.

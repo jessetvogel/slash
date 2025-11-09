@@ -101,13 +101,9 @@ def wrap_test(test: str, method: Callable[[], Elem]) -> Callable[[], Elem]:
     return page
 
 
-def main():
+if __name__ == "__main__":
     app = App()
     app.add_route("/", home)
     for test, method in TESTS.items():
         app.add_route(f"/test/{test}", wrap_test(test, method))
     app.run()
-
-
-if __name__ == "__main__":
-    main()

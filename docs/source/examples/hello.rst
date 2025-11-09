@@ -11,10 +11,7 @@ The following is a minimal example of using Slash to setup a web page.
     def home() -> H1:
         return H1("Hello world!").style({"text-align": "center"})
 
-    def main():
+    if __name__ == "__main__":
         app = App()
         app.add_route("/", home)
         app.run()
-
-    if __name__ == "__main__":
-        main()
