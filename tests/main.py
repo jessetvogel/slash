@@ -31,6 +31,7 @@ from tests.session import test_session
 from tests.storage import test_storage
 from tests.svg import test_svg
 from tests.tabs import test_tabs
+from tests.tooltip import test_tooltip
 from tests.upload import test_upload
 
 TESTS: dict[str, Callable[[], Elem]] = dict(
@@ -62,6 +63,7 @@ TESTS: dict[str, Callable[[], Elem]] = dict(
             "loading": test_loading,
             "errors": test_errors,
             "confirm": test_confirm,
+            "tooltip": test_tooltip,
         }.items()
     )
 )
@@ -83,6 +85,7 @@ def wrap_test(test: str, method: Callable[[], Elem]) -> Callable[[], Elem]:
     next_test = tests[test_index + 1] if test_index < len(tests) - 1 else None
 
     def page() -> Elem:
+        Session.require().set_title(f"Slash test - {test}")
         return Column(
             H2(f"Slash test - {test}").style({"text-align": "center"}),
             Row(

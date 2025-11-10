@@ -13,6 +13,7 @@ from slash.basic._progress import Progress
 from slash.basic._radio import Radio
 from slash.basic._svg import SVG, SVGElem
 from slash.basic._tabs import Tabs
+from slash.basic._tooltip import Tooltip
 from slash.basic._upload import Upload
 
 __all__: list[str] = [
@@ -36,4 +37,5 @@ __all__: list[str] = [
     "Upload",
     "FillBetween",
     "Loading",
+    "Tooltip",
 ]
