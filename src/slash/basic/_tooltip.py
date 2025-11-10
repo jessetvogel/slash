@@ -39,7 +39,13 @@ target.addEventListener("mouseleave", hide);
 
 
 class Tooltip(Elem):
-    """Tooltip element."""
+    """Tooltip element.
+
+    Args:
+        children: Child or children of element. Either an element, string or
+            list of elements and strings.
+        target: Target element. The tooltip will be shown when the target element is hovered.
+    """
 
     def __init__(self, *children: Children, target: Elem) -> None:
         super().__init__("div", *children, Div().add_class("slash-tip"))
