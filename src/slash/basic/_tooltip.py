@@ -33,7 +33,14 @@ function show() {
 function hide() { elem.style.display = "none"; }
 
 target.addEventListener("mouseenter", show);
+target.addEventListener("focus", show);
+target.addEventListener("pointerdown", (e) => { e.preventDefault(); show(); });
+
 target.addEventListener("mouseleave", hide);
+target.addEventListener("blur", hide);
+document.addEventListener('pointerdown', (e) => {
+    if (!target.contains(e.target) && !elem.contains(e.target)) hide();
+});
 """,
 )
 
