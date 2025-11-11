@@ -491,13 +491,12 @@
 
 .slash-tooltip {
     position: absolute;
-    top: 0px;
-    left: 0px;
     background-color: var(--bg-light);
     border-radius: 4px;
     border: 1px solid var(--border-muted);
     box-shadow: var(--shadow);
     padding: 8px;
+    z-index: 100;
 
     .slash-tip {
         position: absolute;
