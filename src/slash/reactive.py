@@ -6,13 +6,36 @@ from typing import Any, Generic, TypeVar
 T = TypeVar("T")
 
 
-OBSERVER_STACK: list[Observer] = []
+OBSERVER_STACK: list[Computed[Any] | Effect] = []
 
 
-class Readable(Generic[T]):
-    """Base class for reactive readable objects.
+def get(x: Signal[T] | Computed[T]) -> T:
+    if OBSERVER_STACK:
+        observer = OBSERVER_STACK[-1]
+        x._observers.add(observer)
+        observer._dependencies.add(x)
+    return x._value
 
-    Tracks observers that depend on it so they can be notified when the value changes.
+
+def run(x: Computed[T] | Effect) -> None:
+    for dep in x._dependencies:
+        dep._observers.discard(x)
+    x._dependencies.clear()
+    OBSERVER_STACK.append(x)
+    try:
+        value = x._fn()
+    finally:
+        OBSERVER_STACK.pop()
+
+    if isinstance(x, Computed):
+        if not hasattr(x, "_value") or value != x._value:
+            x._value = value
+            for observer in x._observers:
+                run(observer)
+
+
+class Signal(Generic[T]):
+    """Reactive value that notifies observers when updated.
 
     Args:
         value: Initial value.
@@ -20,52 +43,7 @@ class Readable(Generic[T]):
 
     def __init__(self, value: T) -> None:
         self._value = value
-        self._observers: set[Observer[Any]] = set()
-
-    def get(self) -> T:
-        """Get the current value.
-
-        Also registers the current observer, if any, as a dependent.
-        """
-        if OBSERVER_STACK:
-            observer = OBSERVER_STACK[-1]
-            self._observers.add(observer)
-            observer._dependencies.add(self)
-        return self._value
-
-    def __call__(self) -> T:
-        return self.get()
-
-
-class Observer(Generic[T]):
-    """Base class for reactive observer objects.
-
-    Args:
-        fn: Function to execute when running the observer.
-    """
-
-    def __init__(self, fn: Callable[[], T]) -> None:
-        self._fn = fn
-        self._dependencies: set[Readable[Any]] = set()
-
-    def _run(self) -> T:
-        for dep in self._dependencies:
-            dep._observers.discard(self)
-        self._dependencies.clear()
-
-        OBSERVER_STACK.append(self)
-        try:
-            return self._fn()
-        finally:
-            OBSERVER_STACK.pop()
-
-
-class Signal(Readable[T]):
-    """Reactive value that notifies observers when updated.
-
-    Args:
-        value: Initial value.
-    """
+        self._observers: set[Computed[Any] | Effect] = set()
 
     def set(self, value: T) -> None:
         """Set the value and notify all observers if it has changed.
@@ -75,41 +53,57 @@ class Signal(Readable[T]):
         """
         if value != self._value:
             self._value = value
-            for obs in list(self._observers):
-                obs._run()
+            for observer in self._observers:
+                run(observer)
+
+    def get(self) -> T:
+        """Return the current value."""
+        return get(self)
+
+    def __call__(self) -> T:
+        return self.get()
 
     def __repr__(self) -> str:
         return f"Signal({self._value})"
 
 
-class Computed(Observer[T], Readable[T]):
-    """Reactive value derived from other reactive values.
+class Computed(Generic[T]):
+    """Reactive value computed from other reactive values.
 
     Args:
-        fn: Function that computes the value.
+        fn: Function that computes the value from other reactive values.
     """
 
-    def __init__(self, fn: Callable[[], T]) -> None:
-        Observer.__init__(self, fn)
-        Readable.__init__(self, Observer._run(self))
+    _value: T
 
-    def _run(self) -> T:
-        if (value := Observer._run(self)) != self._value:
-            self._value = value
-            for obs in list(self._observers):
-                obs._run()
-        return self._value
+    def __init__(self, fn: Callable[[], T]) -> None:
+        self._fn = fn
+        self._dependencies: set[Signal[Any] | Computed[Any]] = set()
+        self._observers: set[Computed[Any] | Effect] = set()
+        run(self)
+
+    def get(self) -> T:
+        """Return the current value."""
+        return get(self)
+
+    def __call__(self) -> T:
+        return self.get()
 
     def __repr__(self) -> str:
         return f"Computed({self._value})"
 
 
-class Effect(Observer[Any]):
-    """Reactive effect that runs automatically when its dependencies update."""
+class Effect:
+    """Reactive effect that runs automatically when the reactive values that it depends are updated.
+
+    Args:
+        fn: Function that executes the effect from reactive values.
+    """
 
     def __init__(self, fn: Callable[[], Any]) -> None:
-        super().__init__(fn)
-        self._run()
+        self._fn = fn
+        self._dependencies: set[Signal[Any] | Computed[Any]] = set()
+        run(self)
 
 
 __all__ = ["Signal", "Computed", "Effect"]
