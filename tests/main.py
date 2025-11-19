@@ -26,6 +26,7 @@ from tests.loading import test_loading
 from tests.log import test_log
 from tests.markdown import test_markdown
 from tests.progress import test_progress
+from tests.reactive import test_reactive
 from tests.select import test_select
 from tests.session import test_session
 from tests.storage import test_storage
@@ -64,12 +65,14 @@ TESTS: dict[str, Callable[[], Elem]] = dict(
             "errors": test_errors,
             "confirm": test_confirm,
             "tooltip": test_tooltip,
+            "reactive": test_reactive,
         }.items()
     )
 )
 
 
 def home() -> Elem:
+    Session.require().set_title("Slash tests")
     return Div(
         H2("Slash tests").style({"text-align": "center"}),
         P("Click on one of the links below to navigate to the corresponding test page."),

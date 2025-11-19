@@ -10,7 +10,8 @@ slash package
    slash.events
    slash.html
    slash.js
-   slash.layout
+   slash.layout   
+   slash.reactive
 
 
 .. automodule:: slash
