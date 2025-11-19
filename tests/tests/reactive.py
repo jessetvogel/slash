@@ -1,8 +1,8 @@
 from typing import Any
 
 from slash.core import Elem
-from slash.html import Code, Div, Input, P, Span
-from slash.reactive import Computed, Effect, Signal
+from slash.html import Code, Div, Input, P
+from slash.reactive import Computed, Signal
 
 
 def input_for_signal(type: str, signal: Signal[Any]) -> Input:
@@ -11,12 +11,6 @@ def input_for_signal(type: str, signal: Signal[Any]) -> Input:
         .style({"width": "64px", "text-align": "center"})
         .oninput(lambda event: signal.set(int(event.value) if event.value else 0))
     )
-
-
-def span_for_readable(readable: Signal[Any] | Computed[Any]) -> Span:
-    span = Span()
-    Effect(lambda: span.set_text(str(readable())))
-    return span
 
 
 def test_reactive() -> Elem:
@@ -41,9 +35,9 @@ def test_reactive() -> Elem:
             input_for_signal("number", cats),
             " cats. ",
             "In total, John has ",
-            span_for_readable(animals).style({"font-weight": "bold"}),
+            animals.to_elem().style({"font-weight": "bold"}),
             " animals.",
         ),
         P("John's farm looks as follows. "),
-        P(span_for_readable(all_emojis).style({"font-size": "1.5rem"})),
+        P(all_emojis.to_elem().style({"font-size": "1.5rem"})),
     )

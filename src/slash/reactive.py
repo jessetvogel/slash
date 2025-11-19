@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, Generic, TypeVar
 
+from slash.core import Elem
+
 T = TypeVar("T")
 
 
@@ -32,6 +34,12 @@ def run(x: Computed[T] | Effect) -> None:
             x._value = value
             for observer in x._observers:
                 run(observer)
+
+
+def to_elem(x: Signal[T] | Computed[T], tag: str = "span") -> Elem:
+    elem = Elem(tag)
+    Effect(lambda: elem.set_text(str(x())))
+    return elem
 
 
 class Signal(Generic[T]):
@@ -66,6 +74,19 @@ class Signal(Generic[T]):
     def __repr__(self) -> str:
         return f"Signal({self._value})"
 
+    def to_elem(self, tag: str = "span") -> Elem:
+        """Create an element whose content is the value of the signal.
+
+        The content of the returned element gets updated with the value of the signal.
+
+        Args:
+            tag: Tag of the element.
+
+        Returns:
+            Element with given tag whose content equals the value of the signal.
+        """
+        return to_elem(self, tag)
+
 
 class Computed(Generic[T]):
     """Reactive value computed from other reactive values.
@@ -91,6 +112,19 @@ class Computed(Generic[T]):
 
     def __repr__(self) -> str:
         return f"Computed({self._value})"
+
+    def to_elem(self, tag: str = "span") -> Elem:
+        """Create an element whose content is the computed value.
+
+        The content of the returned element gets updated with the computed value.
+
+        Args:
+            tag: Tag of the element.
+
+        Returns:
+            Element with given tag whose content equals the computed value.
+        """
+        return to_elem(self, tag)
 
 
 class Effect:
