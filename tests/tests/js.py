@@ -11,7 +11,7 @@ def test_js() -> Elem:
 
     return Div(
         P(
-            "This page tests JavaScript functionality. Write some JavaScript code in the textarea below,"
+            "This page tests JavaScript functionality. Write some JavaScript code in the textarea below, "
             "and press the button to execute it."
         ),
         Column(

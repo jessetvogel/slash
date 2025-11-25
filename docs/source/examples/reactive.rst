@@ -14,7 +14,7 @@ The classes :py:class:`~slash.reactive.Signal`, :py:class:`~slash.reactive.Compu
     from slash import App
     from slash.core import Session
     from slash.reactive import Signal, Computed, Effect
-    from slash.html import Input
+    from slash.html import Input, Div
 
     def home():
         # Create two signals with initial values

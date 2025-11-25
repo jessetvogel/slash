@@ -47,7 +47,7 @@ def test_history() -> Elem:
         P(
             "This page tests the ",
             Code("Session.history"),
-            " object.",
+            " object. ",
             "While changing the animal or food, the page should not reload, ",
             "but the history state (and URL) should be updated. ",
             "Going forward and backward through history should again not reload the page, "
