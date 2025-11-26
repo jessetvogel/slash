@@ -327,16 +327,22 @@ class Slash {
         const div = create('div', { class: 'message ' + level }, [
             create('div', { class: 'title' }, [
                 create('span', { class: 'icon' }),
-                create('span', { style: details === null ? '' : 'font-weight: bold' }, message)
+                create('span', { style: details === null ? '' : 'font-weight: bold' }, message),
+                create('span', { class: 'remove', '@click': () => fadeout() })
             ])
         ]);
+        const fadeout = () => {
+            if (!div.classList.contains('fade-out')) {
+                div.classList.add('fade-out');
+                setTimeout(() => div.remove(), 500);
+            }
+        };
         if (details !== null) {
             div.append(details);
         }
         if (options.permanent !== true) {
             const timeout = options.timeout || 10000;
-            setTimeout(() => div.classList.add('remove'), timeout);
-            setTimeout(() => div.remove(), timeout + 500);
+            setTimeout(fadeout, timeout);
         }
         $('slash-messages').prepend(div);
     }
@@ -345,7 +351,6 @@ Slash.values = {};
 let client;
 function init() {
     window.Slash = Slash;
-    Slash.message('warning', '', '', { timeout: -499 });
     const theme = window.localStorage.getItem('SLASH_THEME');
     if (theme !== null)
         document.body.className = theme;

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 import traceback
 from collections.abc import Callable
@@ -34,6 +35,7 @@ class App:
         ssl_context: SSL context to use for the web server.
         enable_upload: Boolean flag indicating whether file upload is enabled.
         max_upload_size: Maximum file size for uploaded files in bytes.
+        debug: Flag indicating whether debug information is logged.
     """
 
     def __init__(
@@ -44,6 +46,7 @@ class App:
         ssl_context: SSLContext | None = None,
         enable_upload: bool = True,
         max_upload_size: int = 10_000_000,  # 10 MB
+        debug: bool = False,
     ) -> None:
         self._server = Server(
             host,
@@ -54,6 +57,8 @@ class App:
         )
         self._routes: dict[str | re.Pattern, Callable[..., Elem]] = {}
         self._sessions: dict[str, Session] = {}
+
+        LOGGER.setLevel(logging.DEBUG if debug else logging.INFO)
 
     def add_route(self, pattern: str, root: Callable[..., Elem]) -> None:
         """Add route from a path pattern.
