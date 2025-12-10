@@ -199,11 +199,24 @@ class A(Elem, SupportsOnClick):
 class Button(Elem, SupportsOnClick):
     """HTML ``<button>`` element."""
 
-    disabled = Attr("disabled")
+    attr_disabled = Attr("disabled")
 
     def __init__(self, *children: Children, disabled: bool = False) -> None:
         super().__init__("button", *children)
-        self.disabled = "" if disabled else None
+        self.disabled = disabled
+
+    @property
+    def disabled(self) -> bool:
+        return self._disabled
+
+    @disabled.setter
+    def disabled(self, disabled: bool) -> None:
+        self.set_disabled(disabled)
+
+    def set_disabled(self, disabled: bool) -> Self:
+        self._disabled = disabled
+        self.attr_disabled = "" if disabled else None
+        return self
 
 
 class Input(Elem, SupportsOnClick, SupportsOnInput, SupportsOnChange):
@@ -352,20 +365,47 @@ class Option(Elem):
     """HTML ``<option>`` element."""
 
     value = Attr("value")
-    disabled = Attr("disabled")
-    hidden = Attr("hidden")
+    attr_disabled = Attr("disabled")
+    attr_hidden = Attr("hidden")
 
     def __init__(
         self,
         text: str = "",
         value: str | None = None,
+        *,
         disabled: bool = False,
         hidden: bool = False,
     ) -> None:
         super().__init__("option", text)
         self.value = value if value is not None else text
-        self.disabled = "" if disabled else None
-        self.hidden = "" if hidden else None
+        self.disabled = disabled
+        self.hidden = hidden
+
+    @property
+    def disabled(self) -> bool:
+        return self._disabled
+
+    @disabled.setter
+    def disabled(self, disabled: bool) -> None:
+        self.set_disabled(disabled)
+
+    def set_disabled(self, disabled: bool) -> Self:
+        self._disabled = disabled
+        self.attr_disabled = "" if disabled else None
+        return self
+
+    @property
+    def hidden(self) -> bool:
+        return self._hidden
+
+    @hidden.setter
+    def hidden(self, hidden: bool) -> None:
+        self.set_hidden(hidden)
+
+    def set_hidden(self, hidden: bool) -> Self:
+        self._hidden = hidden
+        self.attr_hidden = "" if hidden else None
+        return self
 
 
 _JS_DIALOG_SHOW = JSFunction(["id"], "document.getElementById(id).show()")
