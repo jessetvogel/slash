@@ -2,10 +2,6 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from slash import App
-from slash.core import Elem, Session
-from slash.html import H2, A, Button, Div, Li, P, Ul
-from slash.layout import Column, Row
 from tests.axes import test_axes
 from tests.colors import test_colors
 from tests.confirm import test_confirm
@@ -34,6 +30,11 @@ from tests.svg import test_svg
 from tests.tabs import test_tabs
 from tests.tooltip import test_tooltip
 from tests.upload import test_upload
+
+from slash import App
+from slash.core import Elem, Session
+from slash.html import H2, A, Button, Div, Li, P, Ul
+from slash.layout import Column, Row
 
 TESTS: dict[str, Callable[[], Elem]] = dict(
     sorted(
