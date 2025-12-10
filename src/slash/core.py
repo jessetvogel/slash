@@ -635,7 +635,9 @@ class Elem:
 
         # Reset parent
         if reset_parent:
-            self._parent = None
+            if self._parent is not None:
+                self._parent._children.remove(self)
+                self._parent = None
 
         # Unmark as mounted
         session._mounted_elems.pop(self.id)
