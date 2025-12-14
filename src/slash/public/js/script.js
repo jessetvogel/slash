@@ -40,7 +40,7 @@ class Client {
             }
             catch (error) {
                 console.error(`Invalid message from server\nMessage: ${event.data}`);
-                Slash.message('error', 'Invalid message from server', create('div', {}, [
+                Slash.log('error', 'Invalid message from server', create('div', {}, [
                     create('pre', {}, create('code', {}, event.data)),
                     create('span', {}, `${error}`)
                 ]));
@@ -54,7 +54,7 @@ class Client {
                         await client.handle(message);
                     }
                     catch (error) {
-                        Slash.message('error', 'Failed to handle message from server', create('div', {}, [
+                        Slash.log('error', 'Failed to handle message from server', create('div', {}, [
                             create('pre', {}, create('code', {}, `${message}`)),
                             create('span', {}, `${error}`)
                         ]));
@@ -71,7 +71,7 @@ class Client {
         };
         this.socket.onclose = function () {
             console.log('Connection closed.');
-            Slash.message('warning', 'Connection lost', 'Try reloading the page to reconnect to the server.', { permanent: true });
+            Slash.log('warning', 'Connection lost', 'Try reloading the page to reconnect to the server.', { permanent: true });
         };
     }
     async handle(message) {
@@ -144,7 +144,7 @@ class Client {
                 details = null;
             }
             console.log(`[${level}] %c${text}`, 'color:rgb(216, 198, 162);');
-            Slash.message(level, text, details);
+            Slash.log(level, text, details);
             return;
         }
         if (event == 'data') {
@@ -323,10 +323,10 @@ class Slash {
     static value(name) {
         return Slash.values[name];
     }
-    static message(level, message, details, options = {}) {
+    static log(level, message, details, options = {}) {
         const div = create('div', { class: 'message ' + level }, [
             create('div', { class: 'title' }, [
-                create('span', { class: 'icon' }),
+                create('span', { class: `slash-icon slash-icon-${level}` }),
                 create('span', { style: details === null ? '' : 'font-weight: bold' }, message),
                 create('span', { class: 'remove', '@click': () => fadeout() })
             ])

@@ -7,7 +7,7 @@ name = "slash"
 version = "0.0.1"
 description = "Python web framework"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "MIT"
 keywords = ["slash", "web", "framework"]
 authors = [{ name = "Jesse Vogel", email = "jesse.t.vogel@gmail.com" }]
@@ -30,6 +30,7 @@ dev = [
     "sphinx-autodoc-typehints",
     "sphinx-rtd-theme",
 ]
+test = ["numpy", "matplotlib"]
 
 [project.urls]
 "Homepage" = "https://github.com/jessetvogel/slash"

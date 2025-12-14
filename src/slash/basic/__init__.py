@@ -5,6 +5,7 @@ from slash.basic._checkbox import Checkbox
 from slash.basic._confirm import confirm
 from slash.basic._data_table import DataTable
 from slash.basic._download import Download
+from slash.basic._icon import Icon
 from slash.basic._latex import LaTeX
 from slash.basic._loading import Loading
 from slash.basic._markdown import Markdown
@@ -25,6 +26,7 @@ __all__: list[str] = [
     "Download",
     "FillBetween",
     "Graph",
+    "Icon",
     "LaTeX",
     "Loading",
     "Markdown",

@@ -14,6 +14,7 @@ from tests.errors import test_errors
 from tests.form import test_form
 from tests.history import test_history
 from tests.html import test_html
+from tests.icons import test_icons
 from tests.image import test_image
 from tests.input import test_input
 from tests.js import test_js
@@ -67,6 +68,7 @@ TESTS: dict[str, Callable[[], Elem]] = dict(
             "confirm": test_confirm,
             "tooltip": test_tooltip,
             "reactive": test_reactive,
+            "icons": test_icons,
         }.items()
     )
 )
