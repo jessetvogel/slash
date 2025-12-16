@@ -395,7 +395,7 @@ class Attr(property):
     def __init__(self, name: str) -> None:
         super().__init__(self._get, self._set)
         self._name = name
-        self._private = "_attr_" + name
+        self._private = "_" + name
 
     def _get(self, elem: Elem):
         return getattr(elem, self._private)

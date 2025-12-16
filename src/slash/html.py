@@ -207,14 +207,13 @@ class Button(Elem, SupportsOnClick):
 
     @property
     def disabled(self) -> bool:
-        return self._disabled
+        return self.attr_disabled is not None
 
     @disabled.setter
     def disabled(self, disabled: bool) -> None:
         self.set_disabled(disabled)
 
     def set_disabled(self, disabled: bool) -> Self:
-        self._disabled = disabled
         self.attr_disabled = "" if disabled else None
         return self
 
@@ -383,27 +382,25 @@ class Option(Elem):
 
     @property
     def disabled(self) -> bool:
-        return self._disabled
+        return self.attr_disabled is not None
 
     @disabled.setter
     def disabled(self, disabled: bool) -> None:
         self.set_disabled(disabled)
 
     def set_disabled(self, disabled: bool) -> Self:
-        self._disabled = disabled
         self.attr_disabled = "" if disabled else None
         return self
 
     @property
     def hidden(self) -> bool:
-        return self._hidden
+        return self.attr_hidden is not None
 
     @hidden.setter
     def hidden(self, hidden: bool) -> None:
         self.set_hidden(hidden)
 
     def set_hidden(self, hidden: bool) -> Self:
-        self._hidden = hidden
         self.attr_hidden = "" if hidden else None
         return self
 
