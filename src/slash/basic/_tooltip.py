@@ -27,7 +27,7 @@ function show() {
     const left = Math.max(min_left, Math.min(max_left, box.left + (target.offsetWidth - elem.offsetWidth) / 2 + dx));
     elem.style.top  = `${top}px`;
     elem.style.left = `${left}px`;
-    tip.style.left = `${box.left + target.offsetWidth / 2 - left - 4}px`;
+    tip.style.left = `${box.left + target.offsetWidth / 2 - left - 4 + dx}px`;
 }
 
 function hide() { elem.style.display = "none"; }

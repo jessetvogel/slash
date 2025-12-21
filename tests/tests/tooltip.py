@@ -1,6 +1,6 @@
 from slash.basic import Tooltip
 from slash.core import Elem, Session
-from slash.html import Button, Code, Div, P, Span
+from slash.html import Button, Code, Dialog, Div, P, Span
 from slash.layout import Column, Row
 
 
@@ -29,11 +29,32 @@ def test_tooltip() -> Elem:
                 "This circle is not a circle.",
                 target=green,
             ),
-            button := Button("Button")
+            button_1 := Button("Button")
             .onclick(lambda: Session.require().log("I'm not angry, just disappointed..", level="warning"))
             .style({"border-radius": "100%", "width": "96px", "height": "96px"}),
-            Tooltip("Don't click this button!", target=button),
+            Tooltip("Don't click this button!", target=button_1),
+            button_2 := Button("💬")
+            .onclick(lambda: dialog.show_modal())
+            .style({"border-radius": "4px", "width": "48px", "height": "48px"}),
+            Tooltip("Please click me!", target=button_2),
         ).style({"gap": "16px", "align-items": "center"}),
+        dialog := Dialog(
+            Div(
+                close := Button("🏃‍♂️🚪").onclick(lambda: dialog.close()),
+                Tooltip(
+                    "Close dialog window",
+                    target=close,
+                ),
+            ).style(
+                {
+                    "display": "flex",
+                    "justify-content": "center",
+                    "align-items": "center",
+                    "width": "256px",
+                    "height": "256px",
+                }
+            )
+        ),
     )
 
 
