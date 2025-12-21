@@ -17,7 +17,7 @@ def test_icons() -> Elem:
                         Icon(icon),
                         Span(icon.capitalize()),
                     ]
-                    for icon in ["info", "warning", "error", "debug", "success", "loading", "moon", "sun"]
+                    for icon in ["info", "warning", "error", "debug", "success", "loading", "help", "moon", "sun"]
                 ]
             ).style(
                 {
