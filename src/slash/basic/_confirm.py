@@ -1,6 +1,15 @@
 from slash.core import Elem, Session
 from slash.html import Button, Dialog, Div
+from slash.js import JSFunction
 from slash.layout import Column, Row
+
+_JS_DELETE_ON_CLOSE = JSFunction(
+    ["id"],
+    """
+const elem = document.getElementById(id);
+elem.addEventListener('close', () => elem.remove());
+""",
+)
 
 
 async def confirm(message: str | Elem) -> bool:
@@ -29,6 +38,7 @@ async def confirm(message: str | Elem) -> bool:
         ).style({"gap": "16px"}),
     )
     dialog.mount().show_modal()
+    session.execute(_JS_DELETE_ON_CLOSE, [dialog.id])
     await session.flush()
 
     return await future
