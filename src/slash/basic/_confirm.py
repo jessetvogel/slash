@@ -28,16 +28,19 @@ async def confirm(message: str | Elem) -> bool:
         future.set_result(result)
         dialog.unmount()
 
-    dialog = Dialog(
-        Column(
-            Div(message),
-            Row(
-                Button("OK").onclick(lambda: set_result(True)),
-                Button("Cancel").onclick(lambda: set_result(False)),
-            ).style({"gap": "8px", "justify-content": "center"}),
-        ).style({"gap": "16px"}),
+    dialog = (
+        Dialog(
+            Column(
+                Div(message),
+                Row(
+                    Button("OK").onclick(lambda: set_result(True)),
+                    Button("Cancel").onclick(lambda: set_result(False)),
+                ).style({"gap": "8px", "justify-content": "center"}),
+            ).style({"gap": "16px"}),
+        )
+        .mount()
+        .show_modal()
     )
-    dialog.mount().show_modal()
     session.execute(_JS_DELETE_ON_CLOSE, [dialog.id])
     await session.flush()
 

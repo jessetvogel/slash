@@ -416,17 +416,20 @@ class Dialog(Elem):
     def __init__(self, *children: Children):
         super().__init__("dialog", *children)
 
-    def show(self) -> None:
+    def show(self) -> Self:
         """Show dialog modelessly using the ``HTMLDialogElement.show()`` JavaScript method."""
         Session.require().execute(_JS_DIALOG_SHOW, [self.id])
+        return self
 
-    def show_modal(self) -> None:
+    def show_modal(self) -> Self:
         """Show dialog as a modal using the ``HTMLDialogElement.showModal()`` JavaScript method."""
         Session.require().execute(_JS_DIALOG_SHOW_MODAL, [self.id])
+        return self
 
-    def close(self) -> None:
+    def close(self) -> Self:
         """Close the dialog using the ``HTMLDialogElement.close()`` JavaScript method."""
         Session.require().execute(_JS_DIALOG_CLOSE, [self.id])
+        return self
 
 
 class HTML(Elem):
