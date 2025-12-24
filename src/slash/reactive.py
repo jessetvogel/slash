@@ -61,12 +61,16 @@ class Signal(Generic[T]):
         """
         if value != self._value:
             self._value = value
-            for observer in self._observers:
-                run(observer)
+            self.trigger()
 
     def get(self) -> T:
         """Return the current value."""
         return get(self)
+
+    def trigger(self) -> None:
+        """Trigger all observers without changing the value."""
+        for observer in self._observers:
+            run(observer)
 
     def __call__(self) -> T:
         return self.get()
