@@ -25,6 +25,7 @@ def test_icons() -> Elem:
                         "success",
                         "loading",
                         "help",
+                        "refresh",
                         "moon",
                         "sun",
                         "trash",

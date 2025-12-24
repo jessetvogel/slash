@@ -10,8 +10,8 @@ class Icon(Elem):
 
     Args:
         icon: Icon type, such as :py:const:`info`, :py:const:`warning`, :py:const:`error`,
-            :py:const:`debug`, :py:const:`loading`, :py:const:`help`, :py:const:`moon`,
-            :py:const:`sun`, :py:const:`trash`.
+            :py:const:`debug`, :py:const:`loading`, :py:const:`help`, :py:const:`refresh`,
+            :py:const:`moon`, :py:const:`sun`, :py:const:`trash`.
     """
 
     def __init__(self, icon: str) -> None:
