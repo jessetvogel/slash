@@ -21,13 +21,17 @@ function show() {
         dx = window.scrollX;
         dy = window.scrollY;
     }
-    const top = box.top + dy - elem.offsetHeight - 8;
+    let flip = false;
+    let top = box.top + dy - elem.offsetHeight - 8;
+    if (top < 0) { top = box.bottom + dy + 8; flip = true; }
     const min_left = 4;
     const max_left = (c ? c.clientWidth : window.innerWidth) - elem.offsetWidth - 4;
     const left = Math.max(min_left, Math.min(max_left, box.left + (target.offsetWidth - elem.offsetWidth) / 2 + dx));
     elem.style.top  = `${top}px`;
     elem.style.left = `${left}px`;
     tip.style.left = `${box.left + target.offsetWidth / 2 - left - 4 + dx}px`;
+    if (flip) { tip.classList.add("top"); tip.classList.remove("bottom");
+    } else { tip.classList.add("bottom"); tip.classList.remove("top"); }
 }
 
 function hide() { elem.style.display = "none"; }

@@ -476,14 +476,22 @@
 
     .slash-tip {
         position: absolute;
-        bottom: -5px;
         left: calc(50% - 4px);
         width: 8px;
         height: 8px;
         background-color: var(--bg-light);
-        transform: rotate(45deg);
         border-right: 1px solid var(--border-muted);
         border-bottom: 1px solid var(--border-muted);
+
+        &.bottom {
+            bottom: -5px;
+            transform: rotate(45deg);
+        }
+
+        &.top {
+            top: -5px;
+            transform: rotate(225deg);
+        }
     }
 }
 

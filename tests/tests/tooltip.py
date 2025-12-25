@@ -40,15 +40,21 @@ def test_tooltip() -> Elem:
         ).style({"gap": "16px", "align-items": "center"}),
         dialog := Dialog(
             Div(
-                close := Button("🏃‍♂️🚪").onclick(lambda: dialog.close()),
+                close_top := Button("🏃‍♂️🚪").onclick(lambda: dialog.close()),
                 Tooltip(
                     "Close dialog window",
-                    target=close,
+                    target=close_top,
+                ),
+                close_bottom := Button("🚪🏃‍♂️‍➡️").onclick(lambda: dialog.close()),
+                Tooltip(
+                    "Also close dialog window",
+                    target=close_bottom,
                 ),
             ).style(
                 {
                     "display": "flex",
-                    "justify-content": "center",
+                    "flex-direction": "column",
+                    "justify-content": "space-between",
                     "align-items": "center",
                     "width": "256px",
                     "height": "256px",
