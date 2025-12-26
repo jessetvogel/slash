@@ -330,6 +330,15 @@ class Session:
         """
         self.send(Message("title", title=title))
 
+    def set_favicon(self, path: Path) -> None:
+        """Set favicon.
+
+        Args:
+            path: Path to favicon file.
+        """
+        url = self.share_file(path)
+        self.send(Message.update("slash-favicon", href=url))
+
     def add_stylesheet(self, path: Path) -> None:
         """Add stylesheet.
 

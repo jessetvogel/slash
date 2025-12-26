@@ -1,5 +1,9 @@
+import random
+from pathlib import Path
+
+from slash._server import PATH_PUBLIC
 from slash.core import Elem, Session
-from slash.html import H3, Code, Div, Input, P
+from slash.html import H3, Button, Code, Div, Input, P
 from slash.layout import Column
 
 
@@ -23,5 +27,18 @@ def test_session() -> Elem:
             ).style({"gap": "8px"}),
             H3("Document title"),
             Input(placeholder="Type new document title..").oninput(lambda event: session.set_title(event.value)),
+            H3("Favicon"),
+            Button("Update favicon").onclick(update_favicon),
         ),
     )
+
+
+def update_favicon() -> None:
+    path = [
+        Path(PATH_PUBLIC / "img/debug.png"),
+        Path(PATH_PUBLIC / "img/info.png"),
+        Path(PATH_PUBLIC / "img/warning.png"),
+        Path(PATH_PUBLIC / "img/error.png"),
+    ][int(4 * random.random())]
+
+    Session.require().set_favicon(path)
