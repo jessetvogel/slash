@@ -339,7 +339,7 @@ class Select(Elem, SupportsOnChange):
         if not all(isinstance(option, Option) for option in options):
             msg = "Children of `Select` must be of type `Option`"
             raise ValueError(msg)
-        self._value: str = options[0].value
+        self._value: str = options[0].value if options else ""
         self.onchange(self._handle_change)
 
     @property
