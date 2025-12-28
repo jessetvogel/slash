@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Literal, Self
+from collections.abc import Sequence
+from typing import Literal, Self, cast
 
 from slash._message import Message
 from slash.core import Attr, Children, Elem, Session
@@ -334,12 +335,15 @@ class Img(Elem):
 class Select(Elem, SupportsOnChange):
     """HTML ``<select>`` element."""
 
-    def __init__(self, options: list[Option]):
+    def __init__(self, *options: Option | Sequence[Option]):
         super().__init__("select", *options)
-        if not all(isinstance(option, Option) for option in options):
-            msg = "Children of `Select` must be of type `Option`"
-            raise ValueError(msg)
-        self._value: str = options[0].value if options else ""
+        for option in options:
+            if not isinstance(option, Option) and not (
+                isinstance(option, Sequence) and all(isinstance(x, Option) for x in option)
+            ):
+                msg = "Children of `Select` must be of type `Option`"
+                raise ValueError(msg)
+        self._value: str = cast(Option, self.children[0]).value if self.children else ""
         self.onchange(self._handle_change)
 
     @property
