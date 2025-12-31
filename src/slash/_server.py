@@ -24,6 +24,7 @@ ALLOWED_MIME_TYPES = {
     ".png": "image/png",
     ".ttf": "font/ttf",
     ".txt": "plain/txt",
+    ".json": "application/json",
 }
 
 
