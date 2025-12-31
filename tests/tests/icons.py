@@ -30,6 +30,7 @@ def test_icons() -> Elem:
                         "sun",
                         "trash",
                         "cancel",
+                        "download",
                     ]
                 ]
             ).style(

@@ -1,27 +1,27 @@
 from pathlib import Path
 
+from slash.basic._icon import Icon
 from slash.core import Elem, Session
+from slash.html import Button
 
 
 class Download(Elem):
     """Download button element.
 
     Args:
-        file: Path to file to download.
+        path: Path to file to download.
         text: Text shown on the button.
     """
 
-    def __init__(self, file: Path, *, text: str = "Download") -> None:
-        super().__init__("a", text)
-        self.set_attr("download", file.name)
+    def __init__(self, path: Path, *, text: str = "Download") -> None:
+        super().__init__("a")
+        self._path = path
+
+        self.append(Button(Icon("download"), text).style({"display": "inline-flex", "gap": "4px"}))
+        self.set_attr("download", path.name)
         self.add_class("slash-download")
-
-        self._file = file
-
         self.onmount(self._setup_download)
 
     def _setup_download(self) -> None:
-        session = Session.require()
-
-        url = session.share_file(self._file)
+        url = Session.require().share_file(self._path)
         self.set_attr("href", url)
