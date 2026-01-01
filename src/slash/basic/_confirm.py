@@ -12,11 +12,13 @@ elem.addEventListener('close', () => elem.remove());
 )
 
 
-async def confirm(message: str | Elem) -> bool:
+async def confirm(message: str | Elem, *, ok_text: str = "OK", cancel_text: str = "Cancel") -> bool:
     """Display confirmation dialog.
 
     Args:
         message: Message to display in the confirmation dialog.
+        ok_text: Text to display on the *OK* button.
+        cancel_text: Text to display on the *Cancel* button.
 
     Returns:
         Boolean indicating whether OK (`True`) or Cancel (`False`) was selected.
@@ -33,8 +35,8 @@ async def confirm(message: str | Elem) -> bool:
             Column(
                 Div(message),
                 Row(
-                    Button("OK").onclick(lambda: set_result(True)),
-                    Button("Cancel").onclick(lambda: set_result(False)),
+                    Button(ok_text).onclick(lambda: set_result(True)),
+                    Button(cancel_text).onclick(lambda: set_result(False)),
                 ).style({"gap": "8px", "justify-content": "center"}),
             ).style({"gap": "16px"}),
         )
