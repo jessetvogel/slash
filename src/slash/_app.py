@@ -131,10 +131,9 @@ class App:
             await session.flush()
 
     async def _handle_ws_disconnect(self, client: Client) -> None:
-        # Forget session corresponding to client ...
+        # Forget session corresponding to client and call on disconnect method
         session = self._sessions.pop(client.id)
-        # ... and cancel all its tasks
-        session.cancel_tasks("client disconnected")
+        session._on_disconnect()
 
     def _handle_data_message(self, client: Client, message: Message) -> None:
         """Handle data event."""

@@ -53,6 +53,8 @@ class Session:
 
         self._mounted_elems: dict[str, Elem] = {}  # elements that client already has
         self._functions: set[str] = set()  # functions that client already has
+        self._files: list[str] = []  # urls of files that are currently shared
+        self._upload_callbacks: list[str] = []  # urls of endpoints that accept file uploads
         self._root: Elem | None = None
 
         self._location = Location("")
@@ -196,11 +198,13 @@ class Session:
         # Host files
         for url, path in self._queue_files:
             self._server.share_file(url, path)
+            self._files.append(url)
         self._queue_files = []
 
         # Set upload callbacks
         for url, callback in self._queue_upload_callbacks:
             self._server.accept_file(url, callback)
+            self._upload_callbacks.append(url)
         self._queue_upload_callbacks = []
 
         # Send all messages (including flush event)
@@ -222,7 +226,7 @@ class Session:
         Returns:
             URL from which the file can be accessed.
         """
-        url = f"/tmp/{random_id()}"
+        url = f"/file/{random_id()}"
         self._queue_files.append((url, path))
         return url
 
@@ -389,6 +393,16 @@ class Session:
             Data entry value.
         """
         return self._client.localstorage_get(key)
+
+    def _on_disconnect(self) -> None:
+        # Cancel all tasks
+        self.cancel_tasks("client disconnected")
+        # Unshare all files
+        for url in self._files:
+            self._server.unshare_file(url)
+        # Unaccept all uploads
+        for url in self._upload_callbacks:
+            self._server.unaccept_file(url)
 
 
 # Attributes

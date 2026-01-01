@@ -310,7 +310,12 @@ class Server:
             return web.Response(status=status, content_type=mime_type, body=file.read())
 
     def share_file(self, url: str, path: Path) -> None:
+        """Share file at `path` at the given `url`."""
         self._files[url] = path
+
+    def unshare_file(self, url: str) -> None:
+        """Unshare file that is currently shared at `url`."""
+        self._files.pop(url, None)
 
     def accept_file(self, url: str, callback: Callable[[UploadEvent], None]) -> None:
         if not self._enable_upload:
@@ -318,3 +323,6 @@ class Server:
                 "File uploading is disabled. To enable file uploading, set `enable_upload` to `True` in `App`."
             )
         self._upload_callbacks[url] = callback
+
+    def unaccept_file(self, url: str) -> None:
+        self._upload_callbacks.pop(url, None)
