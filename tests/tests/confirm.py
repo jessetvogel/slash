@@ -6,7 +6,11 @@ from slash.layout import Column
 
 def test_confirm() -> Elem:
     async def delete_circle() -> None:
-        if await confirm("Are you sure you want to delete the circle?"):
+        if await confirm(
+            "Are you sure you want to delete the circle?",
+            ok_text="Yes, definitely",
+            cancel_text="No, rather not",
+        ):
             circle.unmount()
             button.disabled = True
 
