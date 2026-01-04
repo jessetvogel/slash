@@ -448,8 +448,8 @@
         width: 8px;
         height: 8px;
         background-color: var(--bg-light);
-        border-right: 1px solid var(--border-muted);
-        border-bottom: 1px solid var(--border-muted);
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
 
         &.bottom {
             bottom: -5px;
