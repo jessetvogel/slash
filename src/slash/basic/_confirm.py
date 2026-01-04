@@ -37,7 +37,7 @@ async def confirm(message: str | Elem, *, ok_text: str = "OK", cancel_text: str 
                 Row(
                     Button(ok_text).onclick(lambda: set_result(True)),
                     Button(cancel_text).onclick(lambda: set_result(False)),
-                ).style({"gap": "8px", "justify-content": "center"}),
+                ).style({"gap": "16px", "justify-content": "center"}),
             ).style({"gap": "16px"}),
         )
         .mount()
