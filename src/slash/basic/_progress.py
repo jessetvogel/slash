@@ -11,8 +11,9 @@ class Progress(Elem):
     """
 
     def __init__(self, value: float = 0.0, text: str | None = None):
-        super().__init__("div", Span())
+        super().__init__("div", span := Span())
         self.add_class("slash-progress")
+        self._span = span
         self._value = value
         self._text = text
         self.onmount(lambda _: self._update())
@@ -26,8 +27,8 @@ class Progress(Elem):
         self._text = text
         self._update()
 
-    def _update(self):
+    def _update(self) -> None:
         percentage = int(self._value * 100)
         self.style({"--value": f"{percentage}%"})
-        self.children[0].text = self._text if self._text is not None else f"{percentage}%"
+        self._span.text = self._text if self._text is not None else f"{percentage}%"
         (self.add_class if self._value == 1.0 else self.remove_class)("completed")

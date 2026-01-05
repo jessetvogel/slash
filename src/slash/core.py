@@ -701,8 +701,8 @@ class Elem:
             children: Child or children to append. Either an element, string or list of elements and strings.
         """
         for child in children:
-            if isinstance(child, list):
-                self.append(*child)
+            if isinstance(child, Sequence):
+                self.append(*child)  # ty: ignore[invalid-argument-type]
             elif isinstance(child, Elem) or isinstance(child, str):
                 self._append_or_insert_elem(child)
             else:
@@ -718,8 +718,8 @@ class Elem:
         """
         offset = 0
         for child in children:
-            if isinstance(child, list):
-                self.insert(position + offset, *child)
+            if isinstance(child, Sequence):
+                self.insert(position + offset, *child)  # ty: ignore[invalid-argument-type]
                 offset += len(child)
             elif isinstance(child, Elem) or isinstance(child, str):
                 self._append_or_insert_elem(child, position=position + offset)

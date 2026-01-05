@@ -43,7 +43,7 @@ def test_dom() -> Elem:
     )
 
 
-def circle(color: str) -> None:
+def circle(color: str) -> Div:
     return Div().style(
         {
             "background-color": color,

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from ssl import SSLContext
 from types import MappingProxyType
-from typing import Callable
+from typing import Callable, cast
 
 from aiohttp import BodyPartReader, WSCloseCode, WSMsgType, web
 
@@ -14,7 +14,7 @@ import slash
 from slash._logging import LOGGER
 from slash._utils import random_id
 
-PATH_PUBLIC = Path(slash.__file__).resolve().parent / "public"
+PATH_PUBLIC = Path(cast(str, slash.__file__)).resolve().parent / "public"
 PATH_TMP = Path("./__slash_tmp__")
 
 ALLOWED_MIME_TYPES = {

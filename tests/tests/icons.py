@@ -11,7 +11,7 @@ def test_icons() -> Elem:
         P("This page tests the ", Code("Icon"), " element."),
         Panel(
             Div(
-                [
+                *[
                     [
                         Div(Icon(icon)).style({"width": "24px", "height": "24px", "background-color": "var(--gray)"}),
                         Icon(icon),

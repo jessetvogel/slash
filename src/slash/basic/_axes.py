@@ -4,6 +4,7 @@ import math
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from numbers import Real
 from typing import Self
 
 from slash._utils import default_color
@@ -476,9 +477,9 @@ class Axes(SVG):
     def set_xticks(self, xticks: Sequence[float | tuple[float, str]] | None) -> Self:
         self._xticks: list[tuple[float, str]] | None
         if xticks is not None:
-            x_values = [x if isinstance(x, float) else x[0] for x in xticks]
+            x_values = [x if isinstance(x, Real) else x[0] for x in xticks]
             decimals = self._decimals_from_interval(min(abs(x2 - x1) for x1, x2 in zip(x_values, x_values[1:])))
-            self._xticks = [(x, f"{x:.{decimals}f}") if isinstance(x, float) else x for x in xticks]
+            self._xticks = [(x, f"{x:.{decimals}f}") if isinstance(x, Real) else x for x in xticks]  # ty: ignore[invalid-assignment]
         else:
             self._xticks = None
         return self
@@ -498,9 +499,9 @@ class Axes(SVG):
     def set_yticks(self, yticks: Sequence[float | tuple[float, str]] | None) -> Self:
         self._yticks: list[tuple[float, str]] | None
         if yticks is not None:
-            y_values = [y if isinstance(y, float) else y[0] for y in yticks]
+            y_values = [y if isinstance(y, Real) else y[0] for y in yticks]
             decimals = self._decimals_from_interval(min(abs(y2 - y1) for y1, y2 in zip(y_values, y_values[1:])))
-            self._yticks = [(y, f"{y:.{decimals}f}") if isinstance(y, float) else y for y in yticks]
+            self._yticks = [(y, f"{y:.{decimals}f}") if isinstance(y, Real) else y for y in yticks]  # ty: ignore[invalid-assignment]
         else:
             self._yticks = None
         return self

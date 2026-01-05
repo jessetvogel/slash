@@ -22,5 +22,5 @@ def test_errors() -> Elem:
         P("This page tests that exceptions in callbacks are catched correctly."),
         Button("Raise error in callback").onclick(raise_error),
         Button("Raise error in async callback").onclick(raise_error_async),
-        Button("Raise error due to invalid callback").onclick(invalid_callback),
+        Button("Raise error due to invalid callback").onclick(invalid_callback),  # ty: ignore[invalid-argument-type]
     ).style({"gap": "16px"})

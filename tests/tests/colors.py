@@ -34,7 +34,7 @@ def test_colors() -> Elem:
     ).style({"align-items": "center"})
 
 
-def circle(color: str) -> None:
+def circle(color: str) -> Div:
     return Div().style(
         {
             "background-color": color,
