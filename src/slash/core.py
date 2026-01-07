@@ -701,10 +701,10 @@ class Elem:
             children: Child or children to append. Either an element, string or list of elements and strings.
         """
         for child in children:
-            if isinstance(child, Sequence):
-                self.append(*child)  # ty: ignore[invalid-argument-type]
-            elif isinstance(child, Elem) or isinstance(child, str):
+            if isinstance(child, Elem) or isinstance(child, str):
                 self._append_or_insert_elem(child)
+            elif isinstance(child, Sequence):
+                self.append(*child)  # ty: ignore[invalid-argument-type]
             else:
                 raise TypeError(f"Expected child of type `Elem` or `str`, but got `{type(child)}`")
         return self
@@ -718,12 +718,12 @@ class Elem:
         """
         offset = 0
         for child in children:
-            if isinstance(child, Sequence):
-                self.insert(position + offset, *child)  # ty: ignore[invalid-argument-type]
-                offset += len(child)
-            elif isinstance(child, Elem) or isinstance(child, str):
+            if isinstance(child, Elem) or isinstance(child, str):
                 self._append_or_insert_elem(child, position=position + offset)
                 offset += 1
+            elif isinstance(child, Sequence):
+                self.insert(position + offset, *child)  # ty: ignore[invalid-argument-type]
+                offset += len(child)
             else:
                 raise TypeError(f"Object of type {type(child)} cannot be inserted")
         return self

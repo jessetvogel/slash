@@ -1,5 +1,6 @@
 import functools
 from numbers import Real
+from types import MappingProxyType
 from typing import Any, Literal, Mapping, Self, Sequence, TypeAlias
 
 from slash.core import Elem
@@ -12,14 +13,24 @@ class DataTable(Elem):
     """Table for displaying rows of data.
 
     Args:
-        keys: Sequence of column headings.
+        keys: Sequence of keys for the columns.
+        labels: Mapping of labels to be used as column header indexed by column keys.
+            If :py:const:`None`, or if a key is missing, the key itself is used as the
+            column header.
         max_rows: Maximum number of rows displayed at once.
     """
 
-    def __init__(self, keys: Sequence[str], *, max_rows: int = 10) -> None:
+    def __init__(
+        self,
+        keys: Sequence[str],
+        *,
+        labels: Mapping[str, str | Elem] | None = None,
+        max_rows: int = 10,
+    ) -> None:
         super().__init__("div")
         self.add_class("slash-data-table")
         self._keys = list(keys)
+        self._labels = {} if labels is None else dict(labels)
         self._max_rows = max_rows
 
         self._table = Elem("table").style({"width": "100%"})
@@ -44,6 +55,19 @@ class DataTable(Elem):
         self._sort_key: str | None
 
         self._init_table()
+
+    @property
+    def labels(self) -> Mapping[str, str | Elem]:
+        return MappingProxyType(self._labels)
+
+    @labels.setter
+    def labels(self, labels: Mapping[str, str | Elem] | None) -> None:
+        self.labels = labels
+
+    def set_labels(self, labels: Mapping[str, str | Elem] | None) -> Self:
+        self._labels = {} if labels is None else dict(labels)
+        self._init_table()
+        return self
 
     @property
     def max_rows(self) -> int:
@@ -186,7 +210,9 @@ class DataTable(Elem):
         # Table header
         self._table_header = Tr(
             [
-                Th(Label().add_class("sort"), key).onclick(lambda event: self._set_sort_key(event.target.children[1]))
+                Th(Label().add_class("sort"), self.labels.get(key, key)).onclick(
+                    lambda event: self._set_sort_key(event.target.children[1])
+                )
                 for key in self._keys
             ]
         )
