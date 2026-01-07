@@ -211,7 +211,7 @@ class DataTable(Elem):
         self._table_header = Tr(
             [
                 Th(Label().add_class("sort"), self.labels.get(key, key)).onclick(
-                    lambda event: self._set_sort_key(event.target.children[1])
+                    lambda _, key=key: self._set_sort_key(key)
                 )
                 for key in self._keys
             ]
