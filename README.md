@@ -35,7 +35,7 @@ def home():
 
 if __name__ == "__main__":
     app = App()
-    app.add_endpoint("/", home)
+    app.add_route("/", home)
     app.run()
 ```
 
