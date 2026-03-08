@@ -346,6 +346,16 @@ class Axes(SVG):
         )
         return u, v
 
+    def _uv_to_xy(self, u: float, v: float) -> tuple[float, float]:
+        """Convert SVG uv-coordinates to abstract xy-coordinates."""
+        x = self._view.x_min + (self._view.x_max - self._view.x_min) * (u - self._view.u_min) / (
+            self._view.u_max - self._view.u_min
+        )
+        y = self._view.y_min + (self._view.y_max - self._view.y_min) * (v - self._view.v_min) / (
+            self._view.v_max - self._view.v_min
+        )
+        return x, y
+
     def _update_ticks(self) -> None:
         if not hasattr(self, "_svg_ticks"):
             self._svg_ticks = SVGElem(
