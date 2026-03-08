@@ -603,11 +603,18 @@ class Scatter(Plot):
         label: Label to be used in the legend.
     """
 
+    color: str | list[str] | None = None
+
     def plot(self, frame: SVGElem, xy_to_uv: Callable[[float, float], tuple[float, float]]):
-        circles = SVGElem("g", fill=self.color, opacity=str(self.opacity))
-        for x, y in zip(self.xs, self.ys):
+        circles = SVGElem("g", opacity=str(self.opacity))
+        if isinstance(self.color, str):
+            circles.set_attr("fill", self.color)
+        for i, (x, y) in enumerate(zip(self.xs, self.ys)):
             u, v = xy_to_uv(x, y)
-            circles.append(SVGElem("circle", cx=u, cy=v, r=3))
+            circle = SVGElem("circle", cx=u, cy=v, r=3)
+            if isinstance(self.color, list):
+                circle.set_attr("fill", self.color[i])
+            circles.append(circle)
         frame.append(circles)
 
 
